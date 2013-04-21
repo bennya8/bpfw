@@ -30,7 +30,7 @@ e) VHOST-TGBUSER | PHP 5.2.10 / Microsoft-IIS 6.0 / MySQL5.0+
 
 ## 版本历史
 
-Build 1.0.0 r407 2013-04-23 00:50 AM
+Build 1.0.0 r410 2013-04-22
 
 a) 使用PHP5中SPL的动态加载特性，减少重复引入类文件带来的系统开销
 
