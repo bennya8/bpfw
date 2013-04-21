@@ -4,21 +4,19 @@ BPFW 框架
 ## 框架简述
 BPFW是遵从MVC架构和纯OOP风格开发的轻量级PHP框架，出于深入学习框架架构目的而编写，日后会不断更新改进，不断完善功能。
 
-(www.i3code.org)
-
-项目目前由[Benny](http://www.i3code.org)开发、更新及维护。
+项目目前由[Benny](http://www.i3code.org) @ (www.i3code.org) 开发、更新及维护。
 
 E-mail : benny_a8@live.com 
 
 欢迎申请合作者身份共同维护，或用Pull Request进行更新改进。
 
-## 使用说明与文档
-待更新
+## 在线文档
+(https://bpfw.i3code.com)
 
 ## BUG汇报地址
 (https://github.com/bennya8/i3code_bpfw/issues)
 
-## 已通过测试的运行环境
+## 已通过测试环境
 
 a) PC Windows 7 | PHP 5.3.13 / Apache 2.2.22/ MySQL 5.5.42
 
@@ -33,6 +31,7 @@ e) VHOST-TGBUSER | PHP 5.2.10 / Microsoft-IIS 6.0 / MySQL5.0+
 ## 版本历史
 
 Build 1.0.0 r407 2013-04-23 00:50 AM
+
 a) 使用PHP5中SPL的动态加载特性，减少重复引入类文件带来的系统开销
 
 b) 使用工厂模式和单例模式，减少创建对象时的系统开销，支持多种数据库驱动
