@@ -11,7 +11,7 @@ E-mail : benny_a8@live.com
 欢迎申请合作者身份共同维护，或用Pull Request进行更新改进。
 
 ## 在线文档
-(https://bpfw.i3code.com)
+(http://www.i3code.org/bpfw-php-doc)
 
 ## BUG汇报地址
 (https://github.com/bennya8/i3code_bpfw/issues)
