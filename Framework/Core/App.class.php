@@ -7,7 +7,6 @@ require SYS_PATH . DS . 'Core/Base.class.php';
  * @author Benny <benny_a8@live.com>
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * @version Release: @package_version@
  */
 class App extends Base
 {
@@ -17,7 +16,7 @@ class App extends Base
 	 * @access public
 	 * @var string
 	 */
-	public $version = 'Build 1.0.0 r407';
+	public static $version = 'Build 1.0.0 r411';
 
 	/**
 	 * 系统入口

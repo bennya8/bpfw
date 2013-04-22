@@ -197,7 +197,7 @@ class Model extends Base implements DB_Dao
 	 */
 	public function execute($sql)
 	{
-		return $this->db->execute($sql);
+		return $this->db->execute($sql); 
 	}
 
 	/**
