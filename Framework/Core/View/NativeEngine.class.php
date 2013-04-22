@@ -2,7 +2,7 @@
 
 /**
  * PHP原生引擎实现类
- * @package Root.Framework.Core.Action
+ * @package Root.Framework.Core.View
  * @author Benny <benny_a8@live.com>
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
