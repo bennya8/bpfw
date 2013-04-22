@@ -24,13 +24,12 @@ return array(
 	/* 运行状态相关 */
 	'_PHP5_ABOVE_REQUIRED_' => '运行环境需要PHP5以上',
 	'_TIMEZONE_ERROR_' => '时区设定错误',
-						
 	'_CLASS_NOT_FOUND_' => '没有找到该类',
 	'_GET_PROPERTY_DENIED_' => '属性不存在或没有访问权限',
 	'_SET_PROPERTY_DENIED_' => '属性不存在或没有设定权限',
-	'_CALL_METHOD_DENIED_' => '方法不存在或没有访问权限',
-	'_CALL_METHOD_NOT_FOUND_' => '方法不存在',
-						
+	'_CALL_NO_EXIST_METHOD_' => '访问方法不存在',
+	'_CALL_METHOD_DENIED_' => '访问方法不存在 或 没有访问权限',
+	'_CALL_PRIVATE_PROTECTED_METHOD_' => '访问受保护方法 或 私有方法',
 	
 	'_CONTROLLER_NOT_FOUND_' => '没有找到该控制器',
 	'_ACTION_NOT_FOUND_' => '没有找到该行为',
@@ -40,11 +39,11 @@ return array(
 	/* 数据库相关 */
 	'_MYSQL_MODULE_NO_EXIST_' => 'MySQL模块没有安装',
 	'_MYSQLI_MODULE_NO_EXIST_' => 'MySQLi模块没有安装',
+	'_PDO_MYSQL_MODULE_MISSING_' => 'PDO:MySQL模块没有安装',
 	'_MYSQL_CONNECT_FAIL_' => 'MySQL连接失败',
 	'_MYSQL_SELECTDB_FAIL_' => 'MySQL选择数据库出错',
 	'_MYSQL_SETCHARSET_FAIL_' => 'MySQL设定字符集出错',
-	'_MYSQL_SQL_ERROR_' => 'SQL语句出错',
-	'_PDO_MYSQL_MODULE_MISSING_' => 'PDO:MySQL模块没有安装'
+	'_MYSQL_SQL_ERROR_' => 'SQL执行出错',
 );
 
 ?>
