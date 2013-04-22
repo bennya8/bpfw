@@ -269,12 +269,21 @@ class Model extends Base implements DB_Dao
 	/**
 	 * 获取最新一次SQL错误信息
 	 * @access public
-	 * @return array SQL错误信息
-	 * @see DB_MySQL::lastError();
+	 * @return string SQL错误信息
 	 */
-	public function lastError()
+	public function getError()
 	{
-		return $this->db->lastError();
+		return $this->db->getError();
+	}
+
+	/**
+	 * 获取SQL错误信息列表
+	 * @access public
+	 * @return array SQL错误信息列表
+	 */
+	public function getErrorList()
+	{
+		return $this->db->getErrorList();
 	}
 
 	/**
@@ -350,22 +359,18 @@ class Model extends Base implements DB_Dao
 			$reflectClass = App::Create('ReflectionClass', $this->db);
 			if ($reflectClass->hasMethod($name)) {
 				$method = $reflectClass->getMethod($name);
-				if ($method->isProtected()) {
+				if ($method->isProtected() || $method->isPrivate()) {
 					throw new BException(
-							Config::Lang('_METHOD_DENIED_') . ' => Class:' . get_class($this->db) .
-									 '->db->' . $name . '()');
-				} else if ($method->isPrivate()) {
-					throw new BException(
-							Config::Lang('_METHOD_DENIED_') . ' => Class:' . get_class($this->db) .
-									 '->db->' . $name . '()');
+							Config::Lang('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' .
+									 get_class($this->db) . ' Method: ' . $name . '()');
 				} else {
 					return $method->invokeArgs($this->db, $args);
 				}
 			}
 		} else {
 			throw new BException(
-					Config::Lang('_CALL_METHOD_DENIED_') . ' => Class:' . get_class($this) . '->db->' .
-							 $name . '()');
+					Config::Lang('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' .
+							 get_class($this->db) . ' Method: ' . $name . '()');
 		}
 	}
 }
