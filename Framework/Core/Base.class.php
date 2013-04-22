@@ -173,32 +173,37 @@ class Base
 	{}
 
 	/**
-	 * 魔术方法，访问受保护参数时友好提示
+	 * 魔术方法，设定受保护函数时防止发生终止错误，只在开发模式抛出异常
 	 * @access public
-	 * @param string $key
-	 * @throws BException 访问出错
 	 * @return void
 	 */
 	public function __get($key)
 	{
-		throw new BException('Class:' . get_class($this) . '->' . $key);
+		if (SYS_DEBUG) {
+			throw new BException(
+					Config::Lang('_GET_PROPERTY_DENIED_') . ' => Class: ' . get_class($this) .
+							 ' Propertiy: ' . $key);
+		}
 	}
 
 	/**
-	 * 魔术方法，设定受保护参数时友好提示
+	 * 魔术方法，设定受保护函数防止发生终止错误，只在开发模式抛出异常
 	 * @access public
-	 * @param string $key
-	 * @param mixed $value
-	 * @throws BException 访问出错
 	 * @return void
 	 */
 	public function __set($key, $value)
 	{
-		throw new BException('Class:' . get_class($this) . '->' . $key . '=' . $value);
+		if (SYS_DEBUG) {
+			throw new BException(
+					Config::Lang('_SET_PROPERTY_DENIED_') . ' => Class: ' . get_class($this) .
+							 ' Propertiy: ' . $key . '->' . $value);
+		}
 	}
 
 	/**
-	 * 魔术方法，设定受保护函数时友好提示
+	 * 魔术方法，设定受保护函数防止发生终止错误
+	 * 调用不存在函数时尝试抛出错误信息，顶层捕获后，
+	 * 根据环境需要作出是否显示或记录日志
 	 * @access public
 	 * @param string $name 调用方法名
 	 * @param mixed $args 调用参数
@@ -207,7 +212,9 @@ class Base
 	public function __call($name, $args)
 	{
 		if (!method_exists($this, $name)) {
-			throw new BException('Class:' . get_class($this) . '->' . $name . '()');
+			throw new BException(
+					Config::Lang('_CALL_METHOD_DENIED_') . ' => Class: ' . get_class($this) .
+							 ' Method: ' . $name . '()');
 		}
 	}
 }
