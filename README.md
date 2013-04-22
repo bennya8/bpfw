@@ -16,6 +16,25 @@ E-mail : benny_a8@live.com
 ## BUG汇报地址
 (https://github.com/bennya8/i3code_bpfw/issues)
 
+## 编码规范
+所有变量、属性、函数、方法名均使用驼峰法命名。
+
+类名均为首字母大写标识，
+
+如：IndexAction.class.php
+
+静态方法名首字母均用大写标识。
+
+如：static function ReadFile();
+
+私有属性、私有静态变量名前已加 _ (下划线) 作为标识。
+
+如：private static $_PrivateProperty / private static function $_PrivateMethod();
+
+私有方法、私有静态方法名前已加 _ (下划线) 作为标识。
+
+普通变量、普通函数，如：$isTest  /  function checkIsTest();
+
 ## 已通过测试环境
 
 a) PC Windows 7 | PHP 5.3.13 / Apache 2.2.22/ MySQL 5.5.42
