@@ -54,13 +54,14 @@ class DB_MySQL extends DB implements DB_Dao
 
 	/**
 	 * 获取数据库连接
+	 * @access public
 	 * @param string $host IP地址
 	 * @param string $port 端口号
 	 * @param string $user 用户名
 	 * @param string $password 密码
 	 * @return boolean
 	 */
-	private function getConnect($host, $port, $user, $password)
+	public function getConnect($host, $port, $user, $password)
 	{
 		if (!function_exists('mysql_connect')) {
 			throw new BException(Config::Lang('_MYSQL_MODULE_NO_EXIST_'));
