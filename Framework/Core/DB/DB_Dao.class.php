@@ -80,8 +80,13 @@ interface DB_Dao
 	public function lastInsertId();
 
 	/**
-	 * 获取最新一次SQL错误信息
+	 * 获取最新一条SQL错误信息
 	 */
-	public function lastError();
+	public function getError();
+	
+	/**
+	 * 获取SQL错误信息列表
+	 */
+	public function getErrorList();
 }
 ?>
