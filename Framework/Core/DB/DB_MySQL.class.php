@@ -25,11 +25,11 @@ class DB_MySQL extends DB implements DB_Dao
 	private $_lastQueryTimes = 0;
 	
 	/**
-	 * SQL错误信息集
+	 * SQL错误信息列表
 	 * @access public
 	 * @var array
 	 */
-	private $_lastError = array();
+	private $_errorList = array();
 	
 	/**
 	 * 数据库配置
@@ -52,6 +52,10 @@ class DB_MySQL extends DB implements DB_Dao
 		$this->setCharset($this->_config['DB_CHARSET']);
 	}
 
+	public function __destruct(){
+		mysql_close($this->_resource);
+	}
+	
 	/**
 	 * 获取数据库连接
 	 * @access public
@@ -138,9 +142,10 @@ class DB_MySQL extends DB implements DB_Dao
 	public function execute($sql)
 	{
 		if (!$result = mysql_query($sql, $this->_resource)) {
-			$this->_queryError = mysql_error();
+			$this->_errorList = mysql_error();
 			return false;
 		}
+		mysql_freeresult($result);
 		return $this->getAffectedRows();
 	}
 
@@ -153,12 +158,13 @@ class DB_MySQL extends DB implements DB_Dao
 	public function query($sql)
 	{
 		if (!$result = mysql_query($sql, $this->_resource)) {
-			$this->_queryError = mysql_error();
+			$this->_errorList = mysql_error();
 			return false;
 		}
 		while ($row = mysql_fetch_assoc($result)) {
 			$list[] = $row;
 		}
+		mysql_freeresult($result);
 		$this->_lastQueryTimes++;
 		return $list;
 	}
@@ -226,11 +232,21 @@ class DB_MySQL extends DB implements DB_Dao
 	/**
 	 * 获取最新一次SQL错误信息
 	 * @access public
-	 * @return array SQL错误信息
+	 * @return string SQL错误信息
 	 */
-	public function lastError()
+	public function getError()
 	{
-		return $this->_lastError;
+		return array_pop($this->_errorList);
+	}
+	
+	/**
+	 * 获取SQL错误信息列表
+	 * @access public
+	 * @return array SQL错误信息列表
+	 */
+	public function getErrorList()
+	{
+		return $this->_errorList;
 	}
 }
 ?>
