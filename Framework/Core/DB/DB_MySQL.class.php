@@ -142,11 +142,11 @@ class DB_MySQL extends DB implements DB_Dao
 	public function execute($sql)
 	{
 		if (!$result = mysql_query($sql, $this->_resource)) {
-			$this->_errorList = mysql_error();
+			$this->_errorList[] = mysql_error();
 			return false;
 		}
 		mysql_freeresult($result);
-		return $this->getAffectedRows();
+		return $this->lastAffectedRows();
 	}
 
 	/**
@@ -158,7 +158,7 @@ class DB_MySQL extends DB implements DB_Dao
 	public function query($sql)
 	{
 		if (!$result = mysql_query($sql, $this->_resource)) {
-			$this->_errorList = mysql_error();
+			$this->_errorList[] = mysql_error();
 			return false;
 		}
 		while ($row = mysql_fetch_assoc($result)) {
