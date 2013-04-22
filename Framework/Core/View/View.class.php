@@ -240,22 +240,22 @@ class View extends Base
 	 */
 	public function __call($name, $args)
 	{
-		if (method_exists($this->_viewEngine, $name)) {
+		if (method_exists($this->db, $name)) {
 			$reflectClass = App::Create('ReflectionClass', $this->_viewEngine);
 			if ($reflectClass->hasMethod($name)) {
 				$method = $reflectClass->getMethod($name);
-				if ($method->isProtected()) {
+				if ($method->isProtected() || $method->isPrivate()) {
 					throw new BException(
-							Config::Lang('_METHOD_DENIED_') . ' => Class:' .
-									 get_class($this->_viewEngine) . '->' . $name . '()');
-				} else if ($method->isPrivate()) {
-					throw new BException(
-							Config::Lang('_METHOD_DENIED_') . ' => Class:' .
-									 get_class($this->_viewEngine) . '->' . $name . '()');
+							Config::Lang('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' .
+									 get_class($this->_viewEngine) . ' Method: ' . $name . '()');
 				} else {
-					$method->invokeArgs($this->_viewEngine, $args);
+					return $method->invokeArgs($this->_viewEngine, $args);
 				}
 			}
+		} else {
+			throw new BException(
+					Config::Lang('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' .
+							 get_class($this->_viewEngine) . ' Method: ' . $name . '()');
 		}
 	}
 }
