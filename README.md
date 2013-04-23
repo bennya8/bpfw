@@ -17,7 +17,7 @@ E-mail : benny_a8@live.com
 (https://github.com/bennya8/i3code_bpfw/issues)
 
 ## 代码格式化
-已严格按照Zend2标准进行格式化，提高可阅读性
+严格按照Zend2标准进行格式化，提高代码可阅读性
 
 ## 编码规范
 
