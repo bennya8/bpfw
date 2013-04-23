@@ -80,5 +80,4 @@ d) URL_REWRITE模块
 e) RBAC类
 
 ## 关于框架命名
-就是英语中Benny Production of Framework的缩写！
-初版框架，纪念意义大于一切！：）
+就是英语中Benny Production of Framework的缩写！意义重大！：）
