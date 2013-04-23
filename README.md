@@ -69,7 +69,7 @@ f) 引入了Bootstrap前端框架
 
 ## 未来更新
 
-a) PDO类
+a) PDO类 √
 
 b) 关系模型
 
