@@ -9,6 +9,7 @@
  */
 class DB extends Base
 {
+
 	/**
 	 * 数据库工厂，(单例模式)
 	 * @access public
@@ -19,19 +20,13 @@ class DB extends Base
 	{
 		switch ($name) {
 			case 'MySQLi':
-				return parent::Create('DB_MySQLi');
+				return parent::Create('DB_MySQLi', Config::Conf('DB_CONFIG'));
 				break;
-			case 'PDO:MySQL':
-				return parent::Create('DB_PDO_MySQL');
-				break;
-			case 'PDO:SQLite':
-				return parent::Create('DB_PDO_SQLite');
-				break;
-			case 'PDO:Oracle':
-				return parent::Create('DB_PDO_Oracle');
+			case 'MySQL':
+				return parent::Create('DB_MySQL', Config::Conf('DB_CONFIG'));
 				break;
 			default:
-				return parent::Create('DB_MySQL');
+				return parent::Create('DB_PDO', Config::Conf('DB_CONFIG'));
 		}
 	}
 
