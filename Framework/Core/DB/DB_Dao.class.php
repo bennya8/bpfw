@@ -44,6 +44,14 @@ interface DB_Dao
 	public function query($sql);
 
 	/**
+	 * 执行SQL DQL语句，返回结果集
+	 * @param string $sql DQL语句
+	 * @throws BException DQL语句出错
+	 * @return array 结果集 / false 失败
+	 */
+	public function quoteQuery($sql);
+	
+	/**
 	 * 执行SQL DML语句，返回受影响行数
 	 * @param string $sql DQL语句
 	 */

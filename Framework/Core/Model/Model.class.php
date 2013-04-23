@@ -192,6 +192,18 @@ class Model extends Base implements DB_Dao
 	}
 
 	/**
+	 * 执行SQL DQL语句进行转义，返回结果集
+	 * @param string $sql DQL语句
+	 * @throws BException DQL语句出错
+	 * @return array 结果集 / false 失败
+	 * @see DB_MySQL::query();
+	 */
+	public function quoteQuery($sql)
+	{
+		return $this->db->quoteQuery($sql);
+	}
+	
+	/**
 	 * 执行SQL DML语句，返回受影响行数
 	 * @param string $sql DML语句
 	 * @throws BException DML语句出错
