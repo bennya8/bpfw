@@ -9,10 +9,13 @@
  */
 class Model extends Base implements DB_Dao
 {
-	public $tablePrefix = '';
-	public $tableShufix = '';
+	protected $pk = 'id';
+	protected $fields = array();
+	protected $tablePrefix = '';
+	protected $tableShufix = '';
 	public $tableName = '';
 	public $tableFullName = '';
+
 	
 	/**
 	 * 数据库资源实例
