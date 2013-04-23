@@ -43,19 +43,19 @@ class DB_MySQL extends DB implements DB_Dao
 	 * @access public
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct($config)
 	{
-		$this->_config = Config::Conf('DB_CONFIG');
-		$this->getConnect($this->_config['DB_HOST'], $this->_config['DB_PORT'], 
-				$this->_config['DB_USER'], $this->_config['DB_PWD']);
+		$this->_config = $config;
+		$this->getConnect();
 		$this->setDbName($this->_config['DB_NAME']);
 		$this->setCharset($this->_config['DB_CHARSET']);
 	}
 
-	public function __destruct(){
+	public function __destruct()
+	{
 		mysql_close($this->_resource);
 	}
-	
+
 	/**
 	 * 获取数据库连接
 	 * @access public
@@ -65,13 +65,14 @@ class DB_MySQL extends DB implements DB_Dao
 	 * @param string $password 密码
 	 * @return boolean
 	 */
-	public function getConnect($host, $port, $user, $password)
+	public function getConnect($c)
 	{
 		if (!function_exists('mysql_connect')) {
 			throw new BException(Config::Lang('_MYSQL_MODULE_NO_EXIST_'));
 		}
-		if (!$this->_resource = mysql_connect($host . ':' . $port, $user, $password)) {
-			throw new BException(Config::Lang('_MYSQL_CONNECT_FAIL_') . ' => ' . mysql_error());
+		if (!$this->_resource = mysql_connect($c['DB_HOST'] . ':' . $c['DB_PORT'], $c['DB_USER'], 
+				$c['DB_PWD'])) {
+			throw new BException(Config::Lang('_DB_CONNECT_FAIL_') . ' => ' . mysql_error());
 		}
 	}
 
@@ -85,7 +86,7 @@ class DB_MySQL extends DB implements DB_Dao
 	public function setDbName($name)
 	{
 		if (!mysql_select_db($name, $this->_resource)) {
-			throw new BException(Config::Lang('_MYSQL_SELECTDB_FAIL_') . ' => ' . mysql_error());
+			throw new BException(Config::Lang('_SELECT_DB_FAIL_') . ' => ' . mysql_error());
 		}
 	}
 
@@ -99,7 +100,7 @@ class DB_MySQL extends DB implements DB_Dao
 	public function setCharset($name)
 	{
 		if (!mysql_set_charset($name, $this->_resource)) {
-			throw new BException(Config::Lang('_MYSQL_SETCHARSET_FAIL_') . ' => ' . mysql_error());
+			throw new BException(Config::Lang('_SET_CHARSET_FAIL_') . ' => ' . mysql_error());
 		}
 	}
 
@@ -238,7 +239,7 @@ class DB_MySQL extends DB implements DB_Dao
 	{
 		return array_pop($this->_errorList);
 	}
-	
+
 	/**
 	 * 获取SQL错误信息列表
 	 * @access public

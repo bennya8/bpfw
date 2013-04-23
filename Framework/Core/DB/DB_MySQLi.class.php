@@ -35,11 +35,10 @@ class DB_MySQLi extends DB implements DB_Dao
 	 * @access public
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct($config)
 	{
-		$this->_config = Config::Conf('DB_CONFIG');
-		$this->getConnect($this->_config['DB_HOST'], $this->_config['DB_USER'], 
-				$this->_config['DB_PWD'], $this->_config['DB_NAME'], $this->_config['DB_PORT']);
+		$this->_config = $config;
+		$this->getConnect($this->_config);
 		$this->setCharset($this->_config['DB_CHARSET']);
 	}
 
@@ -56,18 +55,20 @@ class DB_MySQLi extends DB implements DB_Dao
 	/**
 	 * 获取数据库连接
 	 * @access public
-	 * @param string $host IP地址
-	 * @param string $port 端口号
-	 * @param string $user 用户名
-	 * @param string $password 密码
+	 * @param array $c 配置数组
 	 * @return void
 	 */
-	public function getConnect($host, $user, $password, $dbname, $port)
+	public function getConnect($c)
 	{
 		if (!function_exists('mysqli_connect')) {
 			throw new BException(Config::Lang('_MYSQLI_MODULE_NO_EXIST_'));
 		}
-		$this->_resource = new mysqli($host, $user, $password, $dbname, $port);
+		try {
+			$this->_resource = new mysqli($c['DB_HOST'], $c['DB_USER'], $c['DB_PWD'], $c['DB_NAME'], 
+					$c['DB_PORT']);
+		} catch (mysqli_sql_exception $e) {
+			throw new BException(Config::Lang('_DB_CONNECT_FAIL_') . ' => ' . $e->getMessage());
+		}
 	}
 
 	/**
@@ -81,7 +82,7 @@ class DB_MySQLi extends DB implements DB_Dao
 	{
 		if (!$this->_resource->select_db($name)) {
 			throw new BException(
-					Config::Lang('_MYSQL_SETCHARSET_FAIL_') . ' => ' . mysqli_error(
+					Config::Lang('_SELECT_DB_FAIL_') . ' => ' . mysqli_error(
 							$this->_resource));
 		}
 	}
@@ -97,7 +98,7 @@ class DB_MySQLi extends DB implements DB_Dao
 	{
 		if (!$this->_resource->set_charset($name)) {
 			throw new BException(
-					Config::Lang('_MYSQL_SETCHARSET_FAIL_') . ' => ' . mysqli_error(
+					Config::Lang('_SET_CHARSET_FAIL_') . ' => ' . mysqli_error(
 							$this->_resource));
 		}
 	}
