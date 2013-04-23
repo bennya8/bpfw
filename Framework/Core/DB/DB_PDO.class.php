@@ -43,9 +43,21 @@ class DB_PDO extends DB implements DB_Dao
 	 * @access public
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct($config)
 	{
-		//@todo
+		$this->_config = $config;
+		$this->getConnect($this->_config);
+		$this->setCharset($this->_config['DB_CHARSET']);
+	}
+
+	/**
+	 * 获取数据库可用驱动
+	 * @access public
+	 * @return array 可用驱动列表
+	 */
+	public function getAvailableDrivers()
+	{
+		return PDO::getAvailableDrivers();
 	}
 
 	/**
@@ -56,21 +68,60 @@ class DB_PDO extends DB implements DB_Dao
 	 * @param string $password 密码
 	 * @return boolean
 	 */
-	private function getConnect($host, $port, $user, $password)
+	public function getConnect($c)
 	{
-		//@todo
+		if (!class_exists('PDO')) {
+			throw new BException(Config::Lang('_PDO_MODULE_MISSING_'));
+		}
+		$dsnName = str_replace('pdo:', '', strtolower($c['DB_ENGINE']));
+		$dsnDrivers = $this->getAvailableDrivers();
+		if (!array_search($dsnName, $dsnDrivers)) {
+			throw new BException(Config::Lang('_PDO_MODULE_MISSING_') . ' => Extension: ' . $dsnName);
+		}
+		$dsn = $dsnName . ':host=' . $c['DB_HOST'] . ';dbname=' . $c['DB_NAME'] . ';port=' .
+				 $c['DB_PORT'];
+		$options = array(
+			PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . $c['DB_CHARSET']
+		);
+		try {
+			$this->_resource = new PDO($dsn, $c['DB_USER'], $c['DB_PWD'], $options);
+		} catch (PDOException $e) {
+			throw new BException(Config::Lang('_DB_CONNECT_FAIL_') . ' => ' . $e->getMessage());
+		}
+	}
+
+	/**
+	 * 获取数据库属性值
+	 * @access public
+	 * @param string $optKey 数据库属性名
+	 * @return string
+	 */
+	public function getAttribute($optKey)
+	{
+		return $this->_resource->getAttribute($optKey);
+	}
+
+	/**
+	 * 设定数据库属性
+	 * @access public
+	 * @param string $optKey 数据库属性名
+	 * @return void
+	 */
+	public function setAttribute($optKey, $optValue)
+	{
+		return $this->_resource->setAttribute($optKey, $optValue);
 	}
 
 	/**
 	 * 设定数据库名称
 	 * @access public
-	 * @param string 数据库名称
+	 * @param string $name 数据库名称
 	 * @throws BException 设定错误
 	 * @return void
 	 */
 	public function setDbName($name)
 	{
-		//@todo
+		$this->_resource->exec('SET NAMES ' . $name);
 	}
 
 	/**
@@ -82,7 +133,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function setCharset($name)
 	{
-		//@todo
+		$this->_resource->query('SET NAMES ' . $name);
 	}
 
 	/**
@@ -92,7 +143,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function getCharset()
 	{
-		//@todo
+		// @todo
 	}
 
 	/**
@@ -102,7 +153,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function getServerVersion()
 	{
-		//@todo
+		// @todo
 	}
 
 	/**
@@ -112,7 +163,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function getClientVersion()
 	{
-		//@todo
+		// @todo
 	}
 
 	/**
@@ -123,7 +174,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function execute($sql)
 	{
-		//@todo
+		// @todo
 	}
 
 	/**
@@ -134,7 +185,18 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function query($sql)
 	{
-		//@todo
+		// @todo
+	}
+
+	/**
+	 * 执行SQL DQL语句进行转义，返回结果集
+	 * @param string $sql DQL语句
+	 * @throws BException DQL语句出错
+	 * @return array 结果集 / false 失败
+	 */
+	public function quoteQuery($sql)
+	{
+		// @todo
 	}
 
 	/**
@@ -144,7 +206,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function transactionBegin()
 	{
-		//@todo
+		return $this->_resource->beginTransaction();
 	}
 
 	/**
@@ -154,7 +216,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function transactionCommit()
 	{
-		//@todo
+		return $this->_resource->commit();
 	}
 
 	/**
@@ -164,7 +226,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function transactionRollback()
 	{
-		//@todo
+		return $this->_resource->rollBack();
 	}
 
 	/**
@@ -174,7 +236,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function lastQueryTimes()
 	{
-		//@todo
+		// @todo
 	}
 
 	/**
@@ -184,7 +246,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function lastAffectedRows()
 	{
-		//@todo
+		// @todo
 	}
 
 	/**
@@ -194,7 +256,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function lastInsertId()
 	{
-		//@todo
+		$this->_resource->lastInsertId();
 	}
 
 	/**
@@ -204,7 +266,22 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function lastError()
 	{
-		//@todo
+		// @todo
+	}
+	/* (non-PHPdoc)
+	 * @see DB_Dao::getError()
+	 */
+	public function getError()
+	{
+		// TODO Auto-generated method stub
+	}
+	
+	/* (non-PHPdoc)
+	 * @see DB_Dao::getErrorList()
+	 */
+	public function getErrorList()
+	{
+		// TODO Auto-generated method stub
 	}
 }
 ?>
