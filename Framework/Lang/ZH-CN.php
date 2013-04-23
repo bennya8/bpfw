@@ -39,11 +39,11 @@ return array(
 	/* 数据库相关 */
 	'_MYSQL_MODULE_NO_EXIST_' => 'MySQL模块没有安装',
 	'_MYSQLI_MODULE_NO_EXIST_' => 'MySQLi模块没有安装',
-	'_PDO_MYSQL_MODULE_MISSING_' => 'PDO:MySQL模块没有安装',
-	'_MYSQL_CONNECT_FAIL_' => 'MySQL连接失败',
-	'_MYSQL_SELECTDB_FAIL_' => 'MySQL选择数据库出错',
-	'_MYSQL_SETCHARSET_FAIL_' => 'MySQL设定字符集出错',
-	'_MYSQL_SQL_ERROR_' => 'SQL执行出错',
+	'_PDO_MODULE_MISSING_' => 'PDO模块没有安装',
+	'_DB_CONNECT_FAIL_' => '数据库连接失败',
+	'_SELECT_DB_FAIL_' => 'MySQL选择数据库出错',
+	'_SET_CHARSET_FAIL_' => 'MySQL设定字符集出错',
+	'_SQL_SYNTAX_ERROR_' => 'SQL执行出错',
 );
 
 ?>
