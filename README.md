@@ -16,7 +16,11 @@ E-mail : benny_a8@live.com
 ## BUG汇报地址
 (https://github.com/bennya8/i3code_bpfw/issues)
 
+## 代码格式化
+已严格按照Zend2标准进行格式化，提高可阅读性
+
 ## 编码规范
+
 所有变量、属性、函数、方法名均使用驼峰法命名。
 
 类名均为首字母大写标识，

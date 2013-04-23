@@ -41,8 +41,8 @@ return array(
 	'_MYSQLI_MODULE_NO_EXIST_' => 'MySQLi模块没有安装',
 	'_PDO_MODULE_MISSING_' => 'PDO模块没有安装',
 	'_DB_CONNECT_FAIL_' => '数据库连接失败',
-	'_SELECT_DB_FAIL_' => 'MySQL选择数据库出错',
-	'_SET_CHARSET_FAIL_' => 'MySQL设定字符集出错',
+	'_SELECT_DB_FAIL_' => '选择数据库出错',
+	'_SET_CHARSET_FAIL_' => '设定字符集出错',
 	'_SQL_SYNTAX_ERROR_' => 'SQL执行出错',
 );
 

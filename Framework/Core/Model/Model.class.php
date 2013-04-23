@@ -13,8 +13,8 @@ class Model extends Base implements DB_Dao
 	protected $fields = array();
 	protected $tablePrefix = '';
 	protected $tableShufix = '';
-	public $tableName = '';
-	public $tableFullName = '';
+	protected $tableName = '';
+	protected $tableFullName = '';
 
 	
 	/**

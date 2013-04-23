@@ -25,6 +25,13 @@ class DB_PDO extends DB implements DB_Dao
 	private $_lastQueryTimes = 0;
 	
 	/**
+	 * 受影响的行数
+	 * @access private
+	 * @var int
+	 */
+	private $_lastAffectedRows = 0;
+	
+	/**
 	 * SQL错误信息集
 	 * @access public
 	 * @var array
@@ -47,7 +54,6 @@ class DB_PDO extends DB implements DB_Dao
 	{
 		$this->_config = $config;
 		$this->getConnect($this->_config);
-		$this->setCharset($this->_config['DB_CHARSET']);
 	}
 
 	/**
@@ -121,7 +127,9 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function setDbName($name)
 	{
-		$this->_resource->exec('SET NAMES ' . $name);
+		if (false === $this->_resource->exec('USE  ' . $name)) {
+			throw new BException(Config::Lang('_SELECT_DB_FAIL_') . ' => DB Name: ' . $name);
+		}
 	}
 
 	/**
@@ -133,7 +141,9 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function setCharset($name)
 	{
-		$this->_resource->query('SET NAMES ' . $name);
+		if (false === $this->_resource->exec('SET NAMES ' . $name)) {
+			throw new BException(Config::Lang('_SET_CHARSET_FAIL_') . ' => Charset: ' . $name);
+		}
 	}
 
 	/**
@@ -153,7 +163,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function getServerVersion()
 	{
-		// @todo
+		return $this->getAttribute(PDO::ATTR_SERVER_VERSION);
 	}
 
 	/**
@@ -163,7 +173,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function getClientVersion()
 	{
-		// @todo
+		return $this->getAttribute(PDO::ATTR_CLIENT_VERSION);
 	}
 
 	/**
@@ -174,7 +184,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function execute($sql)
 	{
-		// @todo
+		return $this->_lastAffectedRows = $this->_resource->exec($sql);
 	}
 
 	/**
@@ -185,7 +195,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function query($sql)
 	{
-		// @todo
+		return $this->_resource->query($sql);
 	}
 
 	/**
@@ -196,7 +206,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function quoteQuery($sql)
 	{
-		// @todo
+		return $this->_resource->quote($sql);
 	}
 
 	/**
@@ -246,7 +256,7 @@ class DB_PDO extends DB implements DB_Dao
 	 */
 	public function lastAffectedRows()
 	{
-		// @todo
+		return $this->_lastAffectedRows;
 	}
 
 	/**

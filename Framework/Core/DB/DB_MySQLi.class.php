@@ -176,6 +176,30 @@ class DB_MySQLi extends DB implements DB_Dao
 	}
 
 	/**
+	 * 执行SQL DQL语句进行转义，返回结果集
+	 * @param string $sql DQL语句
+	 * @throws BException DQL语句出错
+	 * @return array 结果集 / false 失败
+	 */
+	public function quoteQuery($sql)
+	{
+		return $sql = $this->_resource->real_escape_string($sql);
+		if (!$result = $this->_resource->query($sql)) {
+			return false;
+		}
+		if ($result->num_rows > 0) {
+			while ($row = $result->fetch_assoc()) {
+				$list[] = $row;
+			}
+			return $list;
+		}
+		$result->free();
+		$result->close();
+		$this->_lastQueryTimes++;
+		return false;
+	}
+	
+	/**
 	 * 开始一个事务
 	 * @access public
 	 * @return boolean true 开启成功 / false 开启失败

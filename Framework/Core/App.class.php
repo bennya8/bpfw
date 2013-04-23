@@ -16,7 +16,7 @@ class App extends Base
 	 * @access public
 	 * @var string
 	 */
-	public static $version = 'Build 1.0.0 r411';
+	public static $version = 'Build 1.0.0 r415';
 
 	/**
 	 * 系统入口
