@@ -103,7 +103,7 @@ class View extends Base
 	public function display($template = null, $cache_id = null, $compile_id = null, $parent = null)
 	{
 		if (empty($template)) {
-			$temp = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+			$temp = debug_backtrace(2);
 			foreach ($temp as $k => $v) {
 				if ($v['class'] === $this->_controller) {
 					$template = $this->_theme . '/' . substr($this->_controller, 0, -6) . '/' .
