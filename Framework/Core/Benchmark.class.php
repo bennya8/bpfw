@@ -45,7 +45,7 @@ class Benchmark
 	 * @return int
 	 */
 	public static function UseMemory() {
-		return memory_get_usage(true);
+		return self::FormatSize(memory_get_usage(true));
 	}
 
 	/**
@@ -54,6 +54,26 @@ class Benchmark
 	 * @return int
 	 */
 	public static function PeakMemory() {
-		return memory_get_peak_usage(true);
+		return self::FormatSize(memory_get_peak_usage(true));
+	}
+
+	/**
+	 * 格式化字节大小
+	 * @param int $size
+	 * @return string
+	 */
+	public static function FormatSize($size) {
+		$sizetext = array(
+			" B",
+			" KB",
+			" MB",
+			" GB",
+			" TB",
+			" PB",
+			" EB",
+			" ZB",
+			" YB"
+		);
+		return round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . $sizetext[$i];
 	}
 }
