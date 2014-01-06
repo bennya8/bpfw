@@ -8,42 +8,45 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 return array(
-	/* 文件系统相关 */
-	'_SYSCONF_FILE_MISSING_' => '系统配置文件丢失',
-	'_APPCONF_FILE_MISSING_' => '应用配置文件丢失',
-	'_LANG_FILE_MISSING_' => '语言包文件丢失',
-	'_MAKE_DIR_FAILED_' => '创建目录失败',
-	'_COPY_FILE_FAILED_' => '复制文件失败',
-	'_MOVE_FILE_FAILED_' => '移动文件失败',
-	'_MAKE_DIR_FAILED_' => '创建目录失败',
-	'_DIR_CANNOT_WRITE_' => '没有目录写入权限',
-	'_FILE_CANNOT_WRITE_' => '没有文件写入权限',
-	'_DIR_EXIST_' => '目录已存在',
-	'_FILE_EXIST_' => '文件已存在',
-	
-	/* 运行状态相关 */
-	'_PHP5_ABOVE_REQUIRED_' => '运行环境需要PHP5以上',
-	'_TIMEZONE_ERROR_' => '时区设定错误',
-	'_CLASS_NOT_FOUND_' => '没有找到该类',
-	'_GET_PROPERTY_DENIED_' => '属性不存在或没有访问权限',
-	'_SET_PROPERTY_DENIED_' => '属性不存在或没有设定权限',
-	'_CALL_NO_EXIST_METHOD_' => '访问方法不存在',
-	'_CALL_METHOD_DENIED_' => '访问方法不存在 或 没有访问权限',
-	'_CALL_PRIVATE_PROTECTED_METHOD_' => '访问受保护方法 或 私有方法',
-	
-	'_CONTROLLER_NOT_FOUND_' => '没有找到该控制器',
-	'_ACTION_NOT_FOUND_' => '没有找到该行为',
-	'_VIEW_NOT_FOUND_' => '没有找到该视图',
-	'_UNKNOW_ERROR_'=>'未知错误',
-						
-	/* 数据库相关 */
-	'_MYSQL_MODULE_NO_EXIST_' => 'MySQL模块没有安装',
-	'_MYSQLI_MODULE_NO_EXIST_' => 'MySQLi模块没有安装',
-	'_PDO_MODULE_MISSING_' => 'PDO模块没有安装',
-	'_DB_CONNECT_FAIL_' => '数据库连接失败',
-	'_SELECT_DB_FAIL_' => '选择数据库出错',
-	'_SET_CHARSET_FAIL_' => '设定字符集出错',
-	'_SQL_SYNTAX_ERROR_' => 'SQL执行出错',
-);
+	/* 系统配置相关 */
+	'_SYSCONF_FILE_MISSING_' => 'System Config File Missing',
+	'_APPCONF_FILE_MISSING_' => 'Application Config File Missing',
+	'_LANG_FILE_MISSING_' => 'Language File Missing',
 
-?>
+	/* 运行状态相关 */
+	'_PHP5_ABOVE_REQUIRED_' => 'PHP5 Required',
+	'_TIMEZONE_ERROR_' => 'Timezone Setting Error',
+	'_CLASS_NOT_FOUND_' => 'Class Not Found',
+	'_GET_PROPERTY_DENIED_' => 'Get Property Denied',
+	'_SET_PROPERTY_DENIED_' => 'Set Property Denied',
+	'_CALL_NO_EXIST_METHOD_' => 'Invoke Not Exist Method',
+	'_CALL_METHOD_DENIED_' => 'Invoke Method Denied',
+	'_CALL_PRIVATE_PROTECTED_METHOD_' => 'Invoke Private Or Protected Method',
+	'_CONTROLLER_NOT_FOUND_' => 'Controller Not Found',
+	'_ACTION_NOT_FOUND_' => 'Action Not Found',
+	'_VIEW_NOT_FOUND_' => 'View Not Found',
+	'_UNKNOW_ERROR_' => 'Unknow Error',
+						
+	/* 文件系统：目录相关 */
+	'_DIR_EXIST_' => 'Directory Exist',
+	'_MAKE_DIR_FAILED_' => 'Create Directory Failed',
+	'_MOVE_DIR_FAILED_' => 'Move Directory Failed',
+	'_COPY_DIR_FAILED_' => 'Copy Directory Failed',
+	'_REMOVE_DIR_FAILED_' => 'Remove Directory Failed',
+
+	/* 文件系统：文件相关 */
+	'_FILE_EXIST_' => 'File Exist',
+	'_MAKE_DIR_FAILED_' => 'Create File Failed',
+	'_MOVE_FILE_FAILED_' => 'Move File Failed',
+	'_COPY_FILE_FAILED_' => 'Copy File Failed',
+	'_REMOVE_FILE_FAILED_' => 'Remove File Failed',
+	
+	/* 数据库相关 */
+	'_MYSQL_MODULE_NO_EXIST_' => 'MySQL Module Not Exist',
+	'_MYSQLI_MODULE_NO_EXIST_' => 'MySQLi Module Not Exist',
+	'_PDO_MODULE_MISSING_' => 'PDO Module Not Exist',
+	'_DB_CONNECT_FAIL_' => 'Database Connection Failed',
+	'_SELECT_DB_FAIL_' => 'Select Database Failed',
+	'_SET_CHARSET_FAIL_' => 'Set Database Charset Failed',
+	'_SQL_SYNTAX_ERROR_' => 'SQL Syntax error'
+);
