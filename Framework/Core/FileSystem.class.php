@@ -11,120 +11,123 @@ class FileSystem
 {
 	/**
 	 * 错误消息列表
-	 * @access public
+	 * @access private
 	 * @var array
 	 */
-	public static $errorMessage = array();
+	private static $errorMessage = array();
 
 	/**
-	 * 批量创建目录
+	 * 创建目录
 	 * @access public
-	 * @param string / array $dir 目录路径
+	 * @param string $dir 目录路径
 	 * @param int $mode 目录权限
-	 * @param boolean $recursive 使用递归创建
-	 * @return boolean true 创建目录成功 / false 创建目录失败，可查看错误消息列表
+	 * @param boolean $recursive 递归创建子目录
+	 * @return void 可通过获取 GetError() 信息判定目录删除成功与否信息
 	 */
-	public static function MakeDir($dir, $mode = 0777, $recursive = true)
-	{
-		if (is_string($dir)) {
-			if (is_dir($dir)) return false;
-			if (!mkdir($dir, $mode, $recursive)) {
-				throw new BException(Config::Lang('_DIR_CANNOT_WRITE_') . ' => ' . securePath($dir));
-			}
-			return true;
-		} else if (is_array($dir)) {
-			foreach ($dir as $v) {
-				if (is_dir($v)) continue;
-				if (!mkdir($v, $mode, $recursive)) {
-					throw new BException(
-							Config::Lang('_DIR_CANNOT_WRITE_') . ' => ' . securePath($dir));
-				}
-			}
-			return true;
+	public static function MakeDir($dir, $mode = 0755, $recursive = true) {
+		if (is_string($dir) && !is_dir($dir)) {
+			if (!mkdir($dir, $mode, $recursive)) self::SetError('_MAKE_DIR_FAILED_', $dir);
 		}
-		return false;
 	}
 
 	/**
-	 * 批量移动文件
+	 * 删除目录
 	 * @access public
-	 * @param array $file 要移动文件的数组，格式：$k => 原始位置 $v => 目的位置
+	 * @param string $dir 目录路径
+	 * @param boolean $recursive 递归删除子目录
+	 * @return void 可通过获取 GetError() 信息判定目录删除成功与否信息
+	 */
+	public static function RemoveDir($dir, $recursive = true) {
+		if (is_string($dir) && is_dir($dir)) {
+			$handle = opendir($dir);
+			while (false !== ($file = readdir($handle))) {
+				if ($file !== '.' && $file !== '..') {
+					$path = $dir . DS . $file;
+					if (is_dir($path) && $recursive) {
+						self::RemoveDir($path);
+					} else {
+						self::RemoveFile($path);
+					}
+				}
+			}
+			if (!rmdir($dir)) self::SetError('_REMOVE_DIR_FAILED_', $dir);
+		}
+	}
+
+	/**
+	 * 移动文件
+	 * @access public
+	 * @param string $source 文件原路径
+	 * @param string $target 文件新路径
 	 * @param boolean $cover 是否覆盖重名文件
-	 * @return boolean true 移动文件成功 / false 移动文件失败，可查看错误消息列表
+	 * @return void 可通过获取 GetError() 信息判定目录删除成功与否信息
 	 */
-	public static function MoveFile($file, $cover = false)
-	{
-		if (is_array($file)) {
-			if (count($file) == 0) return false;
-			foreach ($file as $k => $v) {
-				if (is_file($k)) {
-					if (!is_dir(dirname($v))) {
-						if (!mkdir(dirname($v), 0777, true)) {
-							self::$errorMessage[Config::Lang('_MAKE_DIR_FAILED_')] = securePath($v);
-						}
-					}
-					if (is_file($v) && $cover) {
-						unlink($v);
-					}
-					if (is_file($v) && !$cover) {
-						continue;
-					}
-					if (!copy($k, $v)) {
-						self::$errorMessage[Config::Lang('_FILE_CANNOT_WRITE_')] = securePath($v);
-					}
-					unlink($k);
+	public static function MoveFile($source, $target, $cover = false) {
+		if (is_string($source) && is_string($target)) {
+			self::MakeDir(dirname($target));
+			if (is_file($source)) {
+				if (is_file($target) && $cover) {
+					self::RemoveFile($target);
+					if (!copy($source, $target)) self::SetError('_MOVE_FILE_FAILED_', $target);
+					self::RemoveFile($source);
+				} else {
+					self::SetError('_FILE_EXIST_', $target);
 				}
 			}
-			return true;
 		}
-		return false;
 	}
 
 	/**
-	 * 批量复制文件
+	 * 复制文件
 	 * @access public
-	 * @param array $file 要复制文件的数组，格式：$k => 原始位置 $v => 目的位置
-	 * @param boolean $cover 覆盖重名文件
-	 * @return boolean true 复制文件完成 / false 复制文件失败
+	 * @param string $source 文件原路径
+	 * @param string $target 文件新路径
+	 * @param boolean $cover 是否覆盖重名文件
+	 * @return void 可通过获取 GetError() 信息判定目录删除成功与否信息
 	 */
-	public static function CopyFile($file, $cover = false)
-	{
-		if (is_array($file)) {
-			if (count($file) === 0) return false;
-			foreach ($file as $k => $v) {
-				if (is_file($k)) {
-					if (!is_dir(dirname($v))) {
-						if (!mkdir(dirname($v), 0777, true)) {
-							self::$errorMessage[Config::Lang('_MAKE_DIR_FAILED_')] = securePath($v);
-						}
-					}
-					if (is_file($v) && $cover) {
-						self::$errorMessage[Config::Lang('_FILE_EXIST_')] = securePath($v);
-						continue;
-					}
-					if (!copy($k, $v)) {
-						self::$errorMessage[Config::Lang('_COPY_FILE_FAILED_')] = securePath($v);
-					}
+	public static function CopyFile($source, $target, $cover = false) {
+		if (is_string($source) && is_string($target)) {
+			self::MakeDir(dirname($target));
+			if (is_file($source)) {
+				if (is_file($target) && $cover) {
+					self::RemoveFile($target);
+					if (!copy($source, $target)) self::SetError('_COPY_FILE_FAILED_', $target);
+				} else {
+					self::SetError('_FILE_EXIST_', $target);
 				}
 			}
-			return true;
 		}
-		return false;
 	}
 
 	/**
 	 * 批量删除文件
-	 * @todo
+	 * @access public
+	 * @param array / string 文件路径
+	 * @return void 可通过获取 GetError() 信息判定目录删除成功与否信息
 	 */
-	public static function removeFile($file)
-	{}
+	public static function RemoveFile($source) {
+		if (is_string($source) && is_file($source)) {
+			if (unlink($source)) self::SetError('_REMOVE_FILE_FAILED_', $source);
+		}
+	}
 
 	/**
-	 * 批量上传文件
-	 * @todo
+	 * 设置错误信息
+	 * @access public
+	 * @param string $errorType 消息类别
+	 * @param string $path 文件/目录信息
+	 * @return void
 	 */
-	public static function uploadFile($file)
-	{}
-}
+	public static function SetError($errorType, $path) {
+		self::$errorMessage[] = Config::Lang($errorType) . ' => ' . securePath($path);
+	}
 
-?>
+	/**
+	 * 获取错误信息列表
+	 * @access public
+	 * @return array 错误信息列表
+	 */
+	public static function GetError() {
+		return self::$errorMessage;
+	}
+}
