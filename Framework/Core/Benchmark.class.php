@@ -9,34 +9,51 @@
  */
 class Benchmark
 {
+	/**
+	 * 脚本开始时间
+	 * @var unknown
+	 */
+	private static $_timeStart = '';
+	/**
+	 * 脚本结束时间
+	 * @var unknown
+	 */
+	private static $_timeEnd = '';
 
 	/**
-	 * 获取脚本开始时间
+	 * 记录脚本开始时间
 	 * @access public
-	 * @todo
+	 * @return void
 	 */
-	static public function StartTime(){}
+	public static function Start() {
+		self::$_timeStart = microtime(true);
+	}
 
 	/**
-	 * 获取脚本结束时间
+	 * 记录脚本结束时间
 	 * @access public
-	 * @todo
+	 * @return int
 	 */
-	static public function EndTime(){}
+	public static function End() {
+		self::$_timeEnd = microtime(true);
+		return round((self::$_timeEnd - self::$_timeStart), 4);
+	}
 
 	/**
 	 * 获取脚本占用内存
 	 * @access public
-	 * @todo
+	 * @return int
 	 */
-	static public function UseMemory(){}
+	public static function UseMemory() {
+		return memory_get_usage(true);
+	}
 
 	/**
 	 * 获取脚本峰值内存
 	 * @access public
-	 * @todo
+	 * @return int
 	 */
-	static public function PeakMemory(){}
+	public static function PeakMemory() {
+		return memory_get_peak_usage(true);
+	}
 }
-
-?>
