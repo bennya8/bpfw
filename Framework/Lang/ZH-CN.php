@@ -8,19 +8,11 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 return array(
-	/* 文件系统相关 */
+	/* 系统配置相关 */
 	'_SYSCONF_FILE_MISSING_' => '系统配置文件丢失',
 	'_APPCONF_FILE_MISSING_' => '应用配置文件丢失',
 	'_LANG_FILE_MISSING_' => '语言包文件丢失',
-	'_MAKE_DIR_FAILED_' => '创建目录失败',
-	'_COPY_FILE_FAILED_' => '复制文件失败',
-	'_MOVE_FILE_FAILED_' => '移动文件失败',
-	'_MAKE_DIR_FAILED_' => '创建目录失败',
-	'_DIR_CANNOT_WRITE_' => '没有目录写入权限',
-	'_FILE_CANNOT_WRITE_' => '没有文件写入权限',
-	'_DIR_EXIST_' => '目录已存在',
-	'_FILE_EXIST_' => '文件已存在',
-	
+
 	/* 运行状态相关 */
 	'_PHP5_ABOVE_REQUIRED_' => '运行环境需要PHP5以上',
 	'_TIMEZONE_ERROR_' => '时区设定错误',
@@ -30,12 +22,25 @@ return array(
 	'_CALL_NO_EXIST_METHOD_' => '访问方法不存在',
 	'_CALL_METHOD_DENIED_' => '访问方法不存在 或 没有访问权限',
 	'_CALL_PRIVATE_PROTECTED_METHOD_' => '访问受保护方法 或 私有方法',
-	
 	'_CONTROLLER_NOT_FOUND_' => '没有找到该控制器',
 	'_ACTION_NOT_FOUND_' => '没有找到该行为',
 	'_VIEW_NOT_FOUND_' => '没有找到该视图',
-	'_UNKNOW_ERROR_'=>'未知错误',
+	'_UNKNOW_ERROR_' => '未知错误',
 						
+	/* 文件系统：目录相关 */
+	'_DIR_EXIST_' => '目录已存在',
+	'_MAKE_DIR_FAILED_' => '创建目录失败',
+	'_MOVE_DIR_FAILED_' => '移动目录失败',
+	'_COPY_DIR_FAILED_' => '复制目录失败',
+	'_REMOVE_DIR_FAILED_' => '删除目录失败',
+
+	/* 文件系统：文件相关 */
+	'_FILE_EXIST_' => '文件已存在',
+	'_MAKE_DIR_FAILED_' => '创建文件失败',
+	'_MOVE_FILE_FAILED_' => '移动文件失败',
+	'_COPY_FILE_FAILED_' => '复制文件失败',
+	'_REMOVE_FILE_FAILED_' => '删除文件失败',
+	
 	/* 数据库相关 */
 	'_MYSQL_MODULE_NO_EXIST_' => 'MySQL模块没有安装',
 	'_MYSQLI_MODULE_NO_EXIST_' => 'MySQLi模块没有安装',
@@ -43,7 +48,5 @@ return array(
 	'_DB_CONNECT_FAIL_' => '数据库连接失败',
 	'_SELECT_DB_FAIL_' => '选择数据库出错',
 	'_SET_CHARSET_FAIL_' => '设定字符集出错',
-	'_SQL_SYNTAX_ERROR_' => 'SQL执行出错',
+	'_SQL_SYNTAX_ERROR_' => 'SQL执行出错'
 );
-
-?>
