@@ -29,7 +29,7 @@ class NativeEngine
 	 */
 	public function __construct()
 	{
-		$this->_templateDir = APP_PATH . DS . 'View/';
+		$this->_templateDir = APP_PATH  . '/View/';
 	}
 
 	/**
