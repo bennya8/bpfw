@@ -7,35 +7,28 @@
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
-class View extends Base
+class View extends Component
 {
 	/**
 	 * 控制器名
-	 * @access private
+	 * @access protected
 	 * @var string
 	 */
-	private $_controller = '';
+	protected $controller = '';
 	
 	/**
 	 * 模板主题名
-	 * @access private
+	 * @access protected
 	 * @var string
 	 */
-	private $_theme = '';
-	
-	/**
-	 * 模板配置
-	 * @access private
-	 * @var array
-	 */
-	private $_viewConfig = array();
+	protected $theme = '';
 	
 	/**
 	 * 模板引擎实例
 	 * @access private
 	 * @var string
 	 */
-	private $_viewEngine = null;
+	protected $engine = null;
 
 	/**
 	 * 构造方法
@@ -43,12 +36,11 @@ class View extends Base
 	 * @param array $args
 	 * @return void
 	 */
-	protected function __construct($args)
-	{
-		$this->_controller = $args['controller'];
-		$this->_viewConfig = Config::Conf('VIEW_CONFIG');
-		$this->_viewEngine = $this->_viewFactory($this->_viewConfig['VIEW_ENGINE']);
-		$this->_theme = $this->_viewConfig['VIEW_THEME'];
+	public function __construct($args) {
+		$this->config = Config::Get('View');
+		$this->controller = $args['controller'];
+		$this->engine = $this->Factory($this->VIEW_ENGINE);
+		$this->theme = $this->VIEW_THEME;
 	}
 
 	/**
@@ -57,18 +49,45 @@ class View extends Base
 	 * @param string $name 模板引擎名
 	 * @return void
 	 */
-	private function _viewFactory($name)
-	{
+	protected function Factory($name) {
 		switch (strtolower($name)) {
 			case 'smarty':
-				return parent::Create('SmartyEngine');
+				return Application::Create('SmartyEngine');
 				break;
-			case 'template_lite':
-				return parent::Create('TpliteEngine');
+			case 'templatelite':
+				return Application::Create('TpliteEngine');
 				break;
-			default: // 'php_native_tpl'
-				return parent::Create('NativeEngine');
+			default:
+				return Application::Create('NativeEngine');
 		}
+	}
+
+	/**
+	 * 获取当前模板引擎名称
+	 * @access public
+	 * @return string 模板引擎名称
+	 */
+	public function getEngineName() {
+		return $this->VIEW_ENGINE;
+	}
+
+	/**
+	 * 获取当前模板引擎实例
+	 * @access public
+	 * @return object 模板引擎实例
+	 */
+	public function getEngine() {
+		return $this->engine;
+	}
+
+	/**
+	 * 切换模板引擎实例
+	 * @param string $name 模板引擎名称
+	 * @access public
+	 * @return void
+	 */
+	public function setEngine($name) {
+		$this->engine = $this->_viewFactory($name);
 	}
 
 	/**
@@ -82,9 +101,8 @@ class View extends Base
 	 * @example 使用TemplateLite引擎，可传2个参数，分别：$key, $value
 	 * @example 使用原生PHP模板引擎，可传2个参数，分别：$key, $value
 	 */
-	public function assign($key, $value, $nocache = false)
-	{
-		return $this->_viewEngine->assign($key, $value, $nocache);
+	public function assign($key, $value, $nocache = false) {
+		return $this->engine->assign($key, $value, $nocache);
 	}
 
 	/**
@@ -100,14 +118,12 @@ class View extends Base
 	 * @example 使用原生PHP模板引擎，最多可传1个参数，分别：$template
 	 * @return void
 	 */
-	public function display($template = null, $cache_id = null, $compile_id = null, $parent = null)
-	{
+	public function display($template = null, $cache_id = null, $compile_id = null, $parent = null) {
 		if (empty($template)) {
 			$temp = debug_backtrace(2);
 			foreach ($temp as $k => $v) {
 				if ($v['class'] === $this->_controller) {
-					$template = $this->_theme . '/' . substr($this->_controller, 0, -6) . '/' .
-							 $v['function'] . '.html';
+					$template = $this->_theme . '/' . substr($this->_controller, 0, -6) . '/' . $v['function'] . '.html';
 					break;
 				}
 			}
@@ -118,11 +134,11 @@ class View extends Base
 		} else {
 			$template = $this->_theme . '/' . substr($this->_controller, 0, -6) . '/' . $template;
 		}
-		if (!is_file(APP_PATH . DS . 'View/' . $template)) {
-			throw new BException(Config::Lang('_VIEW_NOT_FOUND_') . ' => ' . $template);
+		if (!is_file(APP_PATH . '/View/' . $template)) {
+			Application::TriggerError(Translate::Get('_VIEW_NOT_FOUND_') . ' => ' . $template);
 		}
-		$this->_viewEngine->assign('WEBROOT', WEBROOT);
-		$this->_viewEngine->display($template, $cache_id, $compile_id, $parent);
+		$this->engine->assign('WEBROOT', WEBROOT);
+		$this->engine->display($template, $cache_id, $compile_id, $parent);
 	}
 
 	/**
@@ -132,18 +148,16 @@ class View extends Base
 	 * @param number $time 返回时间
 	 * @return void
 	 */
-	public function success($msg = null, $url = null, $time = 3)
-	{
-		$dispatch = empty($GLOBALS['Config']['SYS_CONFIG']['SYS_SUCCESS_PAGE']) ? SYS_PATH . DS .
-				 'Template/systpl_page_success.html' : $GLOBALS['Config']['SYS_CONFIG']['SYS_SUCCESS_PAGE'];
+	public function success($msg = null, $url = null, $time = 3) {
+		$dispatch = empty($GLOBALS['Config']['SYS_CONFIG']['SYS_SUCCESS_PAGE']) ? SYS_PATH .
+				 '/Template/systpl_page_success.html' : $GLOBALS['Config']['SYS_CONFIG']['SYS_SUCCESS_PAGE'];
 		$url = empty($url) ? $_SERVER["HTTP_REFERER"] : $url;
 		if (preg_match('/(\S+):(\S+)/', $dispatch, $match)) {
-			$this->assign('pagelog', 
-					array(
-						'message' => $msg,
-						'time' => $time,
-						'url' => $url
-					));
+			$this->assign('pagelog', array(
+				'message' => $msg,
+				'time' => $time,
+				'url' => $url
+			));
 			$this->display($match[1] . '/' . $match[2]);
 			exit();
 		} else {
@@ -164,18 +178,16 @@ class View extends Base
 	 * @param number $time 返回时间
 	 * @return void
 	 */
-	public function error($msg = null, $url = null, $time = 3)
-	{
-		$dispatch = empty($GLOBALS['Config']['SYS_CONFIG']['SYS_ERROR_PAGE']) ? SYS_PATH . DS .
-				 'Template/systpl_page_error.html' : $GLOBALS['Config']['SYS_CONFIG']['SYS_ERROR_PAGE'];
+	public function error($msg = null, $url = null, $time = 3) {
+		$dispatch = empty($GLOBALS['Config']['SYS_CONFIG']['SYS_ERROR_PAGE']) ? SYS_PATH .
+				 '/Template/systpl_page_error.html' : $GLOBALS['Config']['SYS_CONFIG']['SYS_ERROR_PAGE'];
 		$url = empty($url) ? $_SERVER["HTTP_REFERER"] : $url;
 		if (preg_match('/(\S+):(\S+)/', $dispatch, $match)) {
-			$this->assign('pagelog', 
-					array(
-						'message' => $msg,
-						'time' => $time,
-						'url' => $url
-					));
+			$this->assign('pagelog', array(
+				'message' => $msg,
+				'time' => $time,
+				'url' => $url
+			));
 			$this->display($match[1] . '/' . $match[2]);
 			exit();
 		} else {
@@ -195,40 +207,8 @@ class View extends Base
 	 * @param string $msg 提示信息
 	 * @return void
 	 */
-	public function alert($msg)
-	{
+	public function alert($msg) {
 		echo '<script type="text/javascript">alert("' . $msg . '"); history.back(-1);</script>';
-	}
-
-	/**
-	 * 获取当前模板引擎名称
-	 * @access public
-	 * @return string 模板引擎名称
-	 */
-	public function getViewEngineName()
-	{
-		return $this->_viewConfig['VIEW_ENGINE'];
-	}
-
-	/**
-	 * 获取当前模板引擎实例
-	 * @access public
-	 * @return object 模板引擎实例
-	 */
-	public function getViewEngine()
-	{
-		return $this->_viewEngine;
-	}
-
-	/**
-	 * 切换模板引擎实例
-	 * @param string $name 模板引擎名称
-	 * @access public
-	 * @return void
-	 */
-	public function switchViewEngine($name)
-	{
-		$this->_viewEngine = $this->_viewFactory($name);
 	}
 
 	/**
@@ -238,25 +218,23 @@ class View extends Base
 	 * @param array $args 调用参数
 	 * @return mixed 调用方法的返回值
 	 */
-	public function __call($name, $args)
-	{
-		if (method_exists($this->db, $name)) {
-			$reflectClass = App::Create('ReflectionClass', $this->_viewEngine);
+	public function __call($name, $args) {
+		if (method_exists($this->engine, $name)) {
+			$reflectClass = Application::Create('ReflectionClass', $this->engine);
 			if ($reflectClass->hasMethod($name)) {
 				$method = $reflectClass->getMethod($name);
 				if ($method->isProtected() || $method->isPrivate()) {
-					throw new BException(
-							Config::Lang('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' .
-									 get_class($this->_viewEngine) . ' Method: ' . $name . '()');
+					Application::TriggerError(
+							Translate::Get('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' . get_class($this->engine) .
+									 ' Method: ' . $name . '()', 'warning');
 				} else {
-					return $method->invokeArgs($this->_viewEngine, $args);
+					return $method->invokeArgs($this->engine, $args);
 				}
 			}
 		} else {
-			throw new BException(
-					Config::Lang('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' .
-							 get_class($this->_viewEngine) . ' Method: ' . $name . '()');
+			Application::TriggerError(
+					Translate::Get('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' . get_class($this->engine) .
+							 ' Method: ' . $name . '()', 'error');
 		}
 	}
 }
-?>
