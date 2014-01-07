@@ -7,7 +7,7 @@
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
-class Router extends Base
+class Router extends Component
 {
 	/**
 	 * 控制器名
@@ -27,22 +27,7 @@ class Router extends Base
 	 * @var array
 	 */
 	private $_params = array();
-	/**
-	 * URL配置
-	 * @access private
-	 * @var array
-	 */
-	private $_urlConfig = array();
 
-	/**
-	 * 构造方法
-	 * @access protected
-	 * @return void
-	 */
-	protected function __construct()
-	{
-		$this->_urlConfig = Config::Conf('URL_CONFIG');
-	}
 
 	/**
 	 * URL分析，解析出正确URL位置
@@ -52,14 +37,14 @@ class Router extends Base
 	public function parseUrl()
 	{
 		/* PATH_INFO模式 */
-		if ($this->_urlConfig['URL_MODE'] === 'PATH_INFO') {
+		if ($this->URL_MODE === 'PATH_INFO') {
 			if (!isset($_SERVER['PATH_INFO'])) {
-				$this->_controller = $this->_urlConfig['DEFAULT_CONTROLLER'];
-				$this->_action = $this->_urlConfig['DEFAULT_ACTION'];
+				$this->_controller = $this->DEFAULT_CONTROLLER;
+				$this->_action = $this->DEFAULT_ACTION;
 			} else {
 				$pathInfo = explode('/', trim(str_replace('\\', '/', $_SERVER['PATH_INFO']), '/'));
-				$this->_controller = !empty($pathInfo[0]) ? $pathInfo[0] : $this->_urlConfig['DEFAULT_CONTROLLER'];
-				$this->_action = !empty($pathInfo[1]) ? $pathInfo[1] : $this->_urlConfig['DEFAULT_ACTION'];
+				$this->_controller = !empty($pathInfo[0]) ? $pathInfo[0] : $this->DEFAULT_CONTROLLER;
+				$this->_action = !empty($pathInfo[1]) ? $pathInfo[1] : $this->DEFAULT_ACTION;
 				if (!empty($pathInfo[2])) {
 					$key = $value = array();
 					for ($i = 2, $len = count($pathInfo); $i < $len; $i++) {
@@ -98,7 +83,7 @@ class Router extends Base
 			$reflectClass = new ReflectionClass($controller);
 			if ($reflectClass->hasMethod($action)) {
 				$method = $reflectClass->getMethod($action);
-				$method->invoke(App::Create($controller));
+				$method->invoke(Application::Create($controller));
 			} else {
 				throw new BException(Config::Lang('_ACTION_NOT_FOUND_') . ' => ' . $action);
 			}
