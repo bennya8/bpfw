@@ -7,7 +7,7 @@
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
-class Action extends Base
+abstract class Action extends Component
 {
 	/**
 	 * 模板引擎实例
@@ -23,9 +23,8 @@ class Action extends Base
 	 */
 	public function __construct()
 	{
-		$config = Config::Conf('VIEW_CONFIG');
-		$args['controller'] = $this->getControllerName();
-		$this->view = View::Create('View', $args);
+		$this->config = Config::Get('View');
+		$this->view = Application::Create('View');
 		$this->authorize();
 	}
 
