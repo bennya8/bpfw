@@ -17,8 +17,9 @@ return array(
 	'_PHP5_ABOVE_REQUIRED_' => '运行环境需要PHP5以上',
 	'_TIMEZONE_ERROR_' => '时区设定错误',
 	'_CLASS_NOT_FOUND_' => '没有找到该类',
-	'_GET_PROPERTY_DENIED_' => '属性不存在或没有访问权限',
-	'_SET_PROPERTY_DENIED_' => '属性不存在或没有设定权限',
+						
+	'_PROPERTY_ACCESS_DENIED' => '属性没有访问权限',
+	'_PROPERTY_NOT_EXIST_' => '属性不存在',
 	'_CALL_NO_EXIST_METHOD_' => '访问方法不存在',
 	'_CALL_METHOD_DENIED_' => '访问方法不存在 或 没有访问权限',
 	'_CALL_PRIVATE_PROTECTED_METHOD_' => '访问受保护方法 或 私有方法',
