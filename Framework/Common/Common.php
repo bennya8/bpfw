@@ -13,8 +13,7 @@
  * @param mixed $vars
  * @return void
  */
-function dump($vars)
-{
+function dump($vars) {
 	echo '<pre>';
 	var_dump($vars);
 	echo '</pre>';
@@ -25,8 +24,7 @@ function dump($vars)
  * @param mixed $vars
  * @return void
  */
-function breakpoint($vars = null)
-{
+function breakpoint($vars = null) {
 	echo '<pre>';
 	var_dump($vars);
 	echo '</pre>';
@@ -40,8 +38,7 @@ function breakpoint($vars = null)
  * @example /Volumes/Workspace//App/Action/IndexAction.class.php =>
  *          /App/Action/IndexAction.class.php
  */
-function securePath($path)
-{
+function securePath($path) {
 	return str_replace(ROOT_PATH, '', $path);
 }
 
@@ -52,8 +49,7 @@ function securePath($path)
  * @param array $array2 数组2
  * @return array 合并后的数组
  */
-function multi_array_merge($array1, $array2)
-{
+function multi_array_merge($array1, $array2) {
 	if (is_array($array2) && count($array2)) { // 不是空数组的话
 		foreach ($array2 as $k => $v) {
 			if (is_array($v) && count($v)) {
