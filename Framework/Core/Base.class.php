@@ -15,26 +15,28 @@ class Base
 	 * @var array
 	 */
 	private static $_coreClasses = array(
-		'Action' => 'Core/Action/Action.class.php',
-		'Benchmark' => 'Core/Benchmark.class.php',
-		'App' => 'Core/App.class.php',
-		'BException' => 'Core/BException.class.php',
-		'Config' => 'Core/Config.class.php',
-		'DB' => 'Core/DB/DB.class.php',
-		'DB_Dao' => 'Core/DB/DB_Dao.class.php',
-		'DB_MySQL' => 'Core/DB/DB_MySQL.class.php',
-		'DB_MySQLi' => 'Core/DB/DB_MySQLi.class.php',
-		'DB_PDO' => 'Core/DB/DB_PDO.class.php',
-		'FileSystem' => 'Core/FileSystem.class.php',
-		'Log' => 'Core/Log.class.php',
-		'Model' => 'Core/Model/Model.class.php',
-		'FormModel' => 'Core/Model/FormModel.class.php',
-		'RelationModel' => 'Core/Model/RelationModel.class.php',
-		'Router' => 'Core/Router.class.php',
-		'View' => 'Core/View/View.class.php',
-		'SmartyEngine' => 'Core/View/SmartyEngine.class.php',
-		'TpliteEngine' => 'Core/View/TpliteEngine.class.php',
-		'NativeEngine' => 'Core/View/NativeEngine.class.php'
+		'Action' => '/Core/Action/Action.class.php',
+		'Benchmark' => '/Core/Benchmark.class.php',
+		'Application' => '/Core/Application.class.php',
+		'Component' => '/Core/Component.class.php',
+		'CustomException' => '/Core/CustomException.class.php',
+		'Config' => '/Core/Config.class.php',
+		'Translate' => '/Core/Translate.class.php',
+		'DB' => '/Core/DB/DB.class.php',
+		'DB_Dao' => '/Core/DB/DB_Dao.class.php',
+		'DB_MySQL' => '/Core/DB/DB_MySQL.class.php',
+		'DB_MySQLi' => '/Core/DB/DB_MySQLi.class.php',
+		'DB_PDO' => '/Core/DB/DB_PDO.class.php',
+		'FileSystem' => '/Core/FileSystem.class.php',
+		'Log' => '/Core/Log.class.php',
+		'Model' => '/Core/Model/Model.class.php',
+		'FormModel' => '/Core/Model/FormModel.class.php',
+		'RelationModel' => '/Core/Model/RelationModel.class.php',
+		'Router' => '/Core/Router.class.php',
+		'View' => '/Core/View/View.class.php',
+		'SmartyEngine' => '/Core/View/SmartyEngine.class.php',
+		'TpliteEngine' => '/Core/View/TpliteEngine.class.php',
+		'NativeEngine' => '/Core/View/NativeEngine.class.php'
 	);
 	/**
 	 * 类库注册列表
@@ -65,20 +67,18 @@ class Base
 	 * @throws BException 要载入的类不存在
 	 * @return void
 	 */
-	protected static function ClassesLoader($class)
-	{
+	protected static function ClassesLoader($class) {
 		if (isset(self::$_coreClasses[$class])) {
-			require SYS_PATH . DS . self::$_coreClasses[$class];
+			require SYS_PATH . self::$_coreClasses[$class];
 		} else if (isset(self::$_regisClasses[$class])) {
 			require self::$_coreClasses[$class];
 		} else if (substr($class, -5) === 'Model') {
-			self::_ClassesRegister($class, APP_PATH . DS . 'Model/' . $class . '.class.php');
+			self::_ClassesRegister($class, APP_PATH . '/Model/' . $class . '.class.php');
 		} else if (substr($class, -6) === 'Action') {
-			self::_ClassesRegister($class, APP_PATH . DS . 'Action/' . $class . '.class.php');
-		} else if (self::_ClassesPusher($class)) {
-			return;
+			self::_ClassesRegister($class, APP_PATH . '/Action/' . $class . '.class.php');
 		} else {
-			throw new BException(Config::Lang('_CLASS_NOT_FOUND_') . ' => ' . $class);
+			throw new CustomException('111');
+			//Application::TriggerError(Translate::Get('_CLASS_NOT_FOUND_') . ' => ' . $class, 'notice');
 		}
 	}
 
@@ -90,8 +90,7 @@ class Base
 	 * @throws BException 要载入的类不存在
 	 * @return void
 	 */
-	private static function _ClassesRegister($class, $classPath)
-	{
+	private static function _ClassesRegister($class, $classPath) {
 		if (!is_file($classPath)) {
 			throw new BException(Config::Lang('_CLASS_NOT_FOUND_') . ' => ' . $class);
 		}
@@ -107,8 +106,7 @@ class Base
 	 * @param string $class 类名
 	 * @return boolean true 类在排除列表 / false 类不在排除列表
 	 */
-	private static function _ClassesPusher($class)
-	{
+	private static function _ClassesPusher($class) {
 		foreach (self::$_pushClasses as $k => $v) {
 			if (substr($class, 0, $v) === $k) {
 				return true;
@@ -128,8 +126,7 @@ class Base
 	 * @example 调用：App::Import('Util/Paging.class');
 	 *          系统Extend目录：/Root/Framework/Extend/Util/Paging.class.php
 	 */
-	protected static function Import($class)
-	{
+	protected static function Import($class) {
 		if (strpos($class, '@') === 0) {
 			$classpath = APP_PATH . DS . 'Extend/' . str_replace('@', '', $class) . '.php';
 		} else {
@@ -148,8 +145,7 @@ class Base
 	 * @param array $args 构造参数
 	 * @return object 类的实例
 	 */
-	protected static function Create($class = __CLASS__, $args = NULL)
-	{
+	protected static function Create($class = __CLASS__, $args = NULL) {
 		if (!isset(self::$_instances[$class])) {
 			self::$_instances[$class] = new $class($args);
 		}
@@ -161,62 +157,13 @@ class Base
 	 * @access private
 	 * @return void
 	 */
-	private function __construct()
-	{}
-
+	private function __construct() {}
+	
 	/**
 	 * 魔术方法，防止克隆实例
 	 * @access private
 	 * @return void
 	 */
-	private function __clone()
-	{}
-
-	/**
-	 * 魔术方法，设定受保护函数时防止发生终止错误，只在开发模式抛出异常
-	 * @access public
-	 * @return void
-	 */
-	public function __get($key)
-	{
-		if (SYS_DEBUG) {
-			throw new BException(
-					Config::Lang('_GET_PROPERTY_DENIED_') . ' => Class: ' . get_class($this) .
-							 ' Propertiy: ' . $key);
-		}
-	}
-
-	/**
-	 * 魔术方法，设定受保护函数防止发生终止错误，只在开发模式抛出异常
-	 * @access public
-	 * @return void
-	 */
-	public function __set($key, $value)
-	{
-		if (SYS_DEBUG) {
-			throw new BException(
-					Config::Lang('_SET_PROPERTY_DENIED_') . ' => Class: ' . get_class($this) .
-							 ' Propertiy: ' . $key . '->' . $value);
-		}
-	}
-
-	/**
-	 * 魔术方法，设定受保护函数防止发生终止错误
-	 * 调用不存在函数时尝试抛出错误信息，顶层捕获后，
-	 * 根据环境需要作出是否显示或记录日志
-	 * @access public
-	 * @param string $name 调用方法名
-	 * @param mixed $args 调用参数
-	 * @throws BException 访问出错
-	 */
-	public function __call($name, $args)
-	{
-		if (!method_exists($this, $name)) {
-			throw new BException(
-					Config::Lang('_CALL_METHOD_DENIED_') . ' => Class: ' . get_class($this) .
-							 ' Method: ' . $name . '()');
-		}
-	}
+	private function __clone() {}
 }
 
-?>
