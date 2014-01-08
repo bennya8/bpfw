@@ -39,18 +39,6 @@ E-mail : benny_a8@live.com
 
 普通变量、普通函数，如：$isTest  /  function checkIsTest();
 
-## 已通过测试环境
-
-a) PC Windows 7 | PHP 5.3.13 / Apache 2.2.22/ MySQL 5.5.42
-
-b) Virtual-Machine Cent OS 6.3 | PHP 5.3.3 / Apache 2.2.15 / MySQL 5.1.67
-
-c) MBP OSX 10.8.3 | PHP 5.4.4 / Apache 2.2.22 / MySQL 5.5.25
-
-d) VHOST-ZAPSERVER343 Windows NT 5.2 | PHP 5.2.17 / Microsoft-IIS 6.0 / MySQL5.0+
-
-e) VHOST-TGBUSER | PHP 5.2.10 / Microsoft-IIS 6.0 / MySQL5.0+
-
 ## 版本历史
 
 Build 1.0.0 r410 2013-04-22
@@ -78,6 +66,57 @@ c) 自动验证模块
 d) URL_REWRITE模块
 
 e) RBAC类
+
+## 已通过测试环境
+
+a) PC Windows 7 | PHP 5.3.13 / Apache 2.2.22/ MySQL 5.5.42
+
+b) Virtual-Machine Cent OS 6.3 | PHP 5.3.3 / Apache 2.2.15 / MySQL 5.1.67
+
+c) MBP OSX 10.8.3 | PHP 5.4.4 / Apache 2.2.22 / MySQL 5.5.25
+
+d) VHOST-ZAPSERVER343 Windows NT 5.2 | PHP 5.2.17 / Microsoft-IIS 6.0 / MySQL5.0+
+
+e) VHOST-TGBUSER | PHP 5.2.10 / Microsoft-IIS 6.0 / MySQL5.0+
+
+## 性能测试
+
+Server Software:        Apache/2.2.22
+Server Hostname:        localhost
+Server Port:            80
+
+Document Path:          /github_bpfw/index.php
+Document Length:        20 bytes
+
+Concurrency Level:      10
+Time taken for tests:   1.188 seconds
+Complete requests:      1000
+Failed requests:        0
+Write errors:           0
+Total transferred:      241000 bytes
+HTML transferred:       20000 bytes
+Requests per second:    841.49 [#/sec] (mean)
+Time per request:       11.884 [ms] (mean)
+Time per request:       1.188 [ms] (mean, across all concurrent requests)
+Transfer rate:          198.05 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.7      0       6
+Processing:     4   12  18.9      8     254
+Waiting:        3   11  18.8      8     254
+Total:          4   12  18.9      8     255
+
+Percentage of the requests served within a certain time (ms)
+  50%      8
+  66%      9
+  75%     10
+  80%     11
+  90%     17
+  95%     23
+  98%     69
+  99%    133
+ 100%    255 (longest request)
 
 ## 关于框架命名
 就是英语中Benny Production of Framework的缩写！意义重大！：）
