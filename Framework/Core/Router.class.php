@@ -28,45 +28,49 @@ class Router extends Component
 	 */
 	private $_params = array();
 
-
 	/**
 	 * URL分析，解析出正确URL位置
 	 * @access public
 	 * @return void
 	 */
-	public function parseUrl()
-	{
-		/* PATH_INFO模式 */
-		if ($this->URL_MODE === 'PATH_INFO') {
-			if (!isset($_SERVER['PATH_INFO'])) {
-				$this->_controller = $this->DEFAULT_CONTROLLER;
-				$this->_action = $this->DEFAULT_ACTION;
-			} else {
-				$pathInfo = explode('/', trim(str_replace('\\', '/', $_SERVER['PATH_INFO']), '/'));
-				$this->_controller = !empty($pathInfo[0]) ? $pathInfo[0] : $this->DEFAULT_CONTROLLER;
-				$this->_action = !empty($pathInfo[1]) ? $pathInfo[1] : $this->DEFAULT_ACTION;
-				if (!empty($pathInfo[2])) {
-					$key = $value = array();
-					for ($i = 2, $len = count($pathInfo); $i < $len; $i++) {
-						if ($i % 2 == 0) {
-							$key[] = $pathInfo[$i];
-						} else {
-							$value[] = $pathInfo[$i];
-						}
+	public function parseUrl() {
+		if ($this->URL_MODE === 'PATH_INFO' && isset($_SERVER['PATH_INFO'])) {
+			$pathInfo = explode('/', trim(str_replace('\\', '/', $_SERVER['PATH_INFO']), '/'));
+			$this->_controller = !empty($pathInfo[0]) ? $pathInfo[0] : $this->DEFAULT_CONTROLLER;
+			$this->_action = !empty($pathInfo[1]) ? $pathInfo[1] : $this->DEFAULT_ACTION;
+			if (!empty($pathInfo[2])) {
+				$key = $value = array();
+				for ($i = 2, $len = count($pathInfo); $i < $len; $i++) {
+					if ($i % 2 == 0) {
+						$key[] = $pathInfo[$i];
+					} else {
+						$value[] = $pathInfo[$i];
 					}
-					$this->_params = array_combine($key, $value);
-					$_GET = $this->_params + $_GET;
 				}
+				$this->_params = array_combine($key, $value);
+				$_GET = $this->_params + $_GET;
 			}
-		} else if ($this->_urlConfig['URL_MODE'] === 'ORIGINAL') {
+		} else if ($this->URL_MODE === 'ORIGINAL') {
 			$this->_controller = isset($_GET['c']) ? trim($_GET['c']) : 'Index';
 			$this->_action = isset($_GET['a']) ? trim($_GET['a']) : 'index';
-		} else if ($this->_urlConfig['URL_MODE'] === 'URL_REWRITE') {
-			// @todo URL重写模式
+		} else if ($this->URL_MODE === 'URL_REWRITE') {
+			$rules = Config::Get('Rewrite');
+			$url = ltrim(str_replace('\\', '/', $_SERVER['PATH_INFO']), '/');
+			foreach ($rules as $regex => $route) {
+				if (preg_match($regex, $url, $match)) {
+					$this->_controller = $route['controller'];
+					$this->_action = $route['action'];
+					array_shift($match);
+					$this->_params = array_combine(explode(',', $route['param']), $match);
+					$_GET = $this->_params + $_GET;
+					break;
+				}
+			}
 		}
-		$GLOBALS['CONTROLLER'] = $this->_controller . 'Action';
-		$GLOBALS['ACTION'] = $this->_action;
-
+		$this->_controller = $this->_controller ? $this->_controller : $this->DEFAULT_CONTROLLER;
+		$this->_action = $this->_action ? $this->_action : $this->DEFAULT_ACTION;
+		defined('CONTROLLER') || define('CONTROLLER', $this->_controller . 'Action');
+		defined('ACTION') || define('ACTION', $this->_action);
 	}
 
 	/**
@@ -77,20 +81,17 @@ class Router extends Component
 	 * @throws BException 控制器或行为不存在
 	 * @return void
 	 */
-	public function route($controller, $action)
-	{
+	public function route($controller, $action) {
 		if (class_exists($controller)) {
 			$reflectClass = new ReflectionClass($controller);
 			if ($reflectClass->hasMethod($action)) {
 				$method = $reflectClass->getMethod($action);
 				$method->invoke(Application::Create($controller));
 			} else {
-				throw new BException(Config::Lang('_ACTION_NOT_FOUND_') . ' => ' . $action);
+				Application::TriggerError(Translate::Get('_ACTION_NOT_FOUND_') . ' => ' . $action, 'error');
 			}
 		} else {
-			throw new BException(Config::Lang('_CONTROLLER_NOT_FOUND_') . ' => ' . $controller);
+			Application::TriggerError(Translate::Get('_CONTROLLER_NOT_FOUND_') . ' => ' . $controller, 'error');
 		}
 	}
 }
-
-?>
