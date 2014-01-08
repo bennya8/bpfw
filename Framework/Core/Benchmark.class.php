@@ -44,7 +44,7 @@ class Benchmark
 	 * @access public
 	 * @return int
 	 */
-	public static function UseMemory() {
+	public static function MemoryUse() {
 		return self::FormatSize(memory_get_usage(true));
 	}
 
@@ -53,7 +53,7 @@ class Benchmark
 	 * @access public
 	 * @return int
 	 */
-	public static function PeakMemory() {
+	public static function MemoryPeak() {
 		return self::FormatSize(memory_get_peak_usage(true));
 	}
 
