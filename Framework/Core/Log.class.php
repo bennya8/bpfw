@@ -7,7 +7,7 @@
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
-class Log
+class Log extends Component
 {
 
 	/**
