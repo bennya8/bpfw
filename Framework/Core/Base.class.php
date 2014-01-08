@@ -44,15 +44,7 @@ class Base
 	 * @var array
 	 */
 	private static $_regisClasses = array();
-	/**
-	 * 类库排除列表
-	 * @access private
-	 * @var array
-	 */
-	private static $_pushClasses = array(
-		'Smarty_' => 7,
-		'Smarty' => 6
-	);
+
 	/**
 	 * 注册实例库
 	 * @access private
@@ -76,9 +68,6 @@ class Base
 			self::_ClassesRegister($class, APP_PATH . '/Model/' . $class . '.class.php');
 		} else if (substr($class, -6) === 'Action') {
 			self::_ClassesRegister($class, APP_PATH . '/Action/' . $class . '.class.php');
-		} else {
-			throw new CustomException('111');
-			//Application::TriggerError(Translate::Get('_CLASS_NOT_FOUND_') . ' => ' . $class, 'notice');
 		}
 	}
 
