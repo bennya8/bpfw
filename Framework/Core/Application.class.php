@@ -64,8 +64,6 @@ class Application extends Base
 		if (get_magic_quotes_runtime()) set_magic_quotes_runtime(false);
 		
 		self::Create('Router')->parseUrl();
-		defined('CONTROLLER') || define('CONTROLLER', $GLOBALS['CONTROLLER']);
-		defined('ACTION') || define('ACTION', $GLOBALS['ACTION']);
 		self::Create('Router')->route(CONTROLLER, ACTION);
 	}
 
@@ -146,7 +144,7 @@ class Application extends Base
 	 * @return void
 	 */
 	public static function ErrorHandler($code, $message) {
-		throw new CustomException($message, $code);
+// 		throw new CustomException($message, $code);
 	}
 
 	/**
