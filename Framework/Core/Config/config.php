@@ -65,6 +65,7 @@ return array(
 		'DB_PWD' => 'root', // 密码
 		'DB_NAME' => 'test', // 数据库名
 		'DB_CHARSET' => 'utf8', // 字符集
+		'DB_SAFEMODE'=> true
 	),
 										
 	/* 视图配置 */
