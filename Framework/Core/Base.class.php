@@ -30,6 +30,7 @@ class Base
 		'FileSystem' => '/Core/FileSystem.class.php',
 		'Log' => '/Core/Log.class.php',
 		'Model' => '/Core/Model/Model.class.php',
+		'ModelHelper' => '/Core/Model/ModelHelper.class.php',
 		'FormModel' => '/Core/Model/FormModel.class.php',
 		'Router' => '/Core/Router.class.php',
 		'View' => '/Core/View/View.class.php',
