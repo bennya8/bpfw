@@ -7,53 +7,30 @@
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
-class DB_MySQL extends DB implements DB_Dao
+class Database_MySQL extends Database implements IDatabase
 {
-	
-	/**
-	 * 数据库资源实例
-	 * @access private
-	 * @var resource
-	 */
-	private $_resource = null;
-	
-	/**
-	 * 执行查询次数
-	 * @access private
-	 * @var int
-	 */
-	private $_lastQueryTimes = 0;
-	
-	/**
-	 * SQL错误信息列表
-	 * @access public
-	 * @var array
-	 */
-	private $_errorList = array();
-	
-	/**
-	 * 数据库配置
-	 * @access public
-	 * @var array
-	 */
-	private $_config = array();
 
 	/**
-	 * 构造方法
+	 * 初始化资源
 	 * @access public
 	 * @return void
 	 */
-	public function __construct($config)
+	public function __construct()
 	{
-		$this->_config = $config;
+		parent::__construct();
 		$this->getConnect();
-		$this->setDbName($this->_config['DB_NAME']);
-		$this->setCharset($this->_config['DB_CHARSET']);
+		$this->setDbName($this->DB_NAME);
+		$this->setCharset($this->DB_CHARSET);
 	}
 
+	/**
+	 * 释放资源
+	 * @access public
+	 * @return void
+	 */
 	public function __destruct()
 	{
-		mysql_close($this->_resource);
+		mysql_close($this->resource);
 	}
 
 	/**
@@ -65,14 +42,13 @@ class DB_MySQL extends DB implements DB_Dao
 	 * @param string $password 密码
 	 * @return boolean
 	 */
-	public function getConnect($c)
+	public function getConnect()
 	{
 		if (!function_exists('mysql_connect')) {
-			throw new BException(Config::Lang('_MYSQL_MODULE_NO_EXIST_'));
+			Application::TriggerError(Translate::Get('_MYSQL_MODULE_NO_EXIST_'), 'error');
 		}
-		if (!$this->_resource = mysql_connect($c['DB_HOST'] . ':' . $c['DB_PORT'], $c['DB_USER'], 
-				$c['DB_PWD'])) {
-			throw new BException(Config::Lang('_DB_CONNECT_FAIL_') . ' => ' . mysql_error());
+		if (!$this->resource = mysql_connect($this->DB_HOST . ':' . $this->DB_PORT, $this->DB_USER, $this->DB_PWD)) {
+			Application::TriggerError(Translate::Get('_DB_CONNECT_FAIL_') . ' => ' . mysql_error());
 		}
 	}
 
@@ -85,8 +61,8 @@ class DB_MySQL extends DB implements DB_Dao
 	 */
 	public function setDbName($name)
 	{
-		if (!mysql_select_db($name, $this->_resource)) {
-			throw new BException(Config::Lang('_SELECT_DB_FAIL_') . ' => ' . mysql_error());
+		if (!mysql_select_db($name, $this->resource)) {
+			Application::TriggerError(Translate::Get('_SELECT_DB_FAIL_') . ' => ' . mysql_error());
 		}
 	}
 
@@ -99,8 +75,8 @@ class DB_MySQL extends DB implements DB_Dao
 	 */
 	public function setCharset($name)
 	{
-		if (!mysql_set_charset($name, $this->_resource)) {
-			throw new BException(Config::Lang('_SET_CHARSET_FAIL_') . ' => ' . mysql_error());
+		if (!mysql_set_charset($name, $this->resource)) {
+			Application::TriggerError(Translate::Get('_SET_CHARSET_FAIL_') . ' => ' . mysql_error());
 		}
 	}
 
@@ -111,7 +87,7 @@ class DB_MySQL extends DB implements DB_Dao
 	 */
 	public function getCharset()
 	{
-		return mysql_client_encoding($this->_resource);
+		return mysql_client_encoding($this->resource);
 	}
 
 	/**
@@ -142,8 +118,8 @@ class DB_MySQL extends DB implements DB_Dao
 	 */
 	public function execute($sql)
 	{
-		if (!$result = mysql_query($sql, $this->_resource)) {
-			$this->_errorList[] = mysql_error();
+		if (!$result = mysql_query($sql, $this->resource)) {
+			$this->setError(mysql_error());
 			return false;
 		}
 		mysql_freeresult($result);
@@ -158,15 +134,15 @@ class DB_MySQL extends DB implements DB_Dao
 	 */
 	public function query($sql)
 	{
-		if (!$result = mysql_query($sql, $this->_resource)) {
-			$this->_errorList[] = mysql_error();
+		if (!$result = mysql_query($sql, $this->resource)) {
+			$this->setError(mysql_error());
 			return false;
 		}
 		while ($row = mysql_fetch_assoc($result)) {
 			$list[] = $row;
 		}
 		mysql_freeresult($result);
-		$this->_lastQueryTimes++;
+		$this->lastQueryTimes++;
 		return $list;
 	}
 
@@ -179,15 +155,15 @@ class DB_MySQL extends DB implements DB_Dao
 	public function quoteQuery($sql)
 	{
 		$sql = mysql_real_escape_string($sql);
-		if (!$result = mysql_query($sql, $this->_resource)) {
-			$this->_errorList[] = mysql_error();
+		if (!$result = mysql_query($sql, $this->resource)) {
+			$this->setError(mysql_error());
 			return false;
 		}
 		while ($row = mysql_fetch_assoc($result)) {
 			$list[] = $row;
 		}
 		mysql_freeresult($result);
-		$this->_lastQueryTimes++;
+		$this->lastQueryTimes++;
 		return $list;
 	}
 
@@ -228,7 +204,7 @@ class DB_MySQL extends DB implements DB_Dao
 	 */
 	public function lastQueryTimes()
 	{
-		return $this->_lastQueryTimes;
+		return $this->lastQueryTimes;
 	}
 
 	/**
@@ -250,25 +226,4 @@ class DB_MySQL extends DB implements DB_Dao
 	{
 		return mysql_insert_id();
 	}
-
-	/**
-	 * 获取最新一次SQL错误信息
-	 * @access public
-	 * @return string SQL错误信息
-	 */
-	public function getError()
-	{
-		return array_pop($this->_errorList);
-	}
-
-	/**
-	 * 获取SQL错误信息列表
-	 * @access public
-	 * @return array SQL错误信息列表
-	 */
-	public function getErrorList()
-	{
-		return $this->_errorList;
-	}
 }
-?>

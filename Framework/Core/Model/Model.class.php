@@ -15,14 +15,13 @@ class Model
 	protected $tableShufix = '';
 	protected $tableName = '';
 	protected $tableFullName = '';
-
 	
 	/**
 	 * 数据库资源实例
 	 * @access public
 	 * @var resource
 	 */
-	public $db = null;
+	protected $db = null;
 
 	/**
 	 * 构造方法
@@ -31,12 +30,12 @@ class Model
 	 */
 	public function __construct()
 	{
-		$dbConfig = Config::Conf('DB_CONFIG');
+		$dbConfig = Config::Get('Database');
 		$this->tablePrefix = $dbConfig['DB_PREFIX'];
 		$this->tableShufix = $dbConfig['DB_SHUFIX'];
 		$this->tableName = $this->getTableName();
 		$this->tableFullName = $this->getTableFullName();
-		$this->db = DB::Factory($dbConfig['DB_ENGINE']);
+		$this->db = Database::Factory($dbConfig['DB_ENGINE']);
 	}
 
 	/**
@@ -202,7 +201,7 @@ class Model
 	{
 		return $this->db->quoteQuery($sql);
 	}
-	
+
 	/**
 	 * 执行SQL DML语句，返回受影响行数
 	 * @param string $sql DML语句
@@ -212,7 +211,7 @@ class Model
 	 */
 	public function execute($sql)
 	{
-		return $this->db->execute($sql); 
+		return $this->db->execute($sql);
 	}
 
 	/**
@@ -302,17 +301,6 @@ class Model
 	}
 
 	/**
-	 * 切换数据库引擎
-	 * @access public
-	 * @param string $name 数据库引擎名
-	 * @return void
-	 */
-	public function switchDbEngine($name)
-	{
-		$this->db = DB::Factory($name);
-	}
-
-	/**
 	 * 添加字符转义
 	 * @access public
 	 * @param mixed $value 要添加字符转义的字符串或数组
@@ -361,6 +349,36 @@ class Model
 	}
 
 	/**
+	 * 获取当前数据库引擎名称
+	 * @access public
+	 * @return object 实例
+	 */
+	public function getEngineName()
+	{
+		return get_class($this->db);
+	}
+
+	/**
+	 * 获取当前数据库引擎
+	 * @access public
+	 * @return object 实例
+	 */
+	public function getEngine()
+	{
+		return $this->db;
+	}
+
+	/**
+	 * 切换当前数据库引擎
+	 * @access public
+	 * @return object 实例
+	 */
+	public function setEngine($name)
+	{
+		$this->db = self::Factory($name);
+	}
+
+	/**
 	 * 魔术方法，当调用Model内的方法不存在时
 	 * 自动映射调用数据库引擎类里面方法
 	 * @access public
@@ -371,23 +389,14 @@ class Model
 	public function __call($name, $args)
 	{
 		if (method_exists($this->db, $name)) {
-			$reflectClass = App::Create('ReflectionClass', $this->db);
-			if ($reflectClass->hasMethod($name)) {
-				$method = $reflectClass->getMethod($name);
-				if ($method->isProtected() || $method->isPrivate()) {
-					throw new BException(
-							Config::Lang('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' .
-									 get_class($this->db) . ' Method: ' . $name . '()');
-				} else {
-					return $method->invokeArgs($this->db, $args);
-				}
+			$method = Application::Create('ReflectionMethod', $this->db);
+			if ($method->isPublic()) {
+				$method->invokeArgs($this->db, $args);
+			} else {
+				Application::TriggerError(Translate::Get('_CALL_METHOD_DENIED_') . ' => Class: ' . get_class($this->db) . ' Method: ' . $name . '()');
 			}
 		} else {
-			throw new BException(
-					Config::Lang('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' .
-							 get_class($this->db) . ' Method: ' . $name . '()');
+			Application::TriggerError(Translate::Get('_CALL_NO_EXIST_METHOD_') . ' => Class: ' . get_class($this->db) . ' Method: ' . $name . '()');
 		}
 	}
 }
-
-?>

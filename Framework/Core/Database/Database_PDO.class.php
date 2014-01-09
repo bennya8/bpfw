@@ -7,7 +7,7 @@
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
-class DB_PDO extends DB implements DB_Dao
+class Database_PDO extends Database implements IDatabase
 {
 	
 	/**
@@ -84,8 +84,7 @@ class DB_PDO extends DB implements DB_Dao
 		if (!array_search($dsnName, $dsnDrivers)) {
 			throw new BException(Config::Lang('_PDO_MODULE_MISSING_') . ' => Extension: ' . $dsnName);
 		}
-		$dsn = $dsnName . ':host=' . $c['DB_HOST'] . ';dbname=' . $c['DB_NAME'] . ';port=' .
-				 $c['DB_PORT'];
+		$dsn = $dsnName . ':host=' . $c['DB_HOST'] . ';dbname=' . $c['DB_NAME'] . ';port=' . $c['DB_PORT'];
 		$options = array(
 			PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . $c['DB_CHARSET']
 		);

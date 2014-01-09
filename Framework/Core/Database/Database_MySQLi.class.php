@@ -7,37 +7,11 @@
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
-class DB_MySQLi extends DB implements DB_Dao
+class Database_MySQLi extends Database implements IDatabase
 {
-	/**
-	 * 数据库资源实例
-	 * @access private
-	 * @var resource
-	 */
-	private $_resource = null;
-	
-	/**
-	 * 执行查询次数
-	 * @access private
-	 * @var int
-	 */
-	private $_lastQueryTimes = 0;
-	
-	/**
-	 * 数据库配置
-	 * @access private
-	 * @var array
-	 */
-	private $_config = array();
 
-	/**
-	 * 构造方法，初始化数据库资源
-	 * @access public
-	 * @return void
-	 */
-	public function __construct($config)
+	public function __construct()
 	{
-		$this->_config = $config;
 		$this->getConnect($this->_config);
 		$this->setCharset($this->_config['DB_CHARSET']);
 	}
@@ -64,8 +38,7 @@ class DB_MySQLi extends DB implements DB_Dao
 			throw new BException(Config::Lang('_MYSQLI_MODULE_NO_EXIST_'));
 		}
 		try {
-			$this->_resource = new mysqli($c['DB_HOST'], $c['DB_USER'], $c['DB_PWD'], $c['DB_NAME'], 
-					$c['DB_PORT']);
+			$this->_resource = new mysqli($c['DB_HOST'], $c['DB_USER'], $c['DB_PWD'], $c['DB_NAME'], $c['DB_PORT']);
 		} catch (mysqli_sql_exception $e) {
 			throw new BException(Config::Lang('_DB_CONNECT_FAIL_') . ' => ' . $e->getMessage());
 		}
@@ -81,9 +54,7 @@ class DB_MySQLi extends DB implements DB_Dao
 	public function setDbName($name)
 	{
 		if (!$this->_resource->select_db($name)) {
-			throw new BException(
-					Config::Lang('_SELECT_DB_FAIL_') . ' => ' . mysqli_error(
-							$this->_resource));
+			throw new BException(Config::Lang('_SELECT_DB_FAIL_') . ' => ' . mysqli_error($this->_resource));
 		}
 	}
 
@@ -97,9 +68,7 @@ class DB_MySQLi extends DB implements DB_Dao
 	public function setCharset($name)
 	{
 		if (!$this->_resource->set_charset($name)) {
-			throw new BException(
-					Config::Lang('_SET_CHARSET_FAIL_') . ' => ' . mysqli_error(
-							$this->_resource));
+			throw new BException(Config::Lang('_SET_CHARSET_FAIL_') . ' => ' . mysqli_error($this->_resource));
 		}
 	}
 
@@ -198,7 +167,7 @@ class DB_MySQLi extends DB implements DB_Dao
 		$this->_lastQueryTimes++;
 		return false;
 	}
-	
+
 	/**
 	 * 开始一个事务
 	 * @access public
