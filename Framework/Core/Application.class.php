@@ -23,7 +23,8 @@ class Application extends Base
 	 * @access public
 	 * @return void
 	 */
-	public function run() {
+	public function run()
+	{
 		$this->init();
 	}
 
@@ -32,7 +33,8 @@ class Application extends Base
 	 * @access private
 	 * @return void
 	 */
-	private function init() {
+	private function init()
+	{
 		defined('DEBUG') ? error_reporting(-1) : error_reporting(0);
 		if (!defined('WEBROOT')) {
 			$webroot = dirname($_SERVER['SCRIPT_NAME']);
@@ -47,22 +49,19 @@ class Application extends Base
 			'ClassesLoader'
 		));
 		set_error_handler(array(
-			'Application',
+			'CustomException',
 			'ErrorHandler'
 		));
 		set_exception_handler(array(
-			'Application',
+			'CustomException',
 			'ExceptionHandler'
 		));
-		
 		Translate::Init();
+		Config::Init();
 		$this->checkPhpVersion();
 		$this->makeSample();
-		Config::Init();
-		
 		date_default_timezone_set(Config::Get('SYS_TIMEZONE'));
 		if (get_magic_quotes_runtime()) set_magic_quotes_runtime(false);
-		
 		self::Create('Router')->parseUrl();
 		self::Create('Router')->route(CONTROLLER, ACTION);
 	}
@@ -73,7 +72,8 @@ class Application extends Base
 	 * @throws BException 样本文件丢失
 	 * @return void
 	 */
-	public function makeSample() {
+	public function makeSample()
+	{
 		if (!is_dir(APP_PATH)) {
 			$path = require SYS_PATH . '/Template/sample/sample_path.php';
 			$file = require SYS_PATH . '/Template/sample/sample_file.php';
@@ -93,7 +93,8 @@ class Application extends Base
 	 * @throws BException 语言包文件不存在
 	 * @return void
 	 */
-	public function setLanguage($name) {
+	public function setLanguage($name)
+	{
 		Translate::init($name);
 	}
 
@@ -103,7 +104,8 @@ class Application extends Base
 	 * @throws BException PHP版本低于5.0
 	 * @return void
 	 */
-	public function checkPhpVersion() {
+	public function checkPhpVersion()
+	{
 		if (version_compare(PHP_VERSION, '5', '<')) {
 			self::TriggerError(Translate::Get('_PHP5_ABOVE_REQUIRED_'), 'error');
 		}
@@ -120,7 +122,8 @@ class Application extends Base
 	 * @example 调用：App::Import('Util/Paging.class');
 	 *          系统Extend目录：/Root/Framework/Extend/Util/Paging.class.php
 	 */
-	public static function Import($class) {
+	public static function Import($class)
+	{
 		parent::Import($class);
 	}
 
@@ -131,41 +134,25 @@ class Application extends Base
 	 * @param array $args 构造参数
 	 * @return object 类的实例
 	 */
-	public static function Create($class = __CLASS__, $args = NULL) {
+	public static function Create($class = __CLASS__, $args = NULL)
+	{
 		return parent::Create($class, $args);
 	}
 
 	/**
-	 * 自定义错误句柄
-	 * @access private
-	 * @param int $code
-	 * @param string $message
-	 * @throws BException 捕获未知异常
+	 * 触发用户自定义错误
+	 * @access public
+	 * @param string $message 错误信息
+	 * @param string $errorType 错误级别
 	 * @return void
 	 */
-	public static function ErrorHandler($code, $message) {
-// 		throw new CustomException($message, $code);
-	}
-
-	/**
-	 * 自定义异常句柄
-	 * @access private
-	 * @param int $code
-	 * @param string $message
-	 * @throws BException 捕获未知异常
-	 * @return void
-	 */
-	public static function ExceptionHandler($e) {
-		defined('DEBUG') && (DEBUG) ? $e->trace() : $e->log();
-	}
-
-	public static function TriggerError($errorMsg, $errorType = 'notice') {
+	public static function TriggerError($message, $type = 'notice')
+	{
 		$levels = array(
 			'notice' => E_USER_NOTICE,
 			'warning' => E_USER_WARNING,
 			'error' => E_USER_ERROR
 		);
-		trigger_error($errorMsg, $levels[$errorType]);
+		trigger_error($message, $levels[$type]);
 	}
 }
-
