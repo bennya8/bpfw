@@ -57,9 +57,9 @@ class Application extends Base
 			'ExceptionHandler'
 		));
 		Translate::Init();
-		Config::Init();
 		$this->checkPhpVersion();
 		$this->makeSample();
+		Config::Init();
 		date_default_timezone_set(Config::Get('SYS_TIMEZONE'));
 		if (get_magic_quotes_runtime()) set_magic_quotes_runtime(false);
 		self::Create('Router')->parseUrl();

@@ -59,7 +59,7 @@ class CustomException extends Exception
 	 */
 	public static function ErrorHandler($code, $message)
 	{
-		// throw new CustomException($message, $code);
+		throw new CustomException($message, $code);
 	}
 
 	/**

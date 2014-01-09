@@ -38,7 +38,7 @@ class View extends Component
 	 */
 	public function __construct($args) {
 		$this->config = Config::Get('View');
-		$this->controller = $args['controller'];
+		$this->controller = $args;
 		$this->engine = $this->Factory($this->VIEW_ENGINE);
 		$this->theme = $this->VIEW_THEME;
 	}
@@ -122,17 +122,17 @@ class View extends Component
 		if (empty($template)) {
 			$temp = debug_backtrace(2);
 			foreach ($temp as $k => $v) {
-				if ($v['class'] === $this->_controller) {
-					$template = $this->_theme . '/' . substr($this->_controller, 0, -6) . '/' . $v['function'] . '.html';
+				if ($v['class'] === $this->controller) {
+					$template = $this->theme . '/' . substr($this->controller, 0, -6) . '/' . $v['function'] . '.html';
 					break;
 				}
 			}
 		} else if (preg_match('/(\S+):(\S+)/', $template, $match)) {
-			$template = $this->_theme . '/' . $match[1] . '/' . $match[2];
+			$template = $this->theme . '/' . $match[1] . '/' . $match[2];
 		} else if (preg_match('/(\S+)@(\S+):(\S+)/', $template, $match)) {
 			$template = $match[1] . '/' . $match[2] . '/' . $match[3];
 		} else {
-			$template = $this->_theme . '/' . substr($this->_controller, 0, -6) . '/' . $template;
+			$template = $this->theme . '/' . substr($this->controller, 0, -6) . '/' . $template;
 		}
 		if (!is_file(APP_PATH . '/View/' . $template)) {
 			Application::TriggerError(Translate::Get('_VIEW_NOT_FOUND_') . ' => ' . $template);

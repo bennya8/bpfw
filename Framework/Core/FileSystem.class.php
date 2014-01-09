@@ -96,8 +96,10 @@ class FileSystem
 				if (is_file($target) && $cover) {
 					self::RemoveFile($target);
 					if (!copy($source, $target)) self::SetError('_COPY_FILE_FAILED_', $target);
-				} else {
+				} else if (is_file($target) && !$cover) {
 					self::SetError('_FILE_EXIST_', $target);
+				} else {
+					if (!copy($source, $target)) self::SetError('_COPY_FILE_FAILED_', $target);
 				}
 			}
 		}
@@ -125,7 +127,7 @@ class FileSystem
 	 */
 	public static function SetError($errorType, $path)
 	{
-		self::$errorMessage[] = Config::Lang($errorType) . ' => ' . securePath($path);
+		self::$errorMessage[] = Config::Get($errorType) . ' => ' . securePath($path);
 	}
 
 	/**

@@ -60,11 +60,12 @@ class Base
 	 * @throws BException 要载入的类不存在
 	 * @return void
 	 */
-	protected static function ClassesLoader($class) {
+	protected static function ClassesLoader($class)
+	{
 		if (isset(self::$_coreClasses[$class])) {
 			require SYS_PATH . self::$_coreClasses[$class];
 		} else if (isset(self::$_regisClasses[$class])) {
-			require self::$_coreClasses[$class];
+			require self::$_regisClasses[$class];
 		} else if (substr($class, -5) === 'Model') {
 			self::_ClassesRegister($class, APP_PATH . '/Model/' . $class . '.class.php');
 		} else if (substr($class, -6) === 'Action') {
@@ -80,7 +81,9 @@ class Base
 	 * @throws BException 要载入的类不存在
 	 * @return void
 	 */
-	private static function _ClassesRegister($class, $classPath) {
+	private static function _ClassesRegister($class, $classPath)
+	{
+		if (!is_file($classPath)) Application::TriggerError(Translate::Get('_CLASS_NOT_FOUND_') . ' => ' . $class . '.class.php');
 		if (!isset(self::$_regisClasses[$class])) {
 			self::$_regisClasses[$class] = $classPath;
 		}
@@ -98,7 +101,8 @@ class Base
 	 * @example 调用：App::Import('Util/Paging.class');
 	 *          系统Extend目录：/Root/Framework/Extend/Util/Paging.class.php
 	 */
-	protected static function Import($class) {
+	protected static function Import($class)
+	{
 		if (strpos($class, '@') === 0) {
 			$classpath = APP_PATH . DS . 'Extend/' . str_replace('@', '', $class) . '.php';
 		} else {
@@ -117,7 +121,8 @@ class Base
 	 * @param array $args 构造参数
 	 * @return object 类的实例
 	 */
-	protected static function Create($class = __CLASS__, $args = NULL) {
+	protected static function Create($class = __CLASS__, $args = NULL)
+	{
 		if (!isset(self::$_instances[$class])) {
 			self::$_instances[$class] = new $class($args);
 		}
@@ -129,12 +134,14 @@ class Base
 	 * @access private
 	 * @return void
 	 */
-	private function __construct() {}
+	private function __construct()
+	{}
 
 	/**
 	 * 魔术方法，防止克隆实例
 	 * @access private
 	 * @return void
 	 */
-	private function __clone() {}
+	private function __clone()
+	{}
 }

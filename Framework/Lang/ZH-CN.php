@@ -24,8 +24,8 @@ return array(
 	'_PROPERTY_NOT_EXIST_' => '属性不存在',
 	'_CALL_NO_EXIST_METHOD_' => '访问方法不存在',
 	'_CALL_METHOD_DENIED_' => '访问受保护方法 或 私有方法',
-	'_CONTROLLER_NOT_FOUND_' => '没有找到该控制器',
-	'_ACTION_NOT_FOUND_' => '没有找到该行为',
+	'_CONTROLLER_NOT_FOUND_' => '访问控制器不存在',
+	'_ACTION_NOT_FOUND_' => '访问行为不存在',
 	'_VIEW_NOT_FOUND_' => '没有找到该视图',
 	'_UNKNOW_ERROR_' => '未知错误',
 						

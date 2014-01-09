@@ -33,7 +33,8 @@ class Router extends Component
 	 * @access public
 	 * @return void
 	 */
-	public function parseUrl() {
+	public function parseUrl()
+	{
 		if ($this->URL_MODE === 'PATH_INFO' && isset($_SERVER['PATH_INFO'])) {
 			$url = explode('/', trim(str_replace('\\', '/', $_SERVER['PATH_INFO']), '/'));
 			$this->_controller = !empty($url[0]) ? $url[0] : $this->DEFAULT_CONTROLLER;
@@ -81,17 +82,18 @@ class Router extends Component
 	 * @throws BException 控制器或行为不存在
 	 * @return void
 	 */
-	public function route($controller, $action) {
-		if (class_exists($controller)) {
+	public function route($controller, $action)
+	{
+		if (is_file(APP_PATH . '/Action/' . $controller . '.class.php')) {
 			$reflectClass = new ReflectionClass($controller);
 			if ($reflectClass->hasMethod($action)) {
 				$method = $reflectClass->getMethod($action);
 				$method->invoke(Application::Create($controller));
 			} else {
-				Application::TriggerError(Translate::Get('_ACTION_NOT_FOUND_') . ' => ' . $action, 'error');
+				throw new CustomException(Translate::Get('_ACTION_NOT_FOUND_') . ': ' . $controller.'->'.$action.'()', E_USER_ERROR);
 			}
 		} else {
-			Application::TriggerError(Translate::Get('_CONTROLLER_NOT_FOUND_') . ' => ' . $controller, 'error');
+			throw new CustomException(Translate::Get('_CONTROLLER_NOT_FOUND_') . ': ' . $controller, E_USER_ERROR);
 		}
 	}
 }
