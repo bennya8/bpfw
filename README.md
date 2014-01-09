@@ -69,51 +69,85 @@ e) VHOST-TGBUSER | PHP 5.2.10 / Microsoft-IIS 6.0 / MySQL5.0+
 
 ## 性能测试
 
-硬件环境：
 Macbook Pro 2011 Early
+
 CPU: i5 2415M 2.3Ghz
+
 内存: 8GB 1333Mhz
+
 系统盘: Sandisk 128GB SSD (MAMP环境)
+
 数据盘: Hitachi 320GB HDD (wwwroot挂载数据盘) 
+
 操作系统: 10.9.1 Mavericks
+
 PHP环境：Apache/2.2.2 (Unix) PHP/5.4.4 MySQL 5.5.25
+
 测试参数：ab -c 10 -n 1000 http://localhost/github_bpfw/index.php
 
 Server Software:        Apache/2.2.22
+
 Server Hostname:        localhost
+
 Server Port:            80
 
 Document Path:          /github_bpfw/index.php
+
 Document Length:        20 bytes
 
 Concurrency Level:      10
+
 Time taken for tests:   1.188 seconds
+
 Complete requests:      1000
+
 Failed requests:        0
+
 Write errors:           0
+
 Total transferred:      241000 bytes
+
 HTML transferred:       20000 bytes
+
 Requests per second:    841.49 [#/sec] (mean)
+
 Time per request:       11.884 [ms] (mean)
+
 Time per request:       1.188 [ms] (mean, across all concurrent requests)
+
 Transfer rate:          198.05 [Kbytes/sec] received
 
+
 Connection Times (ms)
+
               min  mean[+/-sd] median   max
+              
 Connect:        0    0   0.7      0       6
+
 Processing:     4   12  18.9      8     254
+
 Waiting:        3   11  18.8      8     254
+
 Total:          4   12  18.9      8     255
 
 Percentage of the requests served within a certain time (ms)
+
   50%      8
+  
   66%      9
+  
   75%     10
+  
   80%     11
+  
   90%     17
+  
   95%     23
+  
   98%     69
+  
   99%    133
+  
  100%    255 (longest request)
 
 ## 关于框架命名
