@@ -15,6 +15,7 @@ class Model
 	protected $tableShufix = '';
 	protected $tableName = '';
 	protected $tableFullName = '';
+	protected $helper = null;
 	
 	/**
 	 * 数据库资源实例
@@ -36,6 +37,7 @@ class Model
 		$this->tableName = $this->getTableName();
 		$this->tableFullName = $this->getTableFullName();
 		$this->db = Database::Factory($dbConfig['DB_ENGINE']);
+		$this->helper = Application::Create('ModelHelper',$this->tableFullName);
 	}
 
 	/**
@@ -44,55 +46,61 @@ class Model
 	 * @param array $condition 筛选条件
 	 * @return array 成功获取 / false 获取失败 / nulL 记录不存在
 	 */
-	public function find($condition)
+	public function find($condition = null)
 	{
-		// @todo
+		$condition['limit'] = '1';
+		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName();
+		return $this->db->query($this->helper->select($condition));
 	}
 
 	/**
-	 * 模型查询：获取多条数据
+	 * 获取数据
 	 * @access public
 	 * @param array $condition 筛选条件
 	 * @return array 成功获取 / false 获取失败 / nulL 记录不存在
 	 */
-	public function findAll($condition)
+	public function findAll($condition = null)
 	{
-		// @todo
+		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName();
+		return $this->db->query($this->helper->select($condition));
 	}
 
 	/**
-	 * 模型查询：新增多条数据
+	 * 新增数据
 	 * @access public
-	 * @param array $map 数据集
+	 * @param array $condition SQL语句组合
+	 * @param array $data 插入数据集
 	 * @return array 新增行数 / false 新增失败
 	 */
-	public function add($map)
+	public function insert($condition,$data)
 	{
-		// @todo
+		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName();
+		return $this->db->execute($this->helper->insert($condition,$data));
 	}
 
 	/**
-	 * 模型查询：更新多条数据
+	 * 更新数据
 	 * @access public
-	 * @param array $map 数据集
-	 * @param array $condition 筛选条件
+	 * @param array $condition SQL语句组合
+	 * @param array $data 更新数据集
 	 * @return array 更新行数 / false 更新失败
 	 */
-	public function save($map, $condition)
+	public function update($condition,$data)
 	{
-		// @todo
+		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName();
+		return $this->db->execute($this->helper->update($condition,$data));
 	}
 
 	/**
-	 * 模型查询：删除多条数据
+	 * 删除数据
 	 * @access public
-	 * @param array $map 数据集
-	 * @param array $condition 筛选条件
+	 * @param array $condition SQL语句组合
 	 * @return int 删除行数 / false 删除失败
 	 */
-	public function delete($map)
+	public function delete($condition)
 	{
-		// @todo
+		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName();
+		return $this->db->execute($this->helper->delete($condition));
 	}
 
 	/**
