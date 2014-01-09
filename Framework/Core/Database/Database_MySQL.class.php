@@ -45,10 +45,10 @@ class Database_MySQL extends Database implements IDatabase
 	public function getConnect()
 	{
 		if (!function_exists('mysql_connect')) {
-			Application::TriggerError(Translate::Get('_MYSQL_MODULE_NO_EXIST_'), 'error');
+			throw new CustomException(Translate::Get('_MYSQL_MODULE_NO_EXIST_'));
 		}
 		if (!$this->resource = mysql_connect($this->DB_HOST . ':' . $this->DB_PORT, $this->DB_USER, $this->DB_PWD)) {
-			Application::TriggerError(Translate::Get('_DB_CONNECT_FAIL_') . ' => ' . mysql_error());
+			throw new CustomException(Translate::Get('_DB_CONNECT_FAIL_') . ' => ' . mysql_error());
 		}
 	}
 
@@ -62,7 +62,7 @@ class Database_MySQL extends Database implements IDatabase
 	public function setDbName($name)
 	{
 		if (!mysql_select_db($name, $this->resource)) {
-			Application::TriggerError(Translate::Get('_SELECT_DB_FAIL_') . ' => ' . mysql_error());
+			throw new CustomException(Translate::Get('_SELECT_DB_FAIL_') . ' => ' . mysql_error());
 		}
 	}
 
@@ -76,7 +76,7 @@ class Database_MySQL extends Database implements IDatabase
 	public function setCharset($name)
 	{
 		if (!mysql_set_charset($name, $this->resource)) {
-			Application::TriggerError(Translate::Get('_SET_CHARSET_FAIL_') . ' => ' . mysql_error());
+			throw new CustomException(Translate::Get('_SET_CHARSET_FAIL_') . ' => ' . mysql_error());
 		}
 	}
 
