@@ -81,6 +81,16 @@ e) VHOST-TGBUSER | PHP 5.2.10 / Microsoft-IIS 6.0 / MySQL5.0+
 
 ## 性能测试
 
+硬件环境：
+Macbook Pro 2011 Early
+CPU: i5 2415M 2.3Ghz
+内存: 8GB 1333Mhz
+系统盘: Sandisk 128GB SSD (MAMP环境)
+数据盘: Hitachi 320GB HDD (wwwroot挂载数据盘) 
+操作系统: 10.9.1 Mavericks
+PHP环境：Apache/2.2.2 (Unix) PHP/5.4.4 MySQL 5.5.25
+测试参数：ab -c 10 -n 1000 http://localhost/github_bpfw/index.php
+
 Server Software:        Apache/2.2.22
 Server Hostname:        localhost
 Server Port:            80
