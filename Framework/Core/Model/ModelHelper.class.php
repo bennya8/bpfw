@@ -51,8 +51,6 @@ class ModelHelper
 	 */
 	protected $table = '';
 
-
-
 	/**
 	 * 生成select语句
 	 * @access public
@@ -214,19 +212,19 @@ class ModelHelper
 				foreach ($this->condition['join'] as $join) {
 					switch (strtolower($join[0])) {
 						case 'right':
-							$join[0] = 'RIGHT JOIN';
+							$join[0] = 'RIGHT JOIN ';
 							break;
 						case 'inner':
-							$join[0] = 'INNER JOIN';
+							$join[0] = 'INNER JOIN ';
 							break;
 						case 'cross':
-							$join[0] = 'CROSS JOIN';
+							$join[0] = 'CROSS JOIN ';
 							break;
 						default:
-							$join[0] = 'LEFT JOIN';
+							$join[0] = 'LEFT JOIN ';
 							break;
 					}
-					$sql .= $join[0] . ' ' . $join[1] . ' ON ' . $join[2] . ' ';
+					$sql .= $join[0] . $join[1] . ' ON ' . $join[2] . ' ';
 				}
 			}
 		}
