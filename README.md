@@ -55,18 +55,6 @@ e) 支持百度BAE环境数据库
 
 f) 引入了Bootstrap前端框架
 
-## 未来更新
-
-a) PDO类 √
-
-b) 关系模型
-
-c) 自动验证模块
-
-d) URL_REWRITE模块
-
-e) RBAC类
-
 ## 已通过测试环境
 
 a) PC Windows 7 | PHP 5.3.13 / Apache 2.2.22/ MySQL 5.5.42
