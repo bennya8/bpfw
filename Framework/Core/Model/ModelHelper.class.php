@@ -2,10 +2,10 @@
 
 class ModelHelper
 {
-	protected final $select = 'SELECT @COLUMN FROM @TABLE @JOIN @WHERE @GROUP @ORDER @LIMIT';
-	protected final $insert = 'INSERT INTO @TABLE @DATA';
-	protected final $update = 'UPDATE @TABLE SET @DATA @WHERE';
-	protected final $delete = 'DELETE FROM @TABLE @WHERE';
+	protected $select = 'SELECT @COLUMN FROM @TABLE @JOIN @WHERE @GROUP @ORDER @LIMIT';
+	protected $insert = 'INSERT INTO @TABLE @DATA';
+	protected $update = 'UPDATE @TABLE SET @DATA @WHERE';
+	protected $delete = 'DELETE FROM @TABLE @WHERE';
 	protected $safemode = true;
 	protected $condition = array();
 	protected $data = array();
@@ -13,38 +13,37 @@ class ModelHelper
 	public function __construct()
 	{
 		
-		
 		// $config = Config::Get('Database');
-// 		$this->safemode = isset($config['DB_SAFEMODE']) ? (boolean) $config['DB_SAFEMODE'] : true;
+		// $this->safemode = isset($config['DB_SAFEMODE']) ? (boolean)
+	// $config['DB_SAFEMODE'] : true;
 	}
 
-	public function insert($condition,$data){
+	public function insert($condition, $data)
+	{
 		$this->condition = $condition;
 		$this->data = $data;
 		$this->parseInsert();
-		exit;
+		exit();
 		$sql = str_replace(array(
 			'@TABLE',
 			'@COLUMN',
 			'@DATA'
 		), array(
 			$this->parseTable(),
-			$this->parseColumn(),
+			$this->parseColumn()
 		), $this->insert);
-		
 	}
-	
-	protected function parseInsert(){
+
+	protected function parseInsert()
+	{
 		$sql = '';
 		$data = $this->data;
-		if(!empty($data) && is_array($data)){
-			list($column,$value) = $data;
+		if (!empty($data) && is_array($data)) {
+			list($column, $value) = $data;
 			array_keys($data[0]);
-			
 		}
 	}
-	
-	
+
 	public function select($condition)
 	{
 		$this->condition = $condition;
@@ -56,15 +55,16 @@ class ModelHelper
 			'@GROUP',
 			'@ORDER',
 			'@LIMIT'
-		), array(
-			$this->parseColumn(),
-			$this->parseTable(),
-			$this->parseWhere(),
-			$this->parseJoin(),
-			$this->parseGroup(),
-			$this->parseOrder(),
-			$this->parseLimit()
-		), $this->select);
+		), 
+				array(
+					$this->parseColumn(),
+					$this->parseTable(),
+					$this->parseWhere(),
+					$this->parseJoin(),
+					$this->parseGroup(),
+					$this->parseOrder(),
+					$this->parseLimit()
+				), $this->select);
 		return $sql;
 	}
 
@@ -199,8 +199,7 @@ array(
 	'aa' => 'aa',
 	'bb' => 'cc',
 	'dd' => 'ee'
-)
-
+);
 
 $helper = new ModelHelper();
 echo $helper->select($c2);
