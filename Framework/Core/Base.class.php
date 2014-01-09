@@ -23,7 +23,7 @@ class Base
 		'Config' => '/Core/Config.class.php',
 		'Translate' => '/Core/Translate.class.php',
 		'Database' => '/Core/Database/Database.class.php',
-		'Database_Dao' => '/Core/Database/Database_Dao.class.php',
+		'IDatabase' => '/Core/Database/IDatabase.class.php',
 		'Database_MySQL' => '/Core/Database/Database_MySQL.class.php',
 		'Database_MySQLi' => '/Core/Database/Database_MySQLi.class.php',
 		'Database_PDO' => '/Core/Database/Database_PDO.class.php',
