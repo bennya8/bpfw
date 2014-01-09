@@ -31,8 +31,8 @@ abstract class Component
 		if (isset($this->config[$key])) {
 			return $this->config[$key];
 		} else if (property_exists($this, $key)) {
-			$reflectMethod = new ReflectionProperty($this, $key);
-			if ($reflectMethod->isPublic()) {
+			$property = new ReflectionProperty($this, $key);
+			if ($property->isPublic()) {
 				return $this->$key;
 			} else {
 				Application::TriggerError(Translate::Get('_PROPERTY_ACCESS_DENIED') . ' => Class: ' . get_class($this) . ' Propertiy: ' . $key, 'notice');
