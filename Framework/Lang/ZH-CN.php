@@ -12,6 +12,8 @@ return array(
 	'_SYSCONF_FILE_MISSING_' => '系统配置文件丢失',
 	'_APPCONF_FILE_MISSING_' => '应用配置文件丢失',
 	'_LANG_FILE_MISSING_' => '语言包文件丢失',
+	'_OPERATION_SUCCESS_' => '操作成功 :)',
+	'_OPERATION_FAILED_' => '操作失败 :)',
 
 	/* 运行状态相关 */
 	'_PHP5_ABOVE_REQUIRED_' => '运行环境需要PHP5以上',
