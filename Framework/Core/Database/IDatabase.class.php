@@ -7,7 +7,7 @@
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
-interface Database_DAO
+interface IDatabase
 {
 
 	/**
@@ -50,7 +50,7 @@ interface Database_DAO
 	 * @return array 结果集 / false 失败
 	 */
 	public function quoteQuery($sql);
-	
+
 	/**
 	 * 执行SQL DML语句，返回受影响行数
 	 * @param string $sql DQL语句
@@ -86,15 +86,4 @@ interface Database_DAO
 	 * 获取最新一次插入行ID
 	 */
 	public function lastInsertId();
-
-	/**
-	 * 获取最新一条SQL错误信息
-	 */
-	public function getError();
-	
-	/**
-	 * 获取SQL错误信息列表
-	 */
-	public function getErrorList();
 }
-?>
