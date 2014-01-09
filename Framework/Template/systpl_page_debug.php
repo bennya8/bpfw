@@ -16,7 +16,7 @@ body{ background-image: URL("<?php echo WEBROOT; ?>/Public/bootstrap/img/bg.png"
 <body>
 	<div class="hero-unit" id="mainframe">
 		<h2>调试信息</h2>
-		<span span id="pagemsg" class="label">错误级别：</span><span id="pagemsg" class="label label-important"><?php echo $this->getErrorType($this->getCode()); ?></span><br/>
+		<span span id="pagemsg" class="label">错误级别：</span><span id="pagemsg" class="label label-important"><?php echo self::ErrorType($this->getCode()); ?></span><br/>
 		<span span id="pagemsg" class="label">错误信息：</span><span id="pagemsg" class="label label-important"><?php echo $this->getMessage(); ?></span><br/>
 		<span span id="pagemsg" class="label">文件位置：</span><span id="pagemsg" class="label label-warning"><?php echo securePath($this->getFile()); ?></span><br/>
 		<span span id="pagemsg" class="label">错误行号：</span><span id="pagemsg" class="label label-warning"><?php echo $this->getLine(); ?></span><br/>
