@@ -16,31 +16,29 @@ abstract class Component
 	 * @access protected
 	 * @return void
 	 */
-	public function __construct() {
+	public function __construct()
+	{
 		$this->config = Config::Get(get_class($this));
 	}
-	
+
 	/**
 	 * 魔术方法，设定受保护函数时防止发生终止错误，只在开发模式抛出异常
 	 * @access public
 	 * @return void
 	 */
-	public function __get($key) {
+	public function __get($key)
+	{
 		if (isset($this->config[$key])) {
 			return $this->config[$key];
 		} else if (property_exists($this, $key)) {
-			$reflectMethod = new ReflectionMethod($this, $key);
+			$reflectMethod = new ReflectionProperty($this, $key);
 			if ($reflectMethod->isPublic()) {
 				return $this->$key;
 			} else {
-				Application::TriggerError(
-						Translate::Get('_PROPERTY_ACCESS_DENIED') . ' => Class: ' . get_class($this) . ' Propertiy: ' .
-								 $key, 'notice');
+				Application::TriggerError(Translate::Get('_PROPERTY_ACCESS_DENIED') . ' => Class: ' . get_class($this) . ' Propertiy: ' . $key, 'notice');
 			}
 		} else {
-			Application::TriggerError(
-					Translate::Get('_GET_PROPERTY_DENIED_') . ' => Class: ' . get_class($this) . ' Propertiy: ' . $key, 
-					'notice');
+			Application::TriggerError(Translate::Get('_GET_PROPERTY_DENIED_') . ' => Class: ' . get_class($this) . ' Propertiy: ' . $key, 'notice');
 		}
 	}
 
@@ -49,12 +47,9 @@ abstract class Component
 	 * @access public
 	 * @return void
 	 */
-	public function __set($key, $value) {
-		if (DEBUG) {
-			throw new BException(
-					Config::Lang('_SET_PROPERTY_DENIED_') . ' => Class: ' . get_class($this) . ' Propertiy: ' . $key .
-							 '->' . $value);
-		}
+	public function __set($key, $value)
+	{
+
 	}
 
 	/**
@@ -66,15 +61,16 @@ abstract class Component
 	 * @param mixed $args 调用参数
 	 * @throws BException 访问出错
 	 */
-// 	public function __call($name, $args) {
-// 		echo 1;
-// 		if (!method_exists($this, $name)) {
-// 			Application::TriggerError(
-// 					Translate::Get('_CALL_METHOD_DENIED_') . ' => Class: ' . get_class($this) . ' Method: ' . $name .
-// 							 '()', 'warning');
-// 		}
-// 	}
-
+	// public function __call($name, $args) {
+	// echo 1;
+	// if (!method_exists($this, $name)) {
+	// Application::TriggerError(
+	// Translate::Get('_CALL_METHOD_DENIED_') . ' => Class: ' . get_class($this)
+	// . ' Method: ' . $name .
+	// '()', 'warning');
+	// }
+	// }
+	
 	/**
 	 * 魔术方法，设定受保护函数防止发生终止错误
 	 * 调用不存在函数时尝试抛出错误信息，顶层捕获后，
@@ -84,11 +80,21 @@ abstract class Component
 	 * @param mixed $args 调用参数
 	 * @throws BException 访问出错
 	 */
-	public static function __callstatic($name, $args) {
+	public static function __callstatic($name, $args)
+	{
+		if (property_exists($this, $key)) {
+			$reflectMethod = new ReflectionProperty($this, $key);
+			if ($reflectMethod->isPublic()) {
+				return $this->$key;
+			} else {
+				Application::TriggerError(Translate::Get('_PROPERTY_ACCESS_DENIED') . ' => Class: ' . get_class($this) . ' Propertiy: ' . $key, 'notice');
+			}
+		} else {
+			Application::TriggerError(Translate::Get('_GET_PROPERTY_DENIED_') . ' => Class: ' . get_class($this) . ' Propertiy: ' . $key, 'notice');
+		}
 		if (!method_exists($this, $name)) {
 			Application::TriggerError(
-					Translate::Get('_CALL_STATIC_METHOD_DENIED_') . ' => Class: ' . get_class($this) . ' Static Method: ' .
-							 $name . '()', 'warning');
+					Translate::Get('_CALL_STATIC_METHOD_DENIED_') . ' => Class: ' . get_class($this) . ' Static Method: ' . $name . '()', 'warning');
 		}
 	}
 }

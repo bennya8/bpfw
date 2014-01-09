@@ -21,7 +21,8 @@ class Config
 	 * @throws BException 系统配置文件丢失
 	 * @return void
 	 */
-	public static function Init() {
+	public static function Init()
+	{
 		if (empty(self::$_config)) {
 			$sysConfig = SYS_PATH . '/Core/Config/config.php';
 			$appConfig = APP_PATH . '/Config/config.php';
@@ -39,7 +40,8 @@ class Config
 	 * @param string $key
 	 * @return string / null
 	 */
-	public static function Get($key) {
+	public static function Get($key)
+	{
 		return isset(self::$_config[$key]) ? self::$_config[$key] : null;
 	}
 
@@ -50,7 +52,8 @@ class Config
 	 * @param string $value
 	 * @return string / null
 	 */
-	public static function Set($key, $value) {
+	public static function Set($key, $value)
+	{
 		return self::$_config[$key] = $value;
 	}
 }

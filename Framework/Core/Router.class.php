@@ -35,16 +35,16 @@ class Router extends Component
 	 */
 	public function parseUrl() {
 		if ($this->URL_MODE === 'PATH_INFO' && isset($_SERVER['PATH_INFO'])) {
-			$pathInfo = explode('/', trim(str_replace('\\', '/', $_SERVER['PATH_INFO']), '/'));
-			$this->_controller = !empty($pathInfo[0]) ? $pathInfo[0] : $this->DEFAULT_CONTROLLER;
-			$this->_action = !empty($pathInfo[1]) ? $pathInfo[1] : $this->DEFAULT_ACTION;
-			if (!empty($pathInfo[2])) {
+			$url = explode('/', trim(str_replace('\\', '/', $_SERVER['PATH_INFO']), '/'));
+			$this->_controller = !empty($url[0]) ? $url[0] : $this->DEFAULT_CONTROLLER;
+			$this->_action = !empty($url[1]) ? $url[1] : $this->DEFAULT_ACTION;
+			if (!empty($url[2])) {
 				$key = $value = array();
-				for ($i = 2, $len = count($pathInfo); $i < $len; $i++) {
+				for ($i = 2, $len = count($url); $i < $len; $i++) {
 					if ($i % 2 == 0) {
-						$key[] = $pathInfo[$i];
+						$key[] = $url[$i];
 					} else {
-						$value[] = $pathInfo[$i];
+						$value[] = $url[$i];
 					}
 				}
 				$this->_params = array_combine($key, $value);

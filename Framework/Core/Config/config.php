@@ -14,6 +14,8 @@ return array(
 	'SYS_TIMEZONE' => 'Asia/Hong_Kong', // 时区设定：香港时间(Asia/Hong_Kong) 北京时间(Asia/Beijing)
 	'SYS_ERROR_PAGE' => '', // 错误跳转页面，格式：Controller:Action，如当前应用下的Index:error
 	'SYS_SUCCESS_PAGE' => '', // 成功跳转页面，格式：Controller:Action，如当前应用下的Index:success
+	'SYS_LOG_ENABLE' => true,
+	'SYS_LOG_MAX_SIZE' => 2048000,
 						
 	/* 路由配置 */
 	/* 
@@ -26,7 +28,7 @@ return array(
 	'Router' => array(
 		'DEFAULT_CONTROLLER' => 'Index', // 默认控制器
 		'DEFAULT_ACTION' => 'index', // 默认方法
-		'URL_MODE' => 'URL_REWRITE', // 路由模式：路径模式(PATH_INFO) 原始模式(ORIGINAL) URL重写(URL_REWRITE)
+		'URL_MODE' => 'PATH_INFO', // 路由模式：路径模式(PATH_INFO) 原始模式(ORIGINAL) URL重写(URL_REWRITE)
 		'URL_PREFIX' => '', // URL前缀，URL重写模式下生效
 		'URL_SHUFIX' => '.html', // URL后缀，URL重写模式下生效
 	),
@@ -96,5 +98,6 @@ return array(
 		'TMPLITE_COMPILE_CHECK' => false, // 检查编译模板，开发环境下建议开启
 		'TMPLITE_CACHE' => false, // 静态页面缓存，生产环境下建议开启
 		'TMPLITE_CACHE_TIME' => 3600 // 缓存时间，静态页面缓存关闭时，此选项失效
-	)
+	),
+	
 );

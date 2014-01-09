@@ -17,20 +17,22 @@ class Log extends Component
 	 * @param int $size 日志文件大小，字节为单位，默认2048000 = 2M
 	 * @return boolean true 写入日志成功 / false 写入日志失败
 	 */
-	public static function Write($msg, $size = 2048000)
+	public static function Write($msg)
 	{
-		$current = APP_PATH . DS . '/Temp/Log/current.log';
-		$next = APP_PATH . DS . '/Temp/Log' . date('ymd_his') . '.log';
-		if (!is_dir(dirname($current))) mkdir(dirname($current), 0777, true);
-		if (!is_file($current)) touch($current);
-		if (filesize($current) >= $size) {
-			rename($current, $next);
-			touch($current);
+		if (Config::Get('SYS_LOG_ENABLE')) {
+			$current = APP_PATH . '/Temp/Log/current.log';
+			$next = APP_PATH . '/Temp/Log/' . date('ymd_his') . '.log';
+			FileSystem::MakeDir(dirname($current));
+			if (!is_file($current)) touch($current);
+			if (filesize($current) >= Config::Get('SYS_LOG_MAX_SIZE')) {
+				rename($current, $next);
+				touch($current);
+			}
+			$format = date('[Y/m/d-H:i:s] ') . $msg . PHP_EOL;
+			if (file_put_contents($current, $format, FILE_APPEND | LOCK_EX)) {
+				return true;
+			}
+			return false;
 		}
-		$format = date('[Y/m/d-H:i:s] ') . $msg . PHP_EOL;
-		if (file_put_contents($current, $format, FILE_APPEND | LOCK_EX)) {
-			return true;
-		}
-		return false;
 	}
 }

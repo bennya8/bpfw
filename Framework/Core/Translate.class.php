@@ -27,7 +27,8 @@ class Translate
 	 * @throws BException 语言包丢失
 	 * @return void
 	 */
-	public static function Init($lang = 'ZH-CN') {
+	public static function Init($lang = 'ZH-CN')
+	{
 		if (!isset(self::$_language[$lang])) {
 			$path = SYS_PATH . '/Lang/' . strtoupper($lang) . '.php';
 			if (!is_file($path)) Application::TriggerError('_LANG_FILE_MISSING_ => ' . securePath($path), 'error');
@@ -42,7 +43,8 @@ class Translate
 	 * @param string $key
 	 * @return string / null
 	 */
-	public static function Get($key) {
+	public static function Get($key)
+	{
 		return isset(self::$_language[self::$_current][$key]) ? self::$_language[self::$_current][$key] : null;
 	}
 
@@ -53,7 +55,8 @@ class Translate
 	 * @param string $value
 	 * @return string / null
 	 */
-	public static function Set($key, $value) {
+	public static function Set($key, $value)
+	{
 		return self::$_language[self::$_current][$key] = $value;
 	}
 }

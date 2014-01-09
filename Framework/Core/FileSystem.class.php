@@ -24,7 +24,8 @@ class FileSystem
 	 * @param boolean $recursive 递归创建子目录
 	 * @return void 可通过获取 GetError() 信息判定目录删除成功与否信息
 	 */
-	public static function MakeDir($dir, $mode = 0755, $recursive = true) {
+	public static function MakeDir($dir, $mode = 0755, $recursive = true)
+	{
 		if (is_string($dir) && !is_dir($dir)) {
 			if (!mkdir($dir, $mode, $recursive)) self::SetError('_MAKE_DIR_FAILED_', $dir);
 		}
@@ -37,7 +38,8 @@ class FileSystem
 	 * @param boolean $recursive 递归删除子目录
 	 * @return void 可通过获取 GetError() 信息判定目录删除成功与否信息
 	 */
-	public static function RemoveDir($dir, $recursive = true) {
+	public static function RemoveDir($dir, $recursive = true)
+	{
 		if (is_string($dir) && is_dir($dir)) {
 			$handle = opendir($dir);
 			while (false !== ($file = readdir($handle))) {
@@ -62,7 +64,8 @@ class FileSystem
 	 * @param boolean $cover 是否覆盖重名文件
 	 * @return void 可通过获取 GetError() 信息判定目录删除成功与否信息
 	 */
-	public static function MoveFile($source, $target, $cover = false) {
+	public static function MoveFile($source, $target, $cover = false)
+	{
 		if (is_string($source) && is_string($target)) {
 			self::MakeDir(dirname($target));
 			if (is_file($source)) {
@@ -85,7 +88,8 @@ class FileSystem
 	 * @param boolean $cover 是否覆盖重名文件
 	 * @return void 可通过获取 GetError() 信息判定目录删除成功与否信息
 	 */
-	public static function CopyFile($source, $target, $cover = false) {
+	public static function CopyFile($source, $target, $cover = false)
+	{
 		if (is_string($source) && is_string($target)) {
 			self::MakeDir(dirname($target));
 			if (is_file($source)) {
@@ -105,7 +109,8 @@ class FileSystem
 	 * @param array / string 文件路径
 	 * @return void 可通过获取 GetError() 信息判定目录删除成功与否信息
 	 */
-	public static function RemoveFile($source) {
+	public static function RemoveFile($source)
+	{
 		if (is_string($source) && is_file($source)) {
 			if (unlink($source)) self::SetError('_REMOVE_FILE_FAILED_', $source);
 		}
@@ -118,7 +123,8 @@ class FileSystem
 	 * @param string $path 文件/目录信息
 	 * @return void
 	 */
-	public static function SetError($errorType, $path) {
+	public static function SetError($errorType, $path)
+	{
 		self::$errorMessage[] = Config::Lang($errorType) . ' => ' . securePath($path);
 	}
 
@@ -127,7 +133,8 @@ class FileSystem
 	 * @access public
 	 * @return array 错误信息列表
 	 */
-	public static function GetError() {
+	public static function GetError()
+	{
 		return self::$errorMessage;
 	}
 }

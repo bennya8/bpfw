@@ -9,16 +9,17 @@
  */
 class CustomException extends Exception
 {
-	
+
 	/**
 	 * 输出异常页面，但不记录日志，用于开发模式
 	 * @access public
 	 * @return void
 	 */
-	public function trace() {
+	public function trace()
+	{
 		$trace = explode("\n", $this->getTraceAsString());
 		include SYS_PATH . '/Template/systpl_page_debug.php';
- 		exit();
+		exit();
 	}
 
 	/**
@@ -26,41 +27,51 @@ class CustomException extends Exception
 	 * @access public
 	 * @return void
 	 */
-	public function log() {
+	public function log()
+	{
 		$trace = explode("\n", $this->getTraceAsString());
 		// require SYS_PATH . DS . 'Template/systpl_page_exception.html';
 		// Log::Write($this->getMessage());
 		exit();
 	}
 
-	protected function getErrorType($errno) {
-		switch ($errno) {
-			case E_WARNING:
-				$message = 'System Warning Error';
-				break;
-			case E_NOTICE:
-				$message = 'System Notice Error';
-				break;
-			case E_STRICT:
-				$message = 'System Strict Error';
-				break;
-			case E_ERROR:
-				$message = 'System Fatal Error';
-				break;
-			case E_USER_NOTICE:
-				$message = 'Application Notice Error';
-				break;
-			case E_USER_WARNING:
-				$message = 'Application Warning Error';
-				break;
-			case E_USER_ERROR:
-				$message = 'Application Fatal Error';
-				break;
-			default:
-				$message = 'Unknow Error';
-		}
-		return $message;
+	public static function ErrorType($type)
+	{
+		$levels = array(
+			E_WARNING => 'System Warning Error',
+			E_NOTICE => 'System Notice Error',
+			E_STRICT => 'System Strict Error',
+			E_ERROR => 'System Fatal Error',
+			E_USER_NOTICE => 'Application Notice Error',
+			E_USER_WARNING => 'Application Warning Error',
+			E_USER_ERROR => 'Application Fatal Error'
+		);
+		return isset($levels[$type]) ? $levels[$type] : 'Unknow Error';
+	}
+
+	/**
+	 * 自定义错误句柄
+	 * @access private
+	 * @param int $code
+	 * @param string $message
+	 * @throws BException 捕获未知异常
+	 * @return void
+	 */
+	public static function ErrorHandler($code, $message)
+	{
+		// throw new CustomException($message, $code);
+	}
+
+	/**
+	 * 自定义异常句柄
+	 * @access private
+	 * @param int $code
+	 * @param string $message
+	 * @throws BException 捕获未知异常
+	 * @return void
+	 */
+	public static function ExceptionHandler($e)
+	{
+		defined('DEBUG') && (DEBUG) ? $e->trace() : $e->log();
 	}
 }
-
-?>
