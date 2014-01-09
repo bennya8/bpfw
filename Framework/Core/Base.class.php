@@ -37,13 +37,14 @@ class Base
 		'TpliteEngine' => '/Core/View/TpliteEngine.class.php',
 		'NativeEngine' => '/Core/View/NativeEngine.class.php'
 	);
+	
 	/**
 	 * 类库注册列表
 	 * @access private
 	 * @var array
 	 */
 	private static $_regisClasses = array();
-
+	
 	/**
 	 * 注册实例库
 	 * @access private
@@ -79,28 +80,10 @@ class Base
 	 * @return void
 	 */
 	private static function _ClassesRegister($class, $classPath) {
-		if (!is_file($classPath)) {
-			throw new BException(Config::Lang('_CLASS_NOT_FOUND_') . ' => ' . $class);
-		}
 		if (!isset(self::$_regisClasses[$class])) {
 			self::$_regisClasses[$class] = $classPath;
 		}
 		require self::$_regisClasses[$class];
-	}
-
-	/**
-	 * 类排除
-	 * @access private
-	 * @param string $class 类名
-	 * @return boolean true 类在排除列表 / false 类不在排除列表
-	 */
-	private static function _ClassesPusher($class) {
-		foreach (self::$_pushClasses as $k => $v) {
-			if (substr($class, 0, $v) === $k) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -121,7 +104,7 @@ class Base
 			$classpath = SYS_PATH . DS . 'Extend/' . $class . '.php';
 		}
 		if (!is_file($classpath)) {
-			throw new BException(Config::Lang('_CLASS_NOT_FOUND_') . ' => ' . $classpath);
+			Application::TriggerError(Translate::Get('_CLASS_NOT_FOUND_') . ' => ' . $classpath, 'error');
 		}
 		require $classpath;
 	}
@@ -146,7 +129,7 @@ class Base
 	 * @return void
 	 */
 	private function __construct() {}
-	
+
 	/**
 	 * 魔术方法，防止克隆实例
 	 * @access private
@@ -154,4 +137,3 @@ class Base
 	 */
 	private function __clone() {}
 }
-
