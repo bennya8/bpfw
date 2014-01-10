@@ -58,7 +58,8 @@ return array(
 	 */
 	'Database' => array(
 		'DB_ENGINE' => 'MySQL', // 数据库引擎：MySQL MySQLi PDO:MySQL PDO:SQLite PDO:Oracle
-		'DB_PREFIX' => 'my_', // 表前缀
+		'DB_PREFIX' => '', // 表前缀
+		'DB_SHUFIX' => '', // 表前缀
 		'DB_HOST' => 'localhost', // IP地址
 		'DB_PORT' => '3306', // 端口
 		'DB_USER' => 'root', // 用户名

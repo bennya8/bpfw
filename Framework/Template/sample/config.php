@@ -59,12 +59,14 @@ return array(
 	'Database' => array(
 		'DB_ENGINE' => 'MySQL', // 数据库引擎：MySQL MySQLi PDO:MySQL PDO:SQLite PDO:Oracle
 		'DB_PREFIX' => '', // 表前缀
+		'DB_SHUFIX' => '', // 表前缀
 		'DB_HOST' => 'localhost', // IP地址
 		'DB_PORT' => '3306', // 端口
 		'DB_USER' => 'root', // 用户名
 		'DB_PWD' => 'root', // 密码
-		'DB_NAME' => '_test_', // 数据库名
+		'DB_NAME' => 'test', // 数据库名
 		'DB_CHARSET' => 'utf8', // 字符集
+		'DB_SAFEMODE'=> true
 	),
 										
 	/* 视图配置 */

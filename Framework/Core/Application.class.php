@@ -138,21 +138,4 @@ class Application extends Base
 	{
 		return parent::Create($class, $args);
 	}
-
-	/**
-	 * 触发用户自定义错误
-	 * @access public
-	 * @param string $message 错误信息
-	 * @param string $errorType 错误级别
-	 * @return void
-	 */
-	public static function TriggerError($message, $type = 'notice')
-	{
-		$levels = array(
-			'notice' => E_USER_NOTICE,
-			'warning' => E_USER_WARNING,
-			'error' => E_USER_ERROR
-		);
-		trigger_error($message, $levels[$type]);
-	}
 }
