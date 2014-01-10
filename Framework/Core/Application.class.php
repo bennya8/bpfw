@@ -101,13 +101,13 @@ class Application extends Base
 	/**
 	 * 检查当前PHP版本
 	 * @access public
-	 * @throws BException PHP版本低于5.0
+	 * @throws CustomException PHP版本低于5.0
 	 * @return void
 	 */
 	public function checkPhpVersion()
 	{
 		if (version_compare(PHP_VERSION, '5', '<')) {
-			self::TriggerError(Translate::Get('_PHP5_ABOVE_REQUIRED_'), 'error');
+			throw new CustomException(Translate::Get('_PHP5_ABOVE_REQUIRED_'),E_ERROR);
 		}
 	}
 
@@ -115,7 +115,7 @@ class Application extends Base
 	 * 引入Extend文件夹内的第三方类库
 	 * @access public
 	 * @param string $class 类名
-	 * @throws BException 要载入的第三方类不存在
+	 * @throws CustomException 要载入的第三方类不存在
 	 * @return void
 	 * @example 调用：App::Import('@Cls_Image');
 	 *          应用Extend目录：/Root/YourApp/Extend/Cls_Image.php

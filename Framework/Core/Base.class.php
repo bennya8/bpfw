@@ -78,12 +78,14 @@ class Base
 	 * @access private
 	 * @param string $class 类名
 	 * @param string $classPath 类库路径
-	 * @throws BException 要载入的类不存在
+	 * @throws CustomException 要载入的类不存在
 	 * @return void
 	 */
 	private static function _ClassesRegister($class, $classPath)
 	{
-		if (!is_file($classPath)) Application::TriggerError(Translate::Get('_CLASS_NOT_FOUND_') . ' => ' . $class . '.class.php');
+		if (!is_file($classPath)) {
+			throw new CustomException(Translate::Get('_CLASS_NOT_FOUND_') . ' => ' . $classPath, E_ERROR);
+		}
 		if (!isset(self::$_regisClasses[$class])) {
 			self::$_regisClasses[$class] = $classPath;
 		}
@@ -94,7 +96,7 @@ class Base
 	 * 引入第三方类库，位于Extend文件夹内
 	 * @access protected
 	 * @param string $class 类名
-	 * @throws BException 要载入的第三方类库不存在
+	 * @throws CustomException 要载入的第三方类库不存在
 	 * @return void
 	 * @example 调用：App::Import('@Cls_Image');
 	 *          应用Extend目录：/Root/YourApp/Extend/Cls_Image.php
@@ -104,14 +106,14 @@ class Base
 	protected static function Import($class)
 	{
 		if (strpos($class, '@') === 0) {
-			$classpath = APP_PATH . DS . 'Extend/' . str_replace('@', '', $class) . '.php';
+			$classPath = APP_PATH . DS . 'Extend/' . str_replace('@', '', $class) . '.php';
 		} else {
-			$classpath = SYS_PATH . DS . 'Extend/' . $class . '.php';
+			$classPath = SYS_PATH . DS . 'Extend/' . $class . '.php';
 		}
-		if (!is_file($classpath)) {
-			Application::TriggerError(Translate::Get('_CLASS_NOT_FOUND_') . ' => ' . $classpath, 'error');
+		if (!is_file($classPath)) {
+			throw new CustomException(Translate::Get('_CLASS_NOT_FOUND_') . ' => ' . $classPath, E_ERROR);
 		}
-		require $classpath;
+		require $classPath;
 	}
 
 	/**
