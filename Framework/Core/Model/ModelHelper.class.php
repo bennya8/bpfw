@@ -72,14 +72,13 @@ class ModelHelper
 		$replace = array(
 			$this->parseSelect(),
 			$this->parseTable(),
-			$this->parseWhere(),
 			$this->parseJoin(),
+			$this->parseWhere(),
 			$this->parseGroup(),
 			$this->parseOrder(),
 			$this->parseLimit()
 		);
-		$sql = str_replace($search, $replace, $this->select);
-		return $sql;
+		return str_replace($search, $replace, $this->select);
 	}
 
 	/**
@@ -89,7 +88,7 @@ class ModelHelper
 	 * @param array $data 插入数据 $k 对应列名，$v 对应值
 	 * @return string SQL语句
 	 */
-	public function insert($condition, $data)
+	public function insert($data, $condition)
 	{
 		$this->condition = $condition;
 		$this->data = $data;
@@ -111,9 +110,21 @@ class ModelHelper
 	 * @param array $data 更新数据 $k 对应列名，$v 对应值
 	 * @return string SQL语句
 	 */
-	public function update($conditon, $data)
+	public function update($data, $condition)
 	{
-		// @todo
+		$this->condition = $condition;
+		$this->data = $data;
+		$search = array(
+			'@TABLE',
+			'@DATA',
+			'@WHERE'
+		);
+		$replace = array(
+			$this->parseTable(),
+			$this->parseUpdate(),
+			$this->parseWhere()
+		);
+		return str_replace($search, $replace, $this->update);
 	}
 
 	/**
@@ -122,9 +133,35 @@ class ModelHelper
 	 * @param string / array $condition 语句组合
 	 * @return string SQL语句
 	 */
-	public function delete($conditon)
+	public function delete($condition)
 	{
-		// @todo
+		$this->condition = $condition;
+		$search = array(
+			'@TABLE',
+			'@WHERE'
+		);
+		$replace = array(
+			$this->parseTable(),
+			$this->parseWhere()
+		);
+		return str_replace($search, $replace, $this->delete);
+	}
+
+	/**
+	 * 分析insert
+	 * @access protected
+	 * @return string SQL片段
+	 */
+	protected function parseUpdate()
+	{
+		$sql = '';
+		if (!empty($this->data) && is_array($this->data)) {
+			foreach ($this->data as $k => $v) {
+				$sql .= '`' . $k . '` = \'' . $v . '\',';
+			}
+			$sql = rtrim($sql, ',');
+		}
+		return $sql;
 	}
 
 	/**
@@ -136,11 +173,10 @@ class ModelHelper
 	{
 		$sql = '';
 		if (!empty($this->data) && is_array($this->data)) {
-			$sql .= '(' . implode(',', array_keys($this->data)) . ') VALUES (';
-			foreach ($this->data as $v) {
-				$sql .= '\'' . $v . '\',';
-			}
-			$sql = rtrim($sql, ',') . ')';
+			$k = array_keys($this->data);
+			$v = array_values($this->data);
+			$sql .= '(`' . implode('`,`', $k) . '`) VALUES ';
+			$sql .= '(\'' . implode('\',\'', $v) . '\')';
 		}
 		return $sql;
 	}
@@ -182,7 +218,7 @@ class ModelHelper
 	}
 
 	/**
-	 * 分析select
+	 * 分析where
 	 * @access protected
 	 * @return string SQL片段
 	 */
@@ -193,7 +229,51 @@ class ModelHelper
 			if (is_string($this->condition['where'])) {
 				$sql = 'WHERE ' . $this->condition['where'];
 			} else if (is_array($this->condition['where'])) {
-				$sql = 'WHERE ' . implode(',', $this->condition['where']);
+				$sql = 'WHERE ';
+				foreach ($this->condition['where'] as $k => $v) {
+					if (isset($v[0]) && isset($v[1])) {
+						switch (strtolower($v[0])) {
+							case 'in':
+								$where = ' IN ';
+								if (is_array($v[1])) {
+									$v[1] .= '(\'' . implode('\',\'', $v[1]) . '\')';
+								} else if (is_string($v[1])) {
+									$v[1] .= '(' . $v[1] . ')';
+								}
+								break;
+							case 'notin':
+								$where = ' NOT IN ';
+								if (is_array($v[1])) {
+									$v[1] .= '(\'' . implode('\',\'', $v[1]) . '\')';
+								} else if (is_string($v[1])) {
+									$v[1] .= '(' . $v[1] . ')';
+								}
+								break;
+							case 'neq':
+								$where = ' != ';
+								break;
+							case 'lteq':
+								$where = ' <= ';
+								break;
+							case 'gteq':
+								$where = ' >= ';
+								break;
+							case 'lt':
+								$where = ' < ';
+								break;
+							case 'gt':
+								$where = ' > ';
+								break;
+							case 'like':
+								$where = ' LIKE ';
+								break;
+							default:
+								$where = ' = ';
+						}
+						$logic = isset($v[2]) ? ' ' . $v[2] : '';
+						$sql .= $k . $where . '\'' . $v[1] . '\'' . $logic . ' ';
+					}
+				}
 			}
 		}
 		return $sql;
@@ -209,22 +289,24 @@ class ModelHelper
 		$sql = '';
 		if ($this->checkAvaliable('join')) {
 			if (is_array($this->condition['join'])) {
-				foreach ($this->condition['join'] as $join) {
-					switch (strtolower($join[0])) {
-						case 'right':
-							$join[0] = 'RIGHT JOIN ';
-							break;
-						case 'inner':
-							$join[0] = 'INNER JOIN ';
-							break;
-						case 'cross':
-							$join[0] = 'CROSS JOIN ';
-							break;
-						default:
-							$join[0] = 'LEFT JOIN ';
-							break;
+				foreach ($this->condition['join'] as $k => $v) {
+					if (isset($v[0]) && isset($v[1])) {
+						switch (strtolower($k)) {
+							case 'right':
+								$sql = 'RIGHT JOIN ';
+								break;
+							case 'inner':
+								$sql = 'INNER JOIN ';
+								break;
+							case 'union':
+								$sql = 'UNION JOIN ';
+								break;
+							default:
+								$sql = 'LEFT JOIN ';
+								break;
+						}
+						$sql .= $v[0] . ' ON ' . $v[1] . ' ';
 					}
-					$sql .= $join[0] . $join[1] . ' ON ' . $join[2] . ' ';
 				}
 			}
 		}

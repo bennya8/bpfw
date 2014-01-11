@@ -118,11 +118,10 @@ class Database_MySQL extends Database implements IDatabase
 	 */
 	public function execute($sql)
 	{
-		if (!$result = mysql_query($sql, $this->resource)) {
+		if (!mysql_query($sql, $this->resource)) {
 			$this->setError(mysql_error());
 			return false;
 		}
-		mysql_freeresult($result);
 		return $this->lastAffectedRows();
 	}
 
@@ -134,6 +133,7 @@ class Database_MySQL extends Database implements IDatabase
 	 */
 	public function query($sql)
 	{
+		$list = array();
 		if (!$result = mysql_query($sql, $this->resource)) {
 			$this->setError(mysql_error());
 			return false;

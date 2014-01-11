@@ -34,10 +34,10 @@ class Model
 		$dbConfig = Config::Get('Database');
 		$this->tablePrefix = $dbConfig['DB_PREFIX'];
 		$this->tableShufix = $dbConfig['DB_SHUFIX'];
-		$this->tableName = $this->getTableName();
-		$this->tableFullName = $this->getTableFullName();
+		$this->tableName = empty($this->tableName) ? $this->getTableName() : $this->tableName;
+		$this->tableFullName = $this->getTableFullName($this->tableName);
 		$this->db = Database::Factory($dbConfig['DB_ENGINE']);
-		$this->helper = Application::Create('ModelHelper',$this->tableFullName);
+		$this->helper = Application::Create('ModelHelper', $this->tableFullName);
 	}
 
 	/**
@@ -49,8 +49,9 @@ class Model
 	public function find($condition = null)
 	{
 		$condition['limit'] = '1';
-		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName();
-		return $this->db->query($this->helper->select($condition));
+		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName($this->tableName);
+		$result = $this->db->query($this->helper->select($condition));
+		return count($result) ? $result[0] : false;
 	}
 
 	/**
@@ -61,7 +62,7 @@ class Model
 	 */
 	public function findAll($condition = null)
 	{
-		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName();
+		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName($this->tableName);
 		return $this->db->query($this->helper->select($condition));
 	}
 
@@ -72,10 +73,10 @@ class Model
 	 * @param array $data 插入数据集
 	 * @return array 新增行数 / false 新增失败
 	 */
-	public function insert($condition,$data)
+	public function insert($data, $condition = null)
 	{
-		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName();
-		return $this->db->execute($this->helper->insert($condition,$data));
+		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName($this->tableName);
+		return $this->db->execute($this->helper->insert($data, $condition));
 	}
 
 	/**
@@ -85,10 +86,10 @@ class Model
 	 * @param array $data 更新数据集
 	 * @return array 更新行数 / false 更新失败
 	 */
-	public function update($condition,$data)
+	public function update($data, $condition)
 	{
-		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName();
-		return $this->db->execute($this->helper->update($condition,$data));
+		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName($this->tableName);
+		return $this->db->execute($this->helper->update($data, $condition));
 	}
 
 	/**
@@ -99,7 +100,7 @@ class Model
 	 */
 	public function delete($condition)
 	{
-		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName();
+		$condition['table'] = isset($condition['table']) ? $condition['table'] : $this->getTableFullName($this->tableName);
 		return $this->db->execute($this->helper->delete($condition));
 	}
 
@@ -122,9 +123,9 @@ class Model
 	 * @access public
 	 * @return string 表全名
 	 */
-	public function getTableFullName()
+	public function getTableFullName($name)
 	{
-		return $this->tablePrefix . $this->getTableName() . $this->tableShufix;
+		return $this->tablePrefix . $name . $this->tableShufix;
 	}
 
 	/**
@@ -401,10 +402,12 @@ class Model
 			if ($method->isPublic()) {
 				$method->invokeArgs($this->db, $args);
 			} else {
-				Application::TriggerError(Translate::Get('_CALL_METHOD_DENIED_') . ' => Class: ' . get_class($this->db) . ' Method: ' . $name . '()');
+				throw new CustomException(Translate::Get('_CALL_METHOD_DENIED_') . ' => Class: ' . get_class($this->db) . ' Method: ' . $name . '()', 
+						E_WARNING);
 			}
 		} else {
-			Application::TriggerError(Translate::Get('_CALL_NO_EXIST_METHOD_') . ' => Class: ' . get_class($this->db) . ' Method: ' . $name . '()');
+			throw new CustomException(Translate::Get('_CALL_NO_EXIST_METHOD_') . ' => Class: ' . get_class($this->db) . ' Method: ' . $name . '()', 
+					E_WARNING);
 		}
 	}
 }

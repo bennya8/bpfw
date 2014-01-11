@@ -36,7 +36,8 @@ class View extends Component
 	 * @param array $args
 	 * @return void
 	 */
-	public function __construct($args) {
+	public function __construct($args)
+	{
 		$this->config = Config::Get('View');
 		$this->controller = $args;
 		$this->engine = $this->Factory($this->VIEW_ENGINE);
@@ -49,7 +50,8 @@ class View extends Component
 	 * @param string $name 模板引擎名
 	 * @return void
 	 */
-	protected function Factory($name) {
+	protected function Factory($name)
+	{
 		switch (strtolower($name)) {
 			case 'smarty':
 				return Application::Create('SmartyEngine');
@@ -67,7 +69,8 @@ class View extends Component
 	 * @access public
 	 * @return string 模板引擎名称
 	 */
-	public function getEngineName() {
+	public function getEngineName()
+	{
 		return $this->VIEW_ENGINE;
 	}
 
@@ -76,7 +79,8 @@ class View extends Component
 	 * @access public
 	 * @return object 模板引擎实例
 	 */
-	public function getEngine() {
+	public function getEngine()
+	{
 		return $this->engine;
 	}
 
@@ -86,7 +90,8 @@ class View extends Component
 	 * @access public
 	 * @return void
 	 */
-	public function setEngine($name) {
+	public function setEngine($name)
+	{
 		$this->engine = $this->_viewFactory($name);
 	}
 
@@ -101,7 +106,8 @@ class View extends Component
 	 * @example 使用TemplateLite引擎，可传2个参数，分别：$key, $value
 	 * @example 使用原生PHP模板引擎，可传2个参数，分别：$key, $value
 	 */
-	public function assign($key, $value, $nocache = false) {
+	public function assign($key, $value, $nocache = false)
+	{
 		return $this->engine->assign($key, $value, $nocache);
 	}
 
@@ -118,7 +124,8 @@ class View extends Component
 	 * @example 使用原生PHP模板引擎，最多可传1个参数，分别：$template
 	 * @return void
 	 */
-	public function display($template = null, $cache_id = null, $compile_id = null, $parent = null) {
+	public function display($template = null, $cache_id = null, $compile_id = null, $parent = null)
+	{
 		if (empty($template)) {
 			$temp = debug_backtrace(2);
 			foreach ($temp as $k => $v) {
@@ -135,7 +142,7 @@ class View extends Component
 			$template = $this->theme . '/' . substr($this->controller, 0, -6) . '/' . $template;
 		}
 		if (!is_file(APP_PATH . '/View/' . $template)) {
-			Application::TriggerError(Translate::Get('_VIEW_NOT_FOUND_') . ' => ' . $template);
+			throw new CustomException(Translate::Get('_VIEW_NOT_FOUND_') . ' => ' . $template, E_WARNING);
 		}
 		$this->engine->assign('WEBROOT', WEBROOT);
 		$this->engine->display($template, $cache_id, $compile_id, $parent);
@@ -148,9 +155,9 @@ class View extends Component
 	 * @param number $time 返回时间
 	 * @return void
 	 */
-	public function success($msg = null, $url = null, $time = 3) {
-		$dispatch = empty($GLOBALS['Config']['SYS_CONFIG']['SYS_SUCCESS_PAGE']) ? SYS_PATH .
-				 '/Template/systpl_page_success.html' : $GLOBALS['Config']['SYS_CONFIG']['SYS_SUCCESS_PAGE'];
+	public function success($msg = null, $url = null, $time = 3)
+	{
+		$dispatch = empty($GLOBALS['Config']['SYS_CONFIG']['SYS_SUCCESS_PAGE']) ? SYS_PATH . '/Template/systpl_page_success.html' : $GLOBALS['Config']['SYS_CONFIG']['SYS_SUCCESS_PAGE'];
 		$url = empty($url) ? $_SERVER["HTTP_REFERER"] : $url;
 		if (preg_match('/(\S+):(\S+)/', $dispatch, $match)) {
 			$this->assign('pagelog', array(
@@ -178,9 +185,9 @@ class View extends Component
 	 * @param number $time 返回时间
 	 * @return void
 	 */
-	public function error($msg = null, $url = null, $time = 3) {
-		$dispatch = empty($GLOBALS['Config']['SYS_CONFIG']['SYS_ERROR_PAGE']) ? SYS_PATH .
-				 '/Template/systpl_page_error.html' : $GLOBALS['Config']['SYS_CONFIG']['SYS_ERROR_PAGE'];
+	public function error($msg = null, $url = null, $time = 3)
+	{
+		$dispatch = empty($GLOBALS['Config']['SYS_CONFIG']['SYS_ERROR_PAGE']) ? SYS_PATH . '/Template/systpl_page_error.html' : $GLOBALS['Config']['SYS_CONFIG']['SYS_ERROR_PAGE'];
 		$url = empty($url) ? $_SERVER["HTTP_REFERER"] : $url;
 		if (preg_match('/(\S+):(\S+)/', $dispatch, $match)) {
 			$this->assign('pagelog', array(
@@ -207,7 +214,8 @@ class View extends Component
 	 * @param string $msg 提示信息
 	 * @return void
 	 */
-	public function alert($msg) {
+	public function alert($msg)
+	{
 		echo '<script type="text/javascript">alert("' . $msg . '"); history.back(-1);</script>';
 	}
 
@@ -218,23 +226,23 @@ class View extends Component
 	 * @param array $args 调用参数
 	 * @return mixed 调用方法的返回值
 	 */
-	public function __call($name, $args) {
+	public function __call($name, $args)
+	{
 		if (method_exists($this->engine, $name)) {
 			$reflectClass = Application::Create('ReflectionClass', $this->engine);
 			if ($reflectClass->hasMethod($name)) {
 				$method = $reflectClass->getMethod($name);
 				if ($method->isProtected() || $method->isPrivate()) {
 					Application::TriggerError(
-							Translate::Get('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' . get_class($this->engine) .
-									 ' Method: ' . $name . '()', 'warning');
+							Translate::Get('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' . get_class($this->engine) . ' Method: ' . $name . '()', 
+							'warning');
 				} else {
 					return $method->invokeArgs($this->engine, $args);
 				}
 			}
 		} else {
 			Application::TriggerError(
-					Translate::Get('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' . get_class($this->engine) .
-							 ' Method: ' . $name . '()', 'error');
+					Translate::Get('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' . get_class($this->engine) . ' Method: ' . $name . '()', 'error');
 		}
 	}
 }
