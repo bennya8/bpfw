@@ -182,7 +182,7 @@ abstract class Action extends Component
 	 */
 	public function toJson($data)
 	{
-		return json_encode($data);
+		exit(json_encode($data));
 	}
 
 	/**
