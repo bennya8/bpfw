@@ -92,7 +92,7 @@ class View extends Component
 	 */
 	public function setEngine($name)
 	{
-		$this->engine = $this->_viewFactory($name);
+		$this->engine = $this->Factory($name);
 	}
 
 	/**
@@ -130,7 +130,8 @@ class View extends Component
 			$temp = debug_backtrace(2);
 			foreach ($temp as $k => $v) {
 				if ($v['class'] === $this->controller) {
-					$template = $this->theme . '/' . substr($this->controller, 0, -6) . '/' . $v['function'] . '.html';
+					$template = $this->theme . '/' . substr($this->controller, 0, -6) . '/' .
+							 $v['function'] . '.html';
 					break;
 				}
 			}
@@ -142,88 +143,19 @@ class View extends Component
 			$template = $this->theme . '/' . substr($this->controller, 0, -6) . '/' . $template;
 		}
 		if (!is_file(APP_PATH . '/View/' . $template)) {
-			throw new CustomException(Translate::Get('_VIEW_NOT_FOUND_') . ' => ' . $template, E_WARNING);
+			throw new CustomException(Translate::Get('_VIEW_NOT_FOUND_') . ' => ' . $template, 
+					E_WARNING);
 		}
 		$this->engine->assign('WEBROOT', WEBROOT);
 		$this->engine->display($template, $cache_id, $compile_id, $parent);
 	}
 
 	/**
-	 * 跳转到成功提示页面
-	 * @access public
-	 * @param string $msg 提示信息
-	 * @param number $time 返回时间
-	 * @return void
-	 */
-	public function success($msg = null, $url = null, $time = 3)
-	{
-		$dispatch = empty($GLOBALS['Config']['SYS_CONFIG']['SYS_SUCCESS_PAGE']) ? SYS_PATH . '/Template/systpl_page_success.html' : $GLOBALS['Config']['SYS_CONFIG']['SYS_SUCCESS_PAGE'];
-		$url = empty($url) ? $_SERVER["HTTP_REFERER"] : $url;
-		if (preg_match('/(\S+):(\S+)/', $dispatch, $match)) {
-			$this->assign('pagelog', array(
-				'message' => $msg,
-				'time' => $time,
-				'url' => $url
-			));
-			$this->display($match[1] . '/' . $match[2]);
-			exit();
-		} else {
-			$pagelog = array(
-				'msg' => $msg,
-				'time' => $time,
-				'url' => $url
-			);
-			require $dispatch;
-			exit();
-		}
-	}
-
-	/**
-	 * 跳转到错误提示页面
-	 * @access public
-	 * @param string $msg 提示信息
-	 * @param number $time 返回时间
-	 * @return void
-	 */
-	public function error($msg = null, $url = null, $time = 3)
-	{
-		$dispatch = empty($GLOBALS['Config']['SYS_CONFIG']['SYS_ERROR_PAGE']) ? SYS_PATH . '/Template/systpl_page_error.html' : $GLOBALS['Config']['SYS_CONFIG']['SYS_ERROR_PAGE'];
-		$url = empty($url) ? $_SERVER["HTTP_REFERER"] : $url;
-		if (preg_match('/(\S+):(\S+)/', $dispatch, $match)) {
-			$this->assign('pagelog', array(
-				'message' => $msg,
-				'time' => $time,
-				'url' => $url
-			));
-			$this->display($match[1] . '/' . $match[2]);
-			exit();
-		} else {
-			$pagelog = array(
-				'msg' => $msg,
-				'time' => $time,
-				'url' => $url
-			);
-			require $dispatch;
-			exit();
-		}
-	}
-
-	/**
-	 * 弹出Alert提示框
-	 * @access public
-	 * @param string $msg 提示信息
-	 * @return void
-	 */
-	public function alert($msg)
-	{
-		echo '<script type="text/javascript">alert("' . $msg . '"); history.back(-1);</script>';
-	}
-
-	/**
-	 * 当调用Model内的方法不存在时，自动映射调用数据库引擎类里面方法
+	 * 当调用View内的方法不存在时，自动映射调用模板引擎里面的方法
 	 * @access public
 	 * @param string $name 调用方法名
 	 * @param array $args 调用参数
+	 * @throws CustomException 当访问方法不存在时 / 方法权限为受保护或私有 (E_WARNING)
 	 * @return mixed 调用方法的返回值
 	 */
 	public function __call($name, $args)
@@ -232,17 +164,19 @@ class View extends Component
 			$reflectClass = Application::Create('ReflectionClass', $this->engine);
 			if ($reflectClass->hasMethod($name)) {
 				$method = $reflectClass->getMethod($name);
-				if ($method->isProtected() || $method->isPrivate()) {
-					Application::TriggerError(
-							Translate::Get('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' . get_class($this->engine) . ' Method: ' . $name . '()', 
-							'warning');
-				} else {
+				if ($method->isPublic()) {
 					return $method->invokeArgs($this->engine, $args);
+				} else {
+					throw new CustomException(
+							Translate::Get('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' .
+									 get_class($this->engine) . ' Method: ' . $name . '()', 
+									E_WARNING);
 				}
 			}
 		} else {
-			Application::TriggerError(
-					Translate::Get('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' . get_class($this->engine) . ' Method: ' . $name . '()', 'error');
+			throw new CustomException(
+					Translate::Get('_CALL_PRIVATE_PROTECTED_METHOD_') . ' => Class: ' .
+							 get_class($this->engine) . ' Method: ' . $name . '()', E_WARNING);
 		}
 	}
 }
