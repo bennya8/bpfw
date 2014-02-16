@@ -45,10 +45,12 @@ class Database_MySQL extends Database implements IDatabase
 	public function getConnect()
 	{
 		if (!function_exists('mysql_connect')) {
-			throw new CustomException(Translate::Get('_MYSQL_MODULE_NO_EXIST_'));
+			throw new CustomException(Translate::Get('_MYSQL_MODULE_NO_EXIST_'), E_ERROR);
 		}
-		if (!$this->resource = mysql_connect($this->DB_HOST . ':' . $this->DB_PORT, $this->DB_USER, $this->DB_PWD)) {
-			throw new CustomException(Translate::Get('_DB_CONNECT_FAIL_') . ' => ' . mysql_error());
+		if (!$this->resource = mysql_connect($this->DB_HOST . ':' . $this->DB_PORT, $this->DB_USER, 
+				$this->DB_PWD)) {
+			throw new CustomException(Translate::Get('_DB_CONNECT_FAIL_') . ' => ' . mysql_error(), 
+					E_ERROR);
 		}
 	}
 
