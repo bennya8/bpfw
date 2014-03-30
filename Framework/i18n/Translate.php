@@ -1,8 +1,10 @@
 <?php
 
-namespace System\i18n;
+namespace Wiicode\i18n;
 
-class Translate extends \System\Core\Component
+use \Wiicode\Core\Component;
+
+class Translate extends Component
 {
 	private static $_language = [];
 
