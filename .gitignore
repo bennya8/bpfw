@@ -3,8 +3,5 @@
 .project
 .settings
 .svn
-/App/*
-/Admin/*
-/Install/*
-admin.php
-config.php
+.idea
+demo/*
