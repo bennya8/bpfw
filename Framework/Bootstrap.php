@@ -2,5 +2,5 @@
 
 require SYSTEM_PATH . '/core/Application.php';
 
-class Bootstrap extends \Wiicode\Core\Application
+class Bootstrap extends \System\Core\Application
 {}
