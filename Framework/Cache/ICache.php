@@ -1,6 +1,6 @@
 <?php
 
-namespace Wiicode\Cache;
+namespace System\Cache;
 
 
 interface ICache

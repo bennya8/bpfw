@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Cache\Driver;
+namespace Wiicode\Cache\Driver;
 
 use \Wiicode\Cache\ICache;
 

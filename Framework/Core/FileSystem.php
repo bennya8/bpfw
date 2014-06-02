@@ -1,6 +1,6 @@
 <?php
 
-namespace Wiicode\Core;
+namespace System\Core;
 
 /**
  * 系统文件操作类

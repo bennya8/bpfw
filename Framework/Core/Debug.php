@@ -1,6 +1,6 @@
 <?php
 
-namespace Wiicode\Core;
+namespace System\Core;
 
 class Debug {
 	private static $_trace = array();

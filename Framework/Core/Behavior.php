@@ -1,12 +1,13 @@
 <?php
 
+
 /**
- * Interface IBehavior
+ *
  */
 
 namespace Wiicode\Behavior;
 
-interface IBehavior
+abstract class Behavior
 {
 
     public function attach();
@@ -14,8 +15,4 @@ interface IBehavior
     public function detach();
 
     public function notify();
-}
-
-interface BehaviorObserver
-{
 }
