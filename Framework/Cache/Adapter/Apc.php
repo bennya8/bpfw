@@ -1,10 +1,10 @@
 <?php
 
-namespace Wiicode\Cache\Driver;
+namespace System\Cache\Adapter;
 
-use \Wiicode\Cache\ICache;
+use \System\Cache\Cache;
 
-class Apc implements ICache
+class Apc extends Cache
 {
     public function flush()
     {
@@ -16,17 +16,14 @@ class Apc implements ICache
 
     public function has()
     {
-        // TODO: Implement has() method.
     }
 
     public function open()
     {
-        // TODO: Implement open() method.
     }
 
     public function close()
     {
-        // TODO: Implement close() method.
     }
 
     public function set()
