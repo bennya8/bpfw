@@ -1,14 +1,16 @@
 <?php
 
-namespace System\Core;
-
 /**
  * 系统文件操作类
- * @package Root.Framework.Core
+ * @package System.Core
  * @author Benny <benny_a8@live.com>
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
+
+namespace System\Core;
+
+
 class FileSystem
 {
 	/**

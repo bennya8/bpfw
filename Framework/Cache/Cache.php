@@ -2,8 +2,7 @@
 
 namespace System\Cache;
 
-use System\Core\Application,
-    System\Core\Component;
+use \System\Core\Component;
 
 abstract class Cache extends Component implements ICache
 {
@@ -11,10 +10,11 @@ abstract class Cache extends Component implements ICache
      * Cache Instance
      * @var object
      */
-    private static $_cache = null;
+    private static $_instance = null;
 
     protected static function factory($class = __CLASS__)
     {
+
         switch (strtolower($class)) {
             case 'apc':
                 return Application::create('System\Cache\Driver\Apc');

@@ -9,9 +9,9 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace Wiicode\Core;
+namespace System\Helper;
 
-class Cookie extends Component
+class Cookie
 {
     /**
      * cookie prefix

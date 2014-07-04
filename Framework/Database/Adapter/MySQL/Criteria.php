@@ -9,9 +9,11 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace System\Database;
+namespace System\Database\Adapter\MySQL;
 
-abstract class Criteria
+use System\Database\Criteria as AbsCriteria;
+
+class Criteria extends AbsCriteria
 {
 
     /**
@@ -60,11 +62,6 @@ abstract class Criteria
      * @var string
      */
     protected $table = '';
-
-
-    public static function factory(){
-
-    }
 
 
     /**

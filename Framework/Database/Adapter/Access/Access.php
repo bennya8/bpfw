@@ -1,11 +1,11 @@
 <?php
 
-namespace Wiicode\Database\Driver;
+namespace System\Database\Driver;
 
-use \Wiicode\Database\DAO;
+use System\Database\Database;
 
 
-class AccessHelper implements DAO {
+class AccessHelper extends Database {
 	private $conn = null;
 
 	public function __construct($setting) {

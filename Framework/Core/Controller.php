@@ -2,12 +2,17 @@
 
 
 
-namespace Wiicode\Core;
+namespace System\Core;
 
 
 class Controller extends Component
 {
-    protected $viewEngnine = null;
+
+
+
+    protected $view = null;
+
+
 
     public function __construct()
     {
@@ -25,27 +30,6 @@ class Controller extends Component
     }
 
     public function ajaxReturn()
-    {
-
-    }
-
-    public function isGet()
-    {
-
-    }
-
-    public function isPost()
-    {
-
-    }
-
-    public function isPut()
-    {
-
-
-    }
-
-    public function isDelete()
     {
 
     }

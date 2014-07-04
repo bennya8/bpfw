@@ -2,15 +2,11 @@
 
 namespace System\Core;
 
-use \System\Core\Application;
-
 abstract class Component
 {
-
     public function __construct($name = __CLASS__)
     {
-        echo get_class($this);
-        $config = Application::create('System\Core\Config')->get('component');
+        $config = $this->getDI('config')->get('component');
         if (!empty($config) && is_array($config)) {
             foreach ($config as $propKey => $propValue) {
                 if (property_exists($this, $propKey)) {
@@ -20,8 +16,20 @@ abstract class Component
         }
     }
 
+    protected function getDI($name)
+    {
+        return DI::factory()->get($name);
+    }
+
+
+    protected function setDI($name, $mixed)
+    {
+        return DI::factory()->set($name, $mixed);
+    }
+
     public function __get($name)
     {
+
     }
 
     public function __set($name, $value)

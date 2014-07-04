@@ -1,13 +1,12 @@
 <?php
 namespace Wiicode\Database\Driver;
 
+use \PDO;
 
 
+class {
+	
 
-class Oracle{
-	
-	
-	
 	
 }
 
@@ -15,5 +14,3 @@ class Oracle{
 
 
 
-
-?>

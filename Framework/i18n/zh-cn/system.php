@@ -2,7 +2,7 @@
 
 /**
  * 系统语言包
- * @package Root.Framework.Lang
+ * @package System.i18n.zh-cn
  * @author Benny <benny_a8@live.com>
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
@@ -45,5 +45,3 @@ return array(
 	'_SET_CHARSET_FAIL_' => '设定字符集出错',
 	'_SQL_SYNTAX_ERROR_' => 'SQL执行出错',
 );
-
-?>

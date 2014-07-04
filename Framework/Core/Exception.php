@@ -2,7 +2,7 @@
 
 namespace System\Core;
 
-class SystemException extends \Exception
+class Exception extends \Exception
 {
 
 	public function __construct($message = null, $code = null, $previous = null) {

@@ -14,6 +14,7 @@ class Config
         }
     }
 
+
     public function get($name)
     {
         return isset($this->_config[$name]) ? $this->_config[$name] : array();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Wiicode\Helper;
+namespace System\Helper;
 
 class Mail
 {}

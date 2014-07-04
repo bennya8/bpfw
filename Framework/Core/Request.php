@@ -2,15 +2,24 @@
 
 namespace System\Core;
 
-class Request extends Component
+class Request //extends Component
 {
 
-    public function getData()
+    public function getParam()
     {
+
+
     }
 
-    public function get()
+    public function get($key, $default = '', $filter = false)
     {
+        $_GET[$key] = isset($_GET[$key]) ? $_GET[$key] : $default;
+        if ($filter) {
+            $_GET[$key] = $this->filter($_GET[$key], $filter);
+        } else {
+
+        }
+        return $_GET[$key];
     }
 
     public function getPost()
@@ -18,34 +27,54 @@ class Request extends Component
     }
 
 
-    public function isPost()
-    {
-    }
-
     public function isGet()
     {
+        return $_SERVER['REQUEST_METHOD'] === 'GET';
     }
 
-    public function isAjax()
+    public function isPost()
     {
+        return $_SERVER['REQUEST_METHOD'] === 'POST';
     }
 
     public function isPut()
     {
+        return $_SERVER['REQUEST_METHOD'] === 'PUT';
     }
 
     public function isDelete()
     {
+        return $_SERVER['REQUEST_METHOD'] === 'DELETE';
+    }
+
+    public function isAjax()
+    {
+
+
     }
 
 
     public function getUserAgent()
     {
+        return $_SERVER['HTTP_USER_AGENT'];
     }
 
     public function getUserIp()
     {
+//        return $_SERVER['SERVER_NAME'];
     }
+
+    public function filter($value, $filter)
+    {
+        $functions = array();
+        if (is_string($filter) && strpos(',', $filter) !== false) {
+            $functions = implode(',', $filter);
+        }
+
+        $value = call_user_func_array($functions, $value);
+
+    }
+
 
     /**
      * 递归添加转义字符
@@ -79,3 +108,10 @@ class Request extends Component
         return $data;
     }
 }
+
+
+$_GET['user'] = "sdsd'f'''f";
+$Request = new Request();
+$resut = $Request->getUserIp();
+
+var_dump($resut);

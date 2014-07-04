@@ -1,7 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Benny
- * Date: 4/1/14
- * Time: 11:02 PM
- */ 
+
+namespace System\Core;
+
+class Dispatch extends Component{
+
+
+
+    public function getNamespace(){}
+    public function setNamespace(){}
+
+
+}

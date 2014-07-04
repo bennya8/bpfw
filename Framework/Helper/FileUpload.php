@@ -1,6 +1,6 @@
 <?php
 
-namespace Wiicode\Helper;
+namespace System\Helper;
 
 /**
  * 批量上传文件

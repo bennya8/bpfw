@@ -11,10 +11,15 @@ abstract class Session extends Component
      * session instance
      * @var object
      */
-    private $_session = null;
+    private $_handle = null;
+
+    private $_handleList = array(
+        'file' => ''
+    );
 
     public function __construct()
     {
+        parent::__construct(__CLASS__);
         session_set_save_handler(array(
             $this => 'open'
         ), array(
@@ -56,7 +61,7 @@ abstract class Session extends Component
     public static function factory($name)
     {
         switch (strtolower($name)) {
-            case 'file':
+            case '':
                 break;
             case 'memcached':
                 break;
