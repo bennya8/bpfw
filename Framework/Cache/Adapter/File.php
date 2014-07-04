@@ -1,8 +1,8 @@
 <?php
 
-namespace Wiicode\Cache\Driver;
+namespace System\Cache\Adapter;
 
-use \Wiicode\Cache\ICache;
+use \System\Cache\ICache;
 
 class File implements ICache
 {

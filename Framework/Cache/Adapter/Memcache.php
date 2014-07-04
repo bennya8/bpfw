@@ -2,8 +2,7 @@
 
 namespace System\Cache\Driver;
 
-use \Wiicode\Cache\ICache;
-
+use \System\Cache\ICache;
 
 class Memcached implements ICache{
 	/* (non-PHPdoc)
