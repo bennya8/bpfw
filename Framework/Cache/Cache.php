@@ -1,41 +1,127 @@
 <?php
 
+/**
+ * Cache component abstract class
+ * @namespace System\Cache
+ * @package system.cache.cache
+ * @author Benny <benny_a8@live.com>
+ * @copyright ©2012-2014 http://github.com/bennya8
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 namespace System\Cache;
 
-use \System\Core\Component;
+use System\Core\Di,
+    System\Core\Component;
 
-abstract class Cache extends Component implements ICache
+abstract class Cache extends Component
 {
     /**
-     * Cache Instance
+     * Cache instance
      * @var object
      */
     private static $_instance = null;
 
-    protected static function factory($class = __CLASS__)
-    {
+    /**
+     * Support list of cache adapter
+     * @var array
+     */
+    private static $_drivers = array(
+        'apc' => 'System\\Cache\\Adapter\\Apc',
+        'file' => 'System\\Cache\\Adapter\\File',
+        'memcached' => 'System\\Cache\\Adapter\\Memcached',
+        'mongodb' => 'System\\Cache\\Adapter\\Mongodbs',
+        'redis' => 'System\\Cache\\Adapter\\Redis',
+        'xcache' => 'System\\Cache\\Adapter\\Xcache'
+    );
 
-        switch (strtolower($class)) {
-            case 'apc':
-                return Application::create('System\Cache\Driver\Apc');
-                break;
-            case 'Memcache':
-                return Application::create('System\Cache\Driver\Memcache');
-                break;
-            default:
-                return Application::create('System\Cache\Driver\File');
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->config = $this->getDI('config')->get('component')['cache'];
+        $adapter = $this->config['adapter'];
+        if (!empty($this->config[$adapter]) && is_array($this->config[$adapter])) {
+            foreach ($this->config[$adapter] as $propKey => $propValue) {
+                if (property_exists($this, $propKey)) {
+                    $this->$propKey = $propValue;
+                }
+            }
         }
+        $this->open();
     }
 
-    abstract public function has();
+    /**
+     * Destructor
+     */
+    public function __destruct()
+    {
+        $this->close();
+    }
 
-    abstract public function open();
+    /**
+     * Cache factory
+     * @throws \Exception
+     * @return object
+     */
+    public static function factory()
+    {
+        $config = Di::factory()->get('config')->get('component')['cache'];
+        if (!isset(self::$_drivers[$config['adapter']])) {
+            throw new \Exception('unknown cache adapter');
+        }
+        $class = self::$_drivers[$config['adapter']];
+        if (!self::$_instance instanceof $class) {
+            self::$_instance = new $class();
+        }
+        return self::$_instance;
+    }
 
-    abstract public function close();
+    /**
+     * Fetch cache data with given key
+     * @param $key
+     * @return mixed
+     */
+    abstract public function get($key);
 
+    /**
+     * Write cache data with given key and value
+     * @param $key
+     * @param $value
+     * @return mixed
+     */
+    abstract public function set($key, $value);
+
+    /**
+     * Delete cache data with given key
+     * @param $key
+     * @return mixed
+     */
+    abstract public function remove($key);
+
+    /**
+     * Checks if the given key in the cache data
+     * @param $key
+     * @return mixed
+     */
+    abstract public function has($key);
+
+    /**
+     * Free all data from cache data
+     * @return mixed
+     */
     abstract public function flush();
 
-    abstract public function get();
+    /**
+     * Open a cache server connection
+     * @return mixed
+     */
+    abstract public function open();
 
-    abstract public function set();
+    /**
+     * Close a cache server connect
+     * @return mixed
+     */
+    abstract public function close();
 }
