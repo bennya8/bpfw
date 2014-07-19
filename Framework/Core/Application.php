@@ -6,37 +6,21 @@ class Application
 {
     public static $version = 'alpha';
 
+    private $_di = array();
+
     public function main()
     {
-        $this->initSystemCommon();
-        $this->registerNamespace();
-        // event :: app start
-
-
+        $this->registerMainService();
+        $this->getDI('event')->notify('app_start');
         $this->registerService();
-        $this->registerModule();
-
-
-        // event :: dispatch start
-
-
-
-        // event :: dispatch end
-
-
-        // event :: app end
-
-//        Debug::start();
-//        Debug::trace(__METHOD__);
-//
-//
-//        $this->_initialize();
-//        echo Debug::end();
+        $this->getDI('event')->notify('dispatcher_start');
+        $this->getDI('route')->dispatcher();
+        $this->getDI('event')->notify('dispatcher_end');
+        $this->getDI('event')->notify('app_end');
     }
 
-    public function initSystemCommon()
+    protected function registerMainService()
     {
-        // according currently environment setting to show error message whether or not
         switch (strtolower(ENVIRONMENT)) {
             case 'development':
             case 'testing':
@@ -45,57 +29,98 @@ class Application
             default:
                 error_reporting(0);
         }
-    }
-
-    public function registerNamespace()
-    {
-
+//        set_exception_handler(array('System\\Core\\Application', 'exceptionHandler'));
+        set_error_handler(array('System\\Core\\Application', 'errorHandler'));
         require SYSTEM_PATH . 'Core/Loader.php';
         $loader = new Loader();
-        $loader->registerNamespace(array(
-            'System\\Core' => SYSTEM_PATH . 'Core',
-        ));
         $loader->register();
-        $di = DI::factory();
-        $di->set('loader', $loader);
-        $di->set('app', $this);
+        $loader->registerNamespace(array(
+            'System\\Cache' => SYSTEM_PATH . 'Cache',
+            'System\\Cache\\Adapter' => SYSTEM_PATH . 'Cache/Adapter',
+            'System\\Core' => SYSTEM_PATH . 'Core',
+            'System\\Event' => SYSTEM_PATH . 'Event',
+            'System\\Extend' => SYSTEM_PATH . 'Extend',
+            'System\\Database' => SYSTEM_PATH . 'Database',
+            'System\\Database\\Adapter' => SYSTEM_PATH . 'Database/Adapter',
+            'System\\Database\\Adapter\\MySQL' => SYSTEM_PATH . 'Database/Adapter/MySQL',
+            'System\\Database\\Adapter\\MySQLi' => SYSTEM_PATH . 'Database/Adapter/MySQLi',
+            'System\\Database\\Adapter\\PDO' => SYSTEM_PATH . 'Database/Adapter/PDO',
+            'System\\Helper' => SYSTEM_PATH . 'Helper',
+            'System\\Session' => SYSTEM_PATH . 'Session',
+            'System\\Session\\Adapter' => SYSTEM_PATH . 'Session/Adapter',
+        ));
+        $this->setDI('loader', $loader);
+        $this->setDI('config', new Config());
+        $this->setDI('event', new EventManager());
+        $this->setDI('route', new Route());
     }
 
-    public function registerService()
+    protected function registerService()
     {
-        $di = DI::factory();
-        $di->set('config', new Config());
-        $di->set('translate', new Translate());
-        $di->set('request', new Request());
-        $di->set('response', new Response());
-        $di->set('event', new Event());
-        $di->set('route', new route());
+        $loader = $this->getDI('loader');
+        $loader->registerNamespace($this->getDI('config')->get('namespace'));
+        $components = array_map('ucfirst', array_keys($this->getDI('config')->get('component')));
+        $services = array('Logger', 'Profiler', 'Cookie', 'Translate', 'Security');
+        $factoryServices = array('Cache', 'Database', 'Session');
+        foreach ($components as $component) {
+            if (in_array($component, $services)) {
+                $class = 'System\\Core\\' . $component;
+                $this->setDI($component, new $class);
+            } elseif (in_array($component, $factoryServices)) {
+                $class = 'System\\' . $component . '\\' . $component;
+                $this->setDI(strtolower($component), $class::factory());
+            }
+        }
+        $modules = $this->getDI('config')->get('module');
+        foreach ($modules as $module) {
+            $loader->registerNamespace($module['namespace']);
+        }
     }
 
-    public static function exception($message, $type = null)
+    protected function getDI($name)
     {
-        trigger_error($message);
+        if (isset($this->_di[$name])) {
+            return $this->_di[$name];
+        } else {
+            return DI::factory()->get($name);
+        }
     }
 
-    public static function exceptionHandler()
+    protected function setDI($name, $mixed, $shared = true)
     {
-
+        if (!$shared) {
+            $this->_di[$name] = $mixed;
+        } else {
+            DI::factory()->set($name, $mixed);
+        }
     }
 
-    public static function errorHandler()
+    public static function exceptionHandler($exception)
     {
+        echo $exception->getMessage();
+
+        switch ($exception->getCode()) {
+            case E_ERROR:
+            case E_STRICT:
+            case E_DEPRECATED:
+            case E_WARNING:
+            case E_PARSE:
+            case E_NOTICE:
+        }
     }
 
-
-    public function __call($class, $args)
+    public static function errorHandler($code, $message)
     {
-        // echo $class;
-        // var_dump($args);
+        throw new \Exception($message, $code);
     }
 
-    public static function __callstatic($class, $args)
+    public function __get($name)
     {
-        // echo $class;
-        // var_dump($args);
+        return $this->getDI($name);
+    }
+
+    public function __set($name, $value)
+    {
+        $this->setDI($name, $value);
     }
 }
