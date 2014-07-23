@@ -16,11 +16,69 @@ use System\Core\DI;
 
 class Memcached extends Cache
 {
-    private $_db;
-
-    public function __construct()
+    /**
+     * Fetch cache data with given key
+     * @access public
+     * @param $key
+     * @return mixed
+     */
+    public function get($key)
     {
-        if (!class_exists('\Memcached')) {
+        // TODO: Implement get() method.
+    }
+
+    /**
+     * Write cache data with given key and value
+     * @access public
+     * @param $key
+     * @param $value
+     * @return mixed
+     */
+    public function set($key, $value)
+    {
+        // TODO: Implement set() method.
+    }
+
+    /**
+     * Delete cache data with given key
+     * @access public
+     * @param $key
+     * @return mixed
+     */
+    public function remove($key)
+    {
+        // TODO: Implement remove() method.
+    }
+
+    /**
+     * Checks if the given key in the cache data
+     * @access public
+     * @param $key
+     * @return mixed
+     */
+    public function has($key)
+    {
+        // TODO: Implement has() method.
+    }
+
+    /**
+     * Free all data from cache data
+     * @access public
+     * @return mixed
+     */
+    public function flush()
+    {
+        // TODO: Implement flush() method.
+    }
+
+    /**
+     * Open a cache server connection
+     * @access public
+     * @return mixed
+     */
+    public function open()
+    {
+        if (!class_exists('\\Memcached')) {
             throw new \Exception('memcached module not install');
         }
         $this->_db = new \Memcached();
@@ -34,76 +92,16 @@ class Memcached extends Cache
 
 
 //        var_dump($this->_db->get('abc'));
-
-    }
-
-    /**
-     * Fetch cache data with given key
-     * @param $key
-     * @return mixed
-     */
-    public function get($key)
-    {
-
-    }
-
-    /**
-     * Write cache data with given key and value
-     * @param $key
-     * @param $value
-     * @return mixed
-     */
-    public function set($key, $value)
-    {
-
-
-    }
-
-    /**
-     * Delete cache data with given key
-     * @param $key
-     * @return mixed
-     */
-    public function remove($key)
-    {
-        // TODO: Implement remove() method.
-    }
-
-    /**
-     * Checks if the given key in the cache data
-     * @param $key
-     * @return mixed
-     */
-    public function has($key)
-    {
-        // TODO: Implement has() method.
-    }
-
-    /**
-     * Free all data from cache data
-     * @return mixed
-     */
-    public function flush()
-    {
-        // TODO: Implement flush() method.
-    }
-
-    /**
-     * Open a cache server connection
-     * @return mixed
-     */
-    public function open()
-    {
-        // TODO: Implement open() method.
     }
 
     /**
      * Close a cache server connect
+     * @access public
      * @return mixed
      */
     public function close()
     {
-        // TODO: Implement close() method.
+        return true;
     }
 
 
