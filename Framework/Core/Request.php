@@ -1,31 +1,66 @@
 <?php
 
+/**
+ * Request
+ * @namespace System\Core
+ * @package system.core.request
+ * @author Benny <benny_a8@live.com>
+ * @copyright ©2012-2014 http://github.com/bennya8
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 namespace System\Core;
 
-class Request //extends Component
+class Request
 {
+    protected $filter;
 
-    public function getParam()
+    public function __construct()
     {
+        $this->filter = new Filter();
+    }
 
-
+    public function filter($value, $filter = 'string')
+    {
+        if (is_string($filter)) {
+            $functions = explode(',', $filter);
+            foreach ($functions as $function) {
+                if (method_exists($this->filter, strtolower($function))) {
+                    $value = call_user_func(array($this->filter, $function), $value);
+                } else if (function_exists($function)) {
+                    $value = call_user_func($function, $value);
+                }
+            }
+        }
+        return $value;
     }
 
     public function get($key, $default = '', $filter = false)
     {
-        $_GET[$key] = isset($_GET[$key]) ? $_GET[$key] : $default;
         if ($filter) {
-            $_GET[$key] = $this->filter($_GET[$key], $filter);
+            return $_GET[$key] = $this->filter($_GET[$key], $filter, $default);
         } else {
-
+            return $_GET[$key] = !empty($_GET[$key]) ? $_GET[$key] : $default;
         }
-        return $_GET[$key];
     }
 
-    public function getPost()
+    public function getPost($key, $default = false, $filter = false)
     {
+        if (empty($_POST[$key]) && !isset($_POST[$key])) {
+            return $_POST[$key] = $default;
+        } else {
+            return $_POST[$key] = $this->filter($_POST[$key], $filter);
+        }
     }
 
+    public function getParam($key, $default = '', $filter = false)
+    {
+        if ($filter) {
+            return $_REQUEST[$key] = $this->filter($_REQUEST[$key], $filter);
+        } else {
+            return $_REQUEST[$key] = !empty($_REQUEST[$key]) ? $_REQUEST[$key] : $default;
+        }
+    }
 
     public function isGet()
     {
@@ -49,10 +84,8 @@ class Request //extends Component
 
     public function isAjax()
     {
-
-
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
     }
-
 
     public function getUserAgent()
     {
@@ -61,57 +94,15 @@ class Request //extends Component
 
     public function getUserIp()
     {
-//        return $_SERVER['SERVER_NAME'];
-    }
-
-    public function filter($value, $filter)
-    {
-        $functions = array();
-        if (is_string($filter) && strpos(',', $filter) !== false) {
-            $functions = implode(',', $filter);
+        $ip = '';
+        if (isset($_SERVER['REMOTE_ADDR'])) {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
-
-        $value = call_user_func_array($functions, $value);
-
+        return $ip;
     }
 
-
-    /**
-     * 递归添加转义字符
-     * @param mixed $data
-     * @return mixed
-     */
-    public function filterEscape($data)
-    {
-        if (is_string($data)) return addslashes($data);
-        if (is_array($data)) {
-            foreach ($data as $k => $v) {
-                $data[$k] = $this->filterEscape($v);
-            }
-        }
-        return $data;
-    }
-
-    /**
-     * 递归去除转义字符
-     * @param mixed $data
-     * @return mixed
-     */
-    public function filterUnescape($data)
-    {
-        if (is_string($data)) return stripslashes($data);
-        if (is_array($data)) {
-            foreach ($data as $k => $v) {
-                $data[$k] = $this->filterUnescape($v);
-            }
-        }
-        return $data;
-    }
 }
-
-
-$_GET['user'] = "sdsd'f'''f";
-$Request = new Request();
-$resut = $Request->getUserIp();
-
-var_dump($resut);
