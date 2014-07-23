@@ -4,6 +4,7 @@ return array(
     'namespace' => array(
         'App\\Common' => APP_PATH . '/Common',
         'App\\Event' => APP_PATH . '/Event',
+        'App\\Model' => APP_PATH . '/Model',
     ),
 
     'module' => array(
@@ -39,7 +40,7 @@ return array(
             'adapter' => 'file',
 
             'file' => array(
-                'path' => ROOT_PATH . 'Runtime/Cache',
+                'path' => 'Runtime/Cache',
                 'node' => 10
             ),
 
@@ -95,11 +96,15 @@ return array(
         ),
 
         'route' => array(
-            'mode' => 'native',
+            // pathinfo / queryinfo / rewrite
+            'mode' => 'rewrite',
             'defaultModule' => 'site',
             'defaultController' => 'site',
             'defaultAction' => 'index',
-            'rules' => array()
+            'rules' => array(
+                '/' => array('site/site/index'),
+                '/news-(:id).html' => array('site/site/test','id=(:id)')
+            )
         ),
 
         'view' => array(
@@ -114,7 +119,8 @@ return array(
 
         'database' => array(
             'adapter' => 'mysql',
-
+            'cache' => true, // field cache
+            'prefix' => '',
             'servers' => array(
                 'master' => array(
                     // only use pdo driver require this param
