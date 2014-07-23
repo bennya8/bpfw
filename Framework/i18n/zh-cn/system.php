@@ -7,6 +7,7 @@
  * @copyright ©2013 www.i3code.org
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
+
 return array(
 	/* 文件系统相关 */
 	'_SYSCONF_FILE_MISSING_' => '系统配置文件丢失',
