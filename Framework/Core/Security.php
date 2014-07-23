@@ -1,28 +1,24 @@
 <?php
-namespace System\Core;
 
+/**
+ * Security
+ * @namespace System\Core
+ * @package system.core.security
+ * @author Benny <benny_a8@live.com>
+ * @copyright ©2012-2014 http://github.com/bennya8
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+namespace System\Core;
 
 class Security extends Component
 {
-    public function checkToken(){
-        if($this->enable){
+    protected function setToken()
+    {
+    }
 
-        }
-        $response = $this->getDI('response');
-
-
-        $response = Application::DI('#response');
-        $session = Application::DI('#session');
-        $response->isPost();
-        $token_key = $response->getParam('token_key');
-
-        if($token_key){
-
-        }
-
+    protected function getToken()
+    {
 
     }
-    public function setToken(){}
-
-
 }
