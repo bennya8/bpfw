@@ -1,44 +1,57 @@
 <?php
 
 /**
- * Cookie Helper
- * @namespace Wiicode\Core
- * @package wiicode.core.cookie
+ * Cookie
+ * @namespace System\Core
+ * @package system.core.cookie
  * @author Benny <benny_a8@live.com>
- * @copyright ©2014 http://github.com/bennya8
+ * @copyright ©2012-2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
-namespace System\Helper;
+namespace System\Core;
 
-class Cookie
+class Cookie extends Component
 {
+
     /**
-     * cookie prefix
+     * Cookie encrypt setting
+     * @var bool
+     */
+    protected $encrypt = true;
+
+    /**
+     * Cookie encrypt key
+     * @var string
+     */
+    protected $encryptKey = 'kl2j34';
+
+    /**
+     * Cookie prefix
      * @var string
      */
     protected $prefix = '';
 
     /**
-     * cookie expire time (second)
+     * Cookie expire time (second)
      * @var int
      */
     protected $expire = 3600;
 
-    /**1
-     * cookie path
+    /**
+     * Cookie path
      * @var string
      */
     protected $path = '/';
 
     /**
-     * cookie domain
-     * @var null
+     * Cookie domain
+     * @var string
      */
-    protected $domain = null;
+    protected $domain = '';
 
     /**
-     * get cookie
+     * Get cookie
      * @param $name
      * @return mixed
      */
@@ -48,30 +61,19 @@ class Cookie
     }
 
     /**
-     * set cookie
+     * Set cookie
      * @param $name
      * @param $value
+     * @param int $expire
      * @return mixed
      */
-    public function set($name, $value)
+    public function set($name, $value, $expire = 3600)
     {
-        return $_COOKIE[$this->prefix . $name] = $value;
+        setcookie($this->prefix . $name, $value, time() + $expire, $this->path, $this->domain);
     }
 
     /**
-     * renew cookie
-     * @param $name
-     * @param int $expire
-     */
-    public function renew($name, $expire = 3600)
-    {
-        if (isset($_COOKIE[$name])) {
-            setcookie($this->prefix . $name, $_COOKIE[$name], time() + $expire, $this->path, $this->domain);
-        }
-    }
-
-    /**
-     * remove cookie
+     * Remove cookie
      * @param $name key of cookie
      */
     public function remove($name)
@@ -80,4 +82,5 @@ class Cookie
             setcookie($this->prefix . $name, '', time() - 1);
         }
     }
+
 }
