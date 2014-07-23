@@ -1,9 +1,19 @@
 <?php
 
+/**
+ * Loader
+ * @namespace System\Core;
+ * @package system.core.loader
+ * @author Benny <benny_a8@live.com>
+ * @copyright ©2012-2014 http://github.com/bennya8
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 namespace System\Core;
 
 class Loader
 {
+
     /**
      * Namespace mapping
      * @var array
@@ -18,21 +28,18 @@ class Loader
     private static $_classes = array();
 
     /**
-     * self instance
+     * Register application autoload function
+     * @retun void
      */
-    private static $_instance = null;
-
-
-    public static function factory()
-    {
-
-    }
-
     public function register()
     {
         spl_autoload_register(array($this, 'autoLoad'));
     }
 
+    /**
+     * Unregister application autoload function
+     * @retun void
+     */
     public function unRegister()
     {
         spl_autoload_unregister(array($this, 'autoLoad'));
@@ -40,8 +47,9 @@ class Loader
 
     /**
      * Classes autoload handler
-     * @access protected
-     * @param string $class 类名
+     * @param string $class
+     * @throws \Exception
+     * @return void
      */
     protected function autoLoad($class)
     {
@@ -49,9 +57,16 @@ class Loader
             require $path;
         } else if (strpos($class, '\\') !== false && $this->registerClass($class)) {
             require $this->getClass($class);
+        } else {
+            throw new \Exception(sprintf('class %s not found', $class), E_WARNING);
         }
     }
 
+    /**
+     * Fetching an class instance or an entire maps
+     * @param $class
+     * @return object
+     */
     public function getClass($class)
     {
         if (!empty($class)) {
@@ -61,6 +76,12 @@ class Loader
         }
     }
 
+    /**
+     * Initialize a class instance and put it into class maps
+     * @param $class
+     * @param string $suffix
+     * @return bool|string
+     */
     public function registerClass($class, $suffix = '.php')
     {
         if (is_string($class)) {
@@ -77,6 +98,11 @@ class Loader
         return false;
     }
 
+    /**
+     * Fetching a register namespace or an entire maps
+     * @param string $namespace
+     * @return string / array
+     */
     public function getNamespace($namespace = '')
     {
         if (!empty($namespace)) {
@@ -86,9 +112,35 @@ class Loader
         }
     }
 
+    /**
+     * Register namespaces for use autoload mechanism
+     * @param array $namespace
+     * @return void
+     */
     public function registerNamespace($namespace)
     {
-        self::$_namespaces = array_merge(self::$_namespaces, $namespace);
+        if (!empty($namespace) && is_array($namespace)) {
+            self::$_namespaces = array_merge(self::$_namespaces, $namespace);
+        }
+    }
+
+    /**
+     * Import a file, same effect as include a file directly
+     * @param string $classAlias
+     * @param string $suffix
+     * @return void
+     */
+    public function import($classAlias, $suffix = '.class.php')
+    {
+        $classAlias = str_replace('.', '/', $classAlias);
+        if (substr($classAlias, 0, 1) === '@') {
+            $classAlias = SYSTEM_PATH . substr($classAlias, 1) . $suffix;
+        } else {
+            $classAlias = APP_PATH . $classAlias . $suffix;
+        }
+        if (is_file($classAlias)) {
+            include $classAlias;
+        }
     }
 
 }
