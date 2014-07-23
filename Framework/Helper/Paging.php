@@ -2,9 +2,11 @@
 
 namespace System\Helper;
 
-class Pagination
+class Paging
 {
-    public function __construct(){}
+    public function format($total, $pageIndex = 1, $pageSize = 10, $params = array())
+    {
 
-    public function
+
+    }
 }

@@ -19,27 +19,52 @@ class File extends Cache
 
     protected $node = 10;
 
+    /**
+     * Fetch cache data with given key
+     * @param $key
+     * @return mixed
+     */
     public function get($key)
     {
         $file = $this->getKeyPath($key);
         return is_file($file) ? unserialize(file_get_contents($file)) : false;
     }
 
+    /**
+     * Write cache data with given key and value
+     * @param $key
+     * @param $value
+     * @return mixed
+     */
     public function set($key, $value)
     {
         return file_put_contents($this->getKeyPath($key), serialize($value));
     }
 
+    /**
+     * Delete cache data with given key
+     * @param $key
+     * @return mixed
+     */
     public function remove($key)
     {
         return unlink($this->getKeyPath($key));
     }
 
+    /**
+     * Checks if the given key in the cache data
+     * @param $key
+     * @return mixed
+     */
     public function has($key)
     {
         return is_file($this->getKeyPath($key));
     }
 
+    /**
+     * Free all data from cache data
+     * @return mixed
+     */
     public function flush()
     {
         for ($i = 0, $len = $this->node; $i < $len; $i++) {
@@ -55,6 +80,10 @@ class File extends Cache
         }
     }
 
+    /**
+     * Open a cache server connection
+     * @return mixed
+     */
     public function open()
     {
         for ($i = 0, $len = $this->node; $i < $len; $i++) {
@@ -63,6 +92,10 @@ class File extends Cache
         }
     }
 
+    /**
+     * Close a cache server connect
+     * @return mixed
+     */
     public function close()
     {
         return true;
