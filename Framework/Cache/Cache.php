@@ -16,14 +16,17 @@ use System\Core\Di,
 
 abstract class Cache extends Component
 {
+    
     /**
      * Cache instance
+     * @access private
      * @var object
      */
     private static $_instance = null;
 
     /**
      * Support list of cache adapter
+     * @access private
      * @var array
      */
     private static $_drivers = array(
@@ -40,7 +43,8 @@ abstract class Cache extends Component
      */
     public function __construct()
     {
-        $this->config = $this->getDI('config')->get('component')['cache'];
+        $this->config = $this->getDI('config')->get('component');
+        $this->config = $this->config['cache'];
         $adapter = $this->config['adapter'];
         if (!empty($this->config[$adapter]) && is_array($this->config[$adapter])) {
             foreach ($this->config[$adapter] as $propKey => $propValue) {
@@ -62,12 +66,14 @@ abstract class Cache extends Component
 
     /**
      * Cache factory
+     * @access public
      * @throws \Exception
      * @return object
      */
     public static function factory()
     {
-        $config = Di::factory()->get('config')->get('component')['cache'];
+        $config = Di::factory()->get('config')->get('component');
+        $config = $config['cache'];
         if (!isset(self::$_drivers[$config['adapter']])) {
             throw new \Exception('unknown cache adapter');
         }
@@ -80,6 +86,7 @@ abstract class Cache extends Component
 
     /**
      * Fetch cache data with given key
+     * @access public
      * @param $key
      * @return mixed
      */
@@ -87,6 +94,7 @@ abstract class Cache extends Component
 
     /**
      * Write cache data with given key and value
+     * @access public
      * @param $key
      * @param $value
      * @return mixed
@@ -95,6 +103,7 @@ abstract class Cache extends Component
 
     /**
      * Delete cache data with given key
+     * @access public
      * @param $key
      * @return mixed
      */
@@ -102,6 +111,7 @@ abstract class Cache extends Component
 
     /**
      * Checks if the given key in the cache data
+     * @access public
      * @param $key
      * @return mixed
      */
@@ -109,18 +119,21 @@ abstract class Cache extends Component
 
     /**
      * Free all data from cache data
+     * @access public
      * @return mixed
      */
     abstract public function flush();
 
     /**
      * Open a cache server connection
+     * @access public
      * @return mixed
      */
     abstract public function open();
 
     /**
      * Close a cache server connect
+     * @access public
      * @return mixed
      */
     abstract public function close();
