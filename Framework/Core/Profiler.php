@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Profiler
+ * @namespace System\Core
+ * @package system.core.profiler
+ * @author Benny <benny_a8@live.com>
+ * @copyright ©2012-2014 http://github.com/bennya8
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 namespace System\Core;
 
 class Profiler
@@ -22,16 +31,18 @@ class Profiler
 
     public static function trace($message)
     {
-        if (is_string($message)) self::$_trace[] = $message;
+        if (is_string($message)) {
+            self::$_trace[] = date('H:i:s', time()) . ' ' . microtime() . ' Memory Used:' . memory_get_peak_usage(true) . ' ' . $message;
+        }
     }
 
     public static function printTrace()
     {
-        $trace = array_reverse(self::$_trace);
-        $html = '<table width="98%" style="position:absolute;bottom:0;">';
-        foreach ($trace as $v) {
-            $microtime = explode(' ', microtime());
-            $html .= '<tr><td style="background:#eee;">' . date('Y-m-d H:i:s', time()) . ' ' . $microtime[0] . ' ' . $v . '</td></tr>';
+
+        $html = '<table width="99%" style="position:absolute;bottom:0;">';
+
+        for ($i = count(self::$_trace) - 1; $i >= 0; $i--) {
+            $html .= '<tr><td style="background:#eee;">' . self::$_trace[$i] . '</td></tr>';
         }
         $html .= '</table>';
         echo $html;
