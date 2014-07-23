@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Configuration class
+ * Configuration
  * @namespace System\Core;
  * @package system.core.config
  * @author Benny <benny_a8@live.com>
@@ -13,6 +13,7 @@ namespace System\Core;
 
 class Config
 {
+
     /**
      * Config container
      * @var array
