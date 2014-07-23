@@ -3,7 +3,7 @@
 /**
  * Criteria SQL Query Standard Class
  * @namespace System\Database
- * @package system.database
+ * @package system.database.criteria
  * @author Benny <benny_a8@live.com>
  * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
@@ -11,258 +11,293 @@
 
 namespace System\Database;
 
-abstract class Criteria
+use System\Core\DI;
+
+class Criteria
 {
-
     /**
-     * 实例
-     */
-    private static $_instance = null;
-
-    /**
-     * SELECT语句模板
-     * @var string
-     */
-    protected $select = 'SELECT @DATA FROM @TABLE @JOIN @WHERE @GROUP @ORDER @LIMIT';
-    /**
-     * INSERT语句模板
-     * @var string
-     */
-    protected $insert = 'INSERT INTO @TABLE @DATA';
-    /**
-     * UPDATE语句模板
-     * @var string
-     */
-    protected $update = 'UPDATE @TABLE SET @DATA @WHERE';
-    /**
-     * DELETE语句模板
-     * @var string
-     */
-    protected $delete = 'DELETE FROM @TABLE @WHERE';
-    /**
-     * SQL安全模式
+     * SQL safe mode
      * @var boolean
      */
-    protected $safemode = true;
-    /**
-     * 语句组合
-     * @var array
-     */
-    protected $condition = array();
-    /**
-     * 语句数据
-     * @var array
-     */
-    protected $data = array();
+    protected $safe = true;
 
     /**
-     * 表名
+     * SELECT statement template
      * @var string
      */
-    protected $table = '';
-
-
-    public static function factory(){
-
-    }
-
+    private $_select = 'SELECT @FIELD FROM @TABLE @JOIN@WHERE@GROUP@ORDER@LIMIT';
 
     /**
-     * 生成select语句
-     * @access public
-     * @param string / array $condition 语句组合
-     * @return string SQL语句
+     * INSERT statement template
+     * @var string
      */
-    public function select($condition)
+    private $_insert = 'INSERT INTO @TABLE @DATA';
+
+    /**
+     * UPDATE statement template
+     * @var string
+     */
+    private $_update = 'UPDATE @TABLE SET @DATA @WHERE';
+
+    /**
+     * DELETE statement template
+     * @var string
+     */
+    private $_delete = 'DELETE FROM @TABLE @WHERE';
+
+    /**
+     * Query condition
+     * @var array
+     */
+    private $_condition = array();
+
+    /**
+     * Query data
+     * @var array
+     */
+    private $_data = array();
+
+    /**
+     * Available chains method
+     * @var array
+     */
+    private $_chains = array('table', 'field', 'select', 'update', 'insert', 'where', 'join', 'group', 'order', 'limit');
+
+    /**
+     * Database instance
+     */
+    private $_db = null;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
-        $this->condition = $condition;
-        $search = array(
-            '@DATA',
+        $this->_db = DI::factory()->get('database');
+    }
+
+    /**
+     * Build a select sql and send a db query
+     * @access public
+     * @param array $condition
+     * @return array query result
+     */
+    public function select($condition = array())
+    {
+        if (!empty($condition) && is_array($condition)) {
+            $this->_condition = array_merge($condition, $this->_condition);
+        }
+        $sql = str_replace(array(
+            '@FIELD',
             '@TABLE',
             '@JOIN',
             '@WHERE',
             '@GROUP',
             '@ORDER',
             '@LIMIT'
-        );
-        $replace = array(
-            $this->parseSelect(),
+        ), array(
+            $this->parseField(),
             $this->parseTable(),
             $this->parseJoin(),
             $this->parseWhere(),
             $this->parseGroup(),
             $this->parseOrder(),
             $this->parseLimit()
-        );
-        return str_replace($search, $replace, $this->select);
+        ), $this->_select);
+
+        $this->_condition = array();
+        return $this->_db->query($sql);
     }
 
     /**
-     * 生成insert语句
+     * Build a insert sql and send a db query
      * @access public
-     * @param string / array $condition 语句组合
-     * @param array $data 插入数据 $k 对应列名，$v 对应值
-     * @return string SQL语句
+     * @param array $data
+     * @throws \Exception
+     * @return array execute result
      */
-    public function insert($data, $condition)
+    public function insert($data = null)
     {
-        $this->condition = $condition;
-        $this->data = $data;
-        $search = array(
+        if (!empty($data) && is_array($data)) {
+            $this->_data = $data;
+        } else {
+            throw new \Exception('insert data can not be empty', E_ERROR);
+        }
+
+        $sql = str_replace(array(
             '@TABLE',
             '@DATA'
-        );
-        $replace = array(
+        ), array(
             $this->parseTable(),
             $this->parseInsert()
-        );
-        return str_replace($search, $replace, $this->insert);
+        ), $this->_insert);
+
+        $this->_data = array();
+        return $this->_db->execute($sql);
     }
 
     /**
-     * 生成update语句
+     * Build an update sql and send a db query
      * @access public
-     * @param string / array $condition 语句组合
-     * @param array $data 更新数据 $k 对应列名，$v 对应值
-     * @return string SQL语句
+     * @param array $data
+     * @param array $where
+     * @throws \Exception
+     * @return array execute result
      */
-    public function update($data, $condition)
+    public function update($data = null, $where = null)
     {
-        $this->condition = $condition;
-        $this->data = $data;
-        $search = array(
+        $this->setCondition('where', $where);
+        if (empty($this->_condition['where'])) {
+            throw new \Exception('execute an update statement without setting where condition', E_ERROR);
+        }
+
+        if (!empty($data) && is_array($data)) {
+            $this->_data = $data;
+        } else {
+            throw new \Exception('update data can not be empty', E_ERROR);
+        }
+
+        $sql = str_replace(array(
             '@TABLE',
             '@DATA',
             '@WHERE'
-        );
-        $replace = array(
+        ), array(
             $this->parseTable(),
             $this->parseUpdate(),
             $this->parseWhere()
-        );
-        return str_replace($search, $replace, $this->update);
+        ), $this->_update);
+
+        $this->_data = array();
+        $this->_condition = array();
+        return $this->_db->execute($sql);
     }
 
     /**
-     * 生成update语句
+     * Build a delete sql and send a db query
      * @access public
-     * @param string / array $condition 语句组合
-     * @return string SQL语句
+     * @param array $condition
+     * @throws \Exception
+     * @return array execute result
      */
-    public function delete($condition)
+    public function delete($where = null)
     {
-        $this->condition = $condition;
-        $search = array(
+        $this->setCondition('where', $where);
+        if ($this->safe && empty($this->_condition['where'])) {
+            throw new \Exception('execute a delete statement without setting where condition', E_ERROR);
+        }
+        $sql = str_replace(array(
             '@TABLE',
             '@WHERE'
-        );
-        $replace = array(
+        ), array(
             $this->parseTable(),
             $this->parseWhere()
-        );
-        return str_replace($search, $replace, $this->delete);
+        ), $this->_delete);
+
+        $this->_condition = array();
+        return $this->_db->execute($sql);
     }
 
     /**
-     * 分析insert
+     * Convert insert data to sql segment
      * @access protected
-     * @return string SQL片段
-     */
-    protected function parseUpdate()
-    {
-        $sql = '';
-        if (!empty($this->data) && is_array($this->data)) {
-            foreach ($this->data as $k => $v) {
-                $sql .= '`' . $k . '` = \'' . $v . '\',';
-            }
-            $sql = rtrim($sql, ',');
-        }
-        return $sql;
-    }
-
-    /**
-     * 分析insert
-     * @access protected
-     * @return string SQL片段
+     * @return string
      */
     protected function parseInsert()
     {
-        $sql = '';
-        if (!empty($this->data) && is_array($this->data)) {
-            $k = array_keys($this->data);
-            $v = array_values($this->data);
-            $sql .= '(`' . implode('`,`', $k) . '`) VALUES ';
-            $sql .= '(\'' . implode('\',\'', $v) . '\')';
+        $parseInsert = '';
+        if (!empty($this->_data) && is_array($this->_data)) {
+            $k = array_keys($this->_data);
+            $v = array_values($this->_data);
+            $parseInsert .= '(`' . implode('`,`', $k) . '`) VALUES ';
+            $parseInsert .= '(\'' . implode('\',\'', $v) . '\')';
         }
-        return $sql;
+        return $parseInsert;
     }
 
     /**
-     * 分析select
+     * Convert update data to sql segment
      * @access protected
-     * @return string SQL片段
+     * @return string
      */
-    protected function parseSelect()
+    protected function parseUpdate()
     {
-        $sql = '*';
-        if ($this->checkAvaliable('select')) {
-            if (is_string($this->condition['select'])) {
-                $sql = $this->condition['select'];
-            } else if (is_array($this->condition['select'])) {
-                $sql = implode(',', $this->condition['select']);
+        $parseUpdate = '';
+        if (!empty($this->_data) && is_array($this->_data)) {
+            foreach ($this->_data as $k => $v) {
+                $parseUpdate .= '`' . $k . '` = \'' . $v . '\',';
+            }
+            $parseUpdate = rtrim($parseUpdate, ',');
+        }
+        return $parseUpdate;
+    }
+
+
+    /**
+     * Convert field data to sql segment
+     * @access protected
+     * @return string
+     */
+    protected function parseField()
+    {
+        $parseField = '*';
+        if ($this->checkCondition('field')) {
+            if (is_string($this->_condition['field'])) {
+                $parseField = $this->_condition['field'];
+            } else if (is_array($this->_condition['field'])) {
+                $parseField = implode(',', $this->_condition['field']);
             }
         }
-        return $sql;
+        return $parseField;
     }
 
     /**
-     * 分析table
+     * set a table name to sql segment
      * @access protected
-     * @return string SQL片段
+     * @return string
      */
     protected function parseTable()
     {
-        $sql = '';
-        if ($this->checkAvaliable('table')) {
-            if (is_string($this->condition['table'])) {
-                $sql = $this->condition['table'];
-            } else if (is_array($this->condition['table'])) {
-                $sql = implode(',', $this->condition['table']);
+        $parseTable = '';
+        if ($this->checkCondition('table')) {
+            if (is_string($this->_condition['table'])) {
+                $parseTable = $this->_condition['table'];
+            } else if (is_array($this->_condition['table'])) {
+                $parseTable = implode(',', $this->_condition['table']);
             }
         }
-        return $sql;
+        return $parseTable;
     }
 
     /**
-     * 分析where
+     * Convert where condition data to sql segment
      * @access protected
-     * @return string SQL片段
+     * @return string
      */
     protected function parseWhere()
     {
-        $sql = '';
-        if ($this->checkAvaliable('where')) {
-            if (is_string($this->condition['where'])) {
-                $sql = 'WHERE ' . $this->condition['where'];
-            } else if (is_array($this->condition['where'])) {
-                $sql = 'WHERE ';
-                foreach ($this->condition['where'] as $k => $v) {
+        $parsedWhere = '';
+        if ($this->checkCondition('where')) {
+            if (is_string($this->_condition['where'])) {
+                $parsedWhere = 'WHERE ' . $this->_condition['where'];
+            } else if (is_array($this->_condition['where'])) {
+                $parsedWhere = 'WHERE ';
+                foreach ($this->_condition['where'] as $k => $v) {
                     if (isset($v[0]) && isset($v[1])) {
                         switch (strtolower($v[0])) {
                             case 'in':
                                 $where = ' IN ';
                                 if (is_array($v[1])) {
-                                    $v[1] .= '(\'' . implode('\',\'', $v[1]) . '\')';
+                                    $v[1] = '(\'' . implode('\',\'', $v[1]) . '\')';
                                 } else if (is_string($v[1])) {
-                                    $v[1] .= '(' . $v[1] . ')';
+                                    $v[1] = '(' . $v[1] . ')';
                                 }
                                 break;
                             case 'notin':
                                 $where = ' NOT IN ';
                                 if (is_array($v[1])) {
-                                    $v[1] .= '(\'' . implode('\',\'', $v[1]) . '\')';
+                                    $v[1] = '(\'' . implode('\',\'', $v[1]) . '\')';
                                 } else if (is_string($v[1])) {
-                                    $v[1] .= '(' . $v[1] . ')';
+                                    $v[1] = '(' . $v[1] . ')';
                                 }
                                 break;
                             case 'neq':
@@ -287,109 +322,134 @@ abstract class Criteria
                                 $where = ' = ';
                         }
                         $logic = isset($v[2]) ? ' ' . $v[2] : '';
-                        $sql .= $k . $where . '\'' . $v[1] . '\'' . $logic . ' ';
+                        $parsedWhere .= $k . $where . $v[1] . $logic . ' ';
+
+                        var_dump($k);
                     }
                 }
             }
         }
-        return $sql;
+        return $parsedWhere;
     }
 
     /**
-     * 分析select
+     * Convert join data to sql segment
      * @access protected
-     * @return string SQL片段
+     * @return string
      */
     protected function parseJoin()
     {
-        $sql = '';
-        if ($this->checkAvaliable('join')) {
-            if (is_array($this->condition['join'])) {
-                foreach ($this->condition['join'] as $k => $v) {
+        $parseJoin = '';
+        if ($this->checkCondition('join')) {
+            if (is_array($this->_condition['join'])) {
+                foreach ($this->_condition['join'] as $k => $v) {
                     if (isset($v[0]) && isset($v[1])) {
                         switch (strtolower($k)) {
                             case 'right':
-                                $sql = 'RIGHT JOIN ';
+                                $parseJoin = 'RIGHT JOIN ';
                                 break;
                             case 'inner':
-                                $sql = 'INNER JOIN ';
+                                $parseJoin = 'INNER JOIN ';
                                 break;
                             case 'union':
-                                $sql = 'UNION JOIN ';
+                                $parseJoin = 'UNION JOIN ';
                                 break;
                             default:
-                                $sql = 'LEFT JOIN ';
+                                $parseJoin = 'LEFT JOIN ';
                                 break;
                         }
-                        $sql .= $v[0] . ' ON ' . $v[1] . ' ';
+                        $parseJoin .= $v[0] . ' ON ' . $v[1] . ' ';
                     }
                 }
+            } elseif (is_string($this->_condition['join'])) {
+                $parseJoin = $this->_condition['join'];
             }
         }
-        return $sql;
+        return $parseJoin;
     }
 
     /**
-     * 分析group
+     * Convert group data to sql segment
      * @access protected
-     * @return string SQL片段
+     * @return string
      */
     protected function parseGroup()
     {
-        $sql = '';
-        if ($this->checkAvaliable('group')) {
-            if (is_string($this->condition['group'])) {
-                $sql = 'GROUP BY ' . $this->condition['group'];
-            } else if (is_array($this->condition['group'])) {
-                $sql = 'GROUP BY ' . implode(',', $this->condition['group']);
+        $parsedGroup = '';
+        if ($this->checkCondition('group')) {
+            if (is_string($this->_condition['group'])) {
+                $parsedGroup = 'GROUP BY ' . $this->_condition['group'];
+            } else if (is_array($this->_condition['group'])) {
+                $parsedGroup = 'GROUP BY ' . implode(',', $this->_condition['group']);
             }
         }
-        return $sql;
+        return $parsedGroup;
     }
 
     /**
-     * 分析order
+     * Convert order data to sql segment
      * @access protected
-     * @return string SQL片段
+     * @return string
      */
     protected function parseOrder()
     {
-        $sql = '';
-        if ($this->checkAvaliable('order')) {
-            if (is_string($this->condition['order'])) {
-                $sql = 'ORDER BY ' . $this->condition['order'];
-            } else if (is_array($this->condition['order'])) {
-                $sql = 'ORDER BY ' . implode(',', $this->condition['order']);
+        $parsedOrder = '';
+        if ($this->checkCondition('order')) {
+            if (is_string($this->_condition['order'])) {
+                $parsedOrder = 'ORDER BY ' . $this->_condition['order'];
+            } else if (is_array($this->_condition['order'])) {
+                $parsedOrder = 'ORDER BY ' . implode(',', $this->_condition['order']);
             }
         }
-        return $sql;
+        return $parsedOrder;
     }
 
     /**
-     * 分析limit
+     * Convert limit data to sql segment
      * @access protected
-     * @return string SQL片段
+     * @return string
      */
     protected function parseLimit()
     {
-        $sql = '';
-        if ($this->checkAvaliable('limit')) {
-            if (is_string($this->condition['limit'])) {
-                $sql = 'LIMIT ' . $this->condition['limit'];
-            } else if (is_array($this->condition['limit'])) {
-                $sql = 'LIMIT ' . implode(',', $this->condition['limit']);
+        $parsedLimit = '';
+        if ($this->checkCondition('limit')) {
+            if (is_string($this->_condition['limit']) || is_numeric($this->_condition['limit'])) {
+                $parsedLimit = 'LIMIT ' . $this->_condition['limit'];
+            } else if (is_array($this->_condition['limit'])) {
+                $parsedLimit = 'LIMIT ' . implode(',', $this->_condition['limit']);
             }
         }
-        return $sql;
+        return $parsedLimit;
     }
 
     /**
-     * 检查语句组合是否合法
-     * @param string $key 语句组合键
+     * Check whether given key in condition exists
+     * @param string $key
      * @return boolean
      */
-    protected function checkAvaliable($key)
+    public function checkCondition($key)
     {
-        return isset($this->condition[$key]) && !empty($this->condition[$key]) ? true : false;
+        return isset($this->_condition[$key]) && !empty($this->_condition[$key]) ? true : false;
+    }
+
+    /**
+     * Chains invoke set condition
+     * @param $key
+     * @param $value
+     */
+    public function setCondition($key, $value)
+    {
+        $this->_condition[$key] = $value;
+    }
+
+    /**
+     * Chains invoke mechanism
+     */
+    public function __call($method, $args = array())
+    {
+        if (in_array($method, $this->_chains)) {
+            $this->setCondition($method, $args[0]);
+            return $this;
+        }
     }
 }
