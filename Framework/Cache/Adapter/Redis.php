@@ -16,10 +16,16 @@ use System\Cache\Cache;
 class Redis extends Cache
 {
 
+    /**
+     * Cache database instance
+     * @access private
+     * @var object
+     */
     private $_db;
 
     /**
      * Fetch cache data with given key
+     * @access public
      * @param $key
      * @return mixed
      */
@@ -30,6 +36,7 @@ class Redis extends Cache
 
     /**
      * Write cache data with given key and value
+     * @access public
      * @param $key
      * @param $value
      * @return mixed
@@ -41,6 +48,7 @@ class Redis extends Cache
 
     /**
      * Delete cache data with given key
+     * @access public
      * @param $key
      * @return mixed
      */
@@ -51,6 +59,7 @@ class Redis extends Cache
 
     /**
      * Checks if the given key in the cache data
+     * @access public
      * @param $key
      * @return mixed
      */
@@ -61,6 +70,7 @@ class Redis extends Cache
 
     /**
      * Free all data from cache data
+     * @access public
      * @return mixed
      */
     public function flush()
@@ -70,11 +80,13 @@ class Redis extends Cache
 
     /**
      * Open a cache server connection
+     * @access public
+     * @throws \Exception
      * @return mixed
      */
     public function open()
     {
-        if(!class_exists('\\Redis')){
+        if (!class_exists('\\Redis')) {
             throw new \Exception('redis module not install');
         }
         $this->_db = new \Redis();
@@ -83,13 +95,13 @@ class Redis extends Cache
 
     /**
      * Close a cache server connect
+     * @access public
      * @return mixed
      */
     public function close()
     {
         return true;
     }
-
 
     /**
      * Invoke method
@@ -107,5 +119,4 @@ class Redis extends Cache
             throw new \Exception('invoke no exists method');
         }
     }
-
 }
