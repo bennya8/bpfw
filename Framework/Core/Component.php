@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Component abstract class
+ * Component
  * @namespace System\Core;
  * @package system.core.component
  * @author Benny <benny_a8@live.com>
@@ -13,6 +13,7 @@ namespace System\Core;
 
 abstract class Component
 {
+
     /**
      * Dependency inject container
      * @var array
@@ -28,7 +29,8 @@ abstract class Component
             $className = explode('\\', get_class($this));
             $className = strtolower(array_pop($className));
         }
-        $config = $this->getDI('config')->get('component')[$className];
+        $config = $this->getDI('config')->get('component');
+        $config = $config[$className];
         if (!empty($config) && is_array($config)) {
             foreach ($config as $propKey => $propValue) {
                 if (property_exists($this, $propKey)) {
@@ -58,7 +60,7 @@ abstract class Component
      * @param $mixed
      * @param bool $shared
      */
-    protected function setDI($name, $mixed, $shared = false)
+    protected function setDI($name, $mixed, $shared = true)
     {
         if ($shared) {
             DI::factory()->set($name, $mixed);
@@ -108,7 +110,7 @@ abstract class Component
         if (method_exists($this, $method)) {
             return $this->$method($args);
         } else {
-            throw new \Exception('invoke no exists method');
+            throw new \Exception('invoke no exists method', E_WARNING);
         }
     }
 
@@ -123,9 +125,9 @@ abstract class Component
     {
         $class = get_called_class();
         if (method_exists($class, $method)) {
-            return static::$method($args);
+            return $class::$method($args);
         } else {
-            throw new \Exception('invoke no exists static method');
+            throw new \Exception('invoke no exists static method', E_WARNING);
         }
     }
 }
