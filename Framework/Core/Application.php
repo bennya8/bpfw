@@ -1,41 +1,42 @@
 <?php
 
-namespace System\Core;
+/**
+ * Application
+ * @namespace System\Core;
+ * @package system.core.application
+ * @author Benny <benny_a8@live.com>
+ * @copyright ©2012-2014 http://github.com/bennya8
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
 
-use \System\Core\SystemException;
+namespace System\Core;
 
 class Application
 {
-    /**
-     * Instantiated classes container
-     * @var array
-     */
-    private static $_instances = array();
 
     /**
-     * Namespaces mapping
-     * class namespaces => class path
-     * @var array
+     * Application main entrance
+     * @return void
      */
-    private static $_classMaps = array(
-        '#Debug' => '/Core/Debug.php',
-        '#Request' => '/Core/Request.php',
-        '#Response' => '/Core/Response.php',
-        '#Route' => '/Core/Route.php',
-        '#Component' => '/Core/Component.php',
-        '#Translate' => '/i18n/Translate.php'
-    );
-
-    /**
-     * Aliases mapping
-     * class alias => class namespace
-     * @var array
-     */
-    private static $_aliasMaps = array();
-
-    public function __construct()
+    public function main()
     {
-        // according currently environment setting to show error message whether or not
+        $this->registerMainService();
+        Profiler::trace('app_start');
+        $this->getDI('event')->notify('app_start');
+        $this->registerService();
+        $this->getDI('event')->notify('dispatcher_start');
+        $this->getDI('route')->dispatcher();
+        $this->getDI('event')->notify('dispatcher_end');
+        $this->getDI('event')->notify('app_end');
+        Profiler::trace('app_end');
+    }
+
+    /**
+     * Register core components
+     * @return void
+     */
+    protected function registerMainService()
+    {
         switch (strtolower(ENVIRONMENT)) {
             case 'development':
             case 'testing':
@@ -44,154 +45,138 @@ class Application
             default:
                 error_reporting(0);
         }
-        // register lazyload method
-        spl_autoload_register([
-            'System\Core\Application',
-            'classLoader'
-        ]);
-        Debug::start();
-        Debug::trace(__METHOD__);
-
-
-
-        $this->_initialize();
-        echo Debug::end();
-        return;
-    }
-
-    private function _initialize()
-    {
-        $translate = Application::create('System\i18n\Translate');
-        var_dump($translate);
-
-exit;
-
-        $config = Application::create('System\Core\Config')->get('system');
-        foreach ($config as $key => $value) {
-            $this->setDI($key, $value);
-        }
-
-        $this->setDI('request', self::create('\System\Core\Request'));
-        $this->setDI('response', self::create('\System\Core\Response'));
-        $this->setDI('response', self::create('\System\Core\Response'));
-
-
-        Debug::trace(__METHOD__);
-
-    }
-
-    public function _initCommon()
-    {
-        Debug::trace(__METHOD__);
-        $constants = APP_PATH . '/common/Constatns.php';
-        $functions = APP_PATH . '/common/Functions.php';
-        if (is_file($constants)) require $constants;
-        if (is_file($functions)) require $functions;
-    }
-
-    private function _initRoute()
-    {
-        Debug::trace(__METHOD__);
-        Route::parseURL();
-        Route::forward();
+        set_exception_handler(array('System\\Core\\Application', 'exceptionHandler'));
+        set_error_handler(array('System\\Core\\Application', 'errorHandler'));
+        require SYSTEM_PATH . 'Core/Loader.php';
+        $loader = new Loader();
+        $loader->register();
+        $loader->registerNamespace(array(
+            'System\\Cache' => SYSTEM_PATH . 'Cache',
+            'System\\Cache\\Adapter' => SYSTEM_PATH . 'Cache/Adapter',
+            'System\\Core' => SYSTEM_PATH . 'Core',
+            'System\\Event' => SYSTEM_PATH . 'Event',
+            'System\\Extend' => SYSTEM_PATH . 'Extend',
+            'System\\Database' => SYSTEM_PATH . 'Database',
+            'System\\Database\\Adapter' => SYSTEM_PATH . 'Database/Adapter',
+            'System\\Database\\Adapter\\MySQL' => SYSTEM_PATH . 'Database/Adapter/MySQL',
+            'System\\Database\\Adapter\\MySQLi' => SYSTEM_PATH . 'Database/Adapter/MySQLi',
+            'System\\Database\\Adapter\\PDO' => SYSTEM_PATH . 'Database/Adapter/PDO',
+            'System\\Helper' => SYSTEM_PATH . 'Helper',
+            'System\\Session' => SYSTEM_PATH . 'Session',
+            'System\\Session\\Adapter' => SYSTEM_PATH . 'Session/Adapter',
+        ));
+        $this->setDI('loader', $loader);
+        $this->setDI('config', new Config());
+        $this->setDI('event', new EventManager());
+        $this->setDI('route', new Route());
     }
 
     /**
-     * Create a class instance and push to classes container (singleton)
-     * @param string $class
-     * @param string $args
-     * @return object
+     * Register user components, namespaces, modules
+     * @return void
      */
-    public static function create($class = __CLASS__, $args = '')
+    protected function registerService()
     {
-        if (!isset(self::$_instances[$class])) {
-            self::$_instances[$class] = new $class($args);
+        $loader = $this->getDI('loader');
+        $loader->import('Common.Constants','.php');
+        $loader->import('Common.Functions','.php');
+        $loader->registerNamespace($this->getDI('config')->get('namespace'));
+        $components = array_map('ucfirst', array_keys($this->getDI('config')->get('component')));
+        $services = array('Logger', 'Profiler', 'Cookie', 'Translate', 'Security');
+        $factoryServices = array('Cache', 'Database', 'Session');
+        foreach ($components as $component) {
+            if (in_array($component, $services)) {
+                $class = 'System\\Core\\' . $component;
+                $this->setDI(strtolower($component), new $class);
+            } elseif (in_array($component, $factoryServices)) {
+                $class = 'System\\' . $component . '\\' . $component;
+                $this->setDI(strtolower($component), $class::factory());
+            }
         }
-        return self::$_instances[$class];
+        $modules = $this->getDI('config')->get('module');
+        foreach ($modules as $module) {
+            $loader->registerNamespace($module['namespace']);
+        }
     }
 
-
     /**
-     * Classes autoload handler
+     * Application exception handler
      * @access protected
-     * @param string $class 类名
+     * @param $exception \Exception
+     * @return void
      */
-    protected static function classLoader($class)
+    public static function exceptionHandler($exception)
     {
-        if (isset(self::$_classMaps[$class])) {
-            require SYSTEM_PATH . self::$_classMaps[$class];
-        } else if (strpos($class, '\\') !== false) {
-            require self::getClassAlias(str_replace('\\', '.', $class));
-        } else {
-            return;
+        switch ($exception->getCode()) {
+            case E_ERROR:
+            case E_STRICT:
+            case E_DEPRECATED:
+            case E_WARNING:
+            case E_PARSE:
+            case E_NOTICE:
+                echo 'server error: '.$exception->getMessage();
+
+            break;
+            case 404:
+                echo 'page not found';
+                break;
         }
     }
 
-    protected static function getClassAlias($alias, $fileSuffix = '.php')
+    /**
+     * Application error handler
+     * @param $code
+     * @param $message
+     * @throws \Exception
+     * @return void
+     */
+    public static function errorHandler($code = '', $message = '')
     {
-        if (isset(self::$_aliasMaps[$alias])) {
-            return self::$_aliasMaps[$alias];
-        } else if (stripos($alias, '.') !== false) {
-            $spit = stripos($alias, '.');
-            switch (substr($alias, 0, $spit)) {
-                case 'System':
-                    $aliasPrefix = SYSTEM_PATH;
-                    break;
-                case 'Vendor':
-                    $aliasPrefix = SYSTEM_PATH . '/Vendor';
-                    break;
-            }
-            $aliasPath = SYSTEM_PATH . str_replace('.', '/', substr($alias, $spit)) . $fileSuffix;
-            if (is_file($aliasPath)) {
-                return self::setClassAlias($alias, $aliasPath);
-            }
-        }
-        self::exception('找不到该别名' . ' => ' . $alias);
-        return $alias;
+        throw new \Exception($message, $code);
     }
 
-    protected static function setClassAlias($alias, $aliasPath)
-    {
-        return self::$_aliasMaps[$alias] = $aliasPath;
-    }
-
-
+    /**
+     * Get instance from di container
+     * @param $name
+     * @return mixed
+     */
     protected function getDI($name)
     {
-        return isset($this->$name) ? $this->$name : null;
+        return DI::factory()->get($name);
     }
 
-
-    protected function setDI($name, $value)
+    /**
+     * Set instance to di container
+     * @param $name
+     * @param $mixed
+     * @return mixed
+     */
+    protected function setDI($name, $mixed)
     {
-        return $this->$name = $value;
+        return DI::factory()->set($name, $mixed);
     }
 
-    public static function exception($message, $type = null)
+    /**
+     * Magic get method
+     * Get instance from di container
+     * @param $name
+     * @return mixed
+     */
+    public function __get($name)
     {
-        trigger_error($message);
+        return $this->getDI($name);
     }
 
-    public static function exceptionHandler()
+    /**
+     * Magic set method
+     * Set instance to di container
+     * @param $name
+     * @param $mixed
+     * @return mixed
+     */
+    public function __set($name, $mixed)
     {
+        return $this->setDI($name, $mixed);
     }
 
-    public static function errorHandler()
-    {
-    }
-
-
-    public function __call($class, $args)
-    {
-        // echo $class;
-        // var_dump($args);
-    }
-
-    public static function __callstatic($class, $args)
-    {
-        // echo $class;
-        // var_dump($args);
-    }
 }
-
-?>

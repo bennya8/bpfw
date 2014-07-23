@@ -1,37 +1,82 @@
 <?php
 
+/**
+ * MySQL Adapter
+ * @namespace System\Database
+ * @package system.database.adapter.mysql
+ * @author Benny <benny_a8@live.com>
+ * @copyright ©2013-2014 http://github.com/bennya8
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 namespace System\Database\Adapter;
 
+use System\Core\DI;
 use System\Database\Database;
 
-class PDO extends Database
+class MySQL extends Database
 {
     /**
-     * Switch database connection with given identify. etc. master,slave1,slave2
-     * @access public
-     * @param $id
+     * Database servers instance
+     * @var array
      */
-    public function pick($id)
+    private $_servers = array();
+
+    /**
+     * Instance id selector
+     * @var string
+     */
+    private $_id = '';
+
+    /**
+     * Switch database instance by using id selector
+     * @param string $id
+     */
+    public function pick($id = '')
     {
-        // TODO: Implement pick() method.
+        $this->_id = $id;
     }
 
     /**
      * Open several database connection
-     * @return mixed
+     * @access public
+     * @throws \Exception
+     * @return bool
      */
     public function connect()
     {
-        // TODO: Implement connect() method.
+        $config = DI::factory()->get('config')->get('component');
+        $servers = $config['database']['servers'];
+        if (!function_exists('mysql_connect')) {
+            throw new \Exception('mysql module not install', E_ERROR);
+        }
+        $ids = array_keys($servers);
+        if (empty($ids)) {
+            throw new \Exception('fail to load server config', E_ERROR);
+        } else {
+            $this->_id = $ids[0];
+        }
+        foreach ($servers as $id => $cfg) {
+            if (!isset($this->_servers[$id])) {
+                $resource = mysql_connect($cfg['host'] . ':' . $cfg['port'], $cfg['username'], $cfg['password']);
+                mysql_select_db($cfg['database'], $resource);
+                mysql_query("set charset = {$cfg['charset']}", $resource);
+                $this->_servers[$id] = $resource;
+            }
+        }
     }
 
     /**
      * Close several database connection
-     * @return mixed
+     * @access public
+     * @return bool
      */
     public function close()
     {
-        // TODO: Implement close() method.
+        foreach ($this->_servers as $id => $resource) {
+            mysql_close($resource);
+            unset($this->_servers[$id]);
+        }
     }
 
     /**
@@ -39,11 +84,20 @@ class PDO extends Database
      * @access public
      * @param string $sql
      * @param array $params [optional] bind query, only available for pdo driver
+     * @throws \Exception
      * @return mixed
      */
     public function query($sql, $params = null)
     {
-        // TODO: Implement query() method.
+        $rows = array();
+        $result = mysql_query($sql, $this->_servers[$this->_id]);
+        if (!$result) {
+            throw new \Exception(mysql_error($this->_servers[$this->_id]));
+        }
+        while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+            $rows[] = $row;
+        }
+        return $rows;
     }
 
     /**
@@ -51,11 +105,16 @@ class PDO extends Database
      * @access public
      * @param string $sql
      * @param array $params [optional] bind query, only available for pdo driver
+     * @throws \Exception
      * @return mixed
      */
     public function execute($sql, $params = null)
     {
-        // TODO: Implement execute() method.
+        $result = mysql_query($sql, $this->_servers[$this->_id]);
+        if (!$result) {
+            throw new \Exception(mysql_error($this->_servers[$this->_id]));
+        }
+        return mysql_affected_rows($this->_servers[$this->_id]);
     }
 
     /**
@@ -65,7 +124,7 @@ class PDO extends Database
      */
     public function begin()
     {
-        // TODO: Implement begin() method.
+        mysql_query('BEGIN', $this->_servers[$this->_id]);
     }
 
     /**
@@ -75,7 +134,8 @@ class PDO extends Database
      */
     public function commit()
     {
-        // TODO: Implement commit() method.
+        mysql_query('COMMIT', $this->_servers[$this->_id]);
+        mysql_query('END', $this->_servers[$this->_id]);
     }
 
     /**
@@ -85,7 +145,8 @@ class PDO extends Database
      */
     public function rollback()
     {
-        // TODO: Implement rollback() method.
+        mysql_query('ROLLBACK', $this->_servers[$this->_id]);
+        mysql_query('END', $this->_servers[$this->_id]);
     }
 
     /**
@@ -95,7 +156,7 @@ class PDO extends Database
      */
     public function lastInsertId()
     {
-        // TODO: Implement lastInsertId() method.
+        mysql_insert_id($this->_servers[$this->_id]);
     }
 
     /**
@@ -105,7 +166,7 @@ class PDO extends Database
      */
     public function affectedRows()
     {
-        // TODO: Implement affectedRows() method.
+        mysql_affected_rows($this->_servers[$this->_id]);
     }
 
     /**
@@ -258,29 +319,18 @@ class PDO extends Database
         // TODO: Implement addIndex() method.
     }
 
-    /**
-     * Drop an index
-     * @access public
-     * @return mixed
-     */
+
     public function dropIndex()
     {
-        // TODO: Implement dropIndex() method.
+//        ALTER TABLE `dingmore_www`.`www_user`
+//DROP INDEX `222` ;
     }
 
-    /**
-     * Get database version
-     * @return mixed
-     */
     public function version()
     {
-        // TODO: Implement version() method.
+        $version = $this->query('select VERSION() as version');
+        return isset($version[0]['version']) ? $version[0]['version'] : 'unknown';
     }
 
 
 }
-
-
-
-
-

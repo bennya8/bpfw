@@ -1,47 +1,113 @@
 <?php
 
-namespace Wiicode\Cache\Driver;
+/**
+ * File Adapter
+ * @namespace System\Cache\Adapter
+ * @package system.cache.adapter.file
+ * @author Benny <benny_a8@live.com>
+ * @copyright ©2013-2014 http://github.com/bennya8
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ */
 
-use \Wiicode\Cache\ICache;
+namespace System\Cache\Adapter;
 
-class File implements ICache
+use System\Cache\Cache;
+
+class File extends Cache
 {
-    /* (non-PHPdoc)
-     * @see \System\Cache\ICache::get()
+    protected $path = 'Runtime/Cache';
+
+    protected $node = 10;
+
+    /**
+     * Fetch cache data with given key
+     * @param $key
+     * @return mixed
      */
-    public function get()
+    public function get($key)
     {
-        // TODO Auto-generated method stub
+        $file = $this->getKeyPath($key);
+        return is_file($file) ? unserialize(file_get_contents($file)) : false;
     }
 
-    /* (non-PHPdoc)
-     * @see \System\Cache\ICache::set()
+    /**
+     * Write cache data with given key and value
+     * @param $key
+     * @param $value
+     * @return mixed
      */
-    public function set()
+    public function set($key, $value)
     {
-        // TODO Auto-generated method stub
+        return file_put_contents($this->getKeyPath($key), serialize($value));
     }
 
-    /* (non-PHPdoc)
-     * @see \System\Cache\ICache::flush()
+    /**
+     * Delete cache data with given key
+     * @param $key
+     * @return mixed
+     */
+    public function remove($key)
+    {
+        return unlink($this->getKeyPath($key));
+    }
+
+    /**
+     * Checks if the given key in the cache data
+     * @param $key
+     * @return mixed
+     */
+    public function has($key)
+    {
+        return is_file($this->getKeyPath($key));
+    }
+
+    /**
+     * Free all data from cache data
+     * @return mixed
      */
     public function flush()
     {
-        // TODO Auto-generated method stub
+        for ($i = 0, $len = $this->node; $i < $len; $i++) {
+            $path = ROOT_PATH . $this->path . '/' . $i . '/';
+            if (is_dir($path)) {
+                $files = scandir($path);
+                foreach ($files as $file) {
+                    if ($file !== '.' && $file !== '..' && is_file($path . $file)) {
+                        unlink($path . $file);
+                    }
+                }
+            }
+        }
     }
 
-    public function has()
-    {
-        // TODO: Implement has() method.
-    }
-
+    /**
+     * Open a cache server connection
+     * @return mixed
+     */
     public function open()
     {
-        // TODO: Implement open() method.
+        for ($i = 0, $len = $this->node; $i < $len; $i++) {
+            $nodePath = ROOT_PATH . $this->path . '/' . $i;
+            if (!is_dir($nodePath)) mkdir($nodePath, 0777, true);
+        }
     }
 
+    /**
+     * Close a cache server connect
+     * @return mixed
+     */
     public function close()
     {
-        // TODO: Implement close() method.
+        return true;
+    }
+
+    protected function getNodeKey($key)
+    {
+        return abs(crc32($key)) % $this->node;
+    }
+
+    protected function getKeyPath($key)
+    {
+        return ROOT_PATH . $this->path . '/' . $this->getNodeKey($key) . '/' . md5($key);
     }
 }

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * File Session
+ * Memcache Session
  * @namespace System\Session\Adapter
- * @package system.session.adapter.file
+ * @package system.session.adapter.memcache
  * @author Benny <benny_a8@live.com>
  * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
@@ -13,15 +13,8 @@ namespace System\Session\Adapter;
 
 use System\Session\Session;
 
-class File extends Session
+class Redis extends Session
 {
-    public function __construct()
-    {
-        session_save_path(ROOT_PATH . 'Runtime/Session/');
-        ini_set('session.gc_probability', 1);
-        if (!session_id()) session_start();
-    }
-
     /**
      * Fetch session data with given key
      * @param $key
@@ -29,7 +22,7 @@ class File extends Session
      */
     public function get($key)
     {
-        return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
+        // TODO: Implement get() method.
     }
 
     /**
@@ -40,7 +33,7 @@ class File extends Session
      */
     public function set($key, $value)
     {
-        $_SESSION[$key] = $value;
+        // TODO: Implement set() method.
     }
 
     /**
@@ -50,7 +43,7 @@ class File extends Session
      */
     public function delete($key)
     {
-        unset($_SESSION[$key]);
+        // TODO: Implement delete() method.
     }
 
     /**
@@ -60,7 +53,7 @@ class File extends Session
      */
     public function has($key)
     {
-        return isset($_SESSION[$key]);
+        // TODO: Implement has() method.
     }
 
     /**
@@ -69,7 +62,7 @@ class File extends Session
      */
     public function flush()
     {
-        $_SESSION = null;
+        // TODO: Implement flush() method.
     }
 
     /**
@@ -78,7 +71,7 @@ class File extends Session
      */
     public function destroy()
     {
-        session_destroy();
+        // TODO: Implement destroy() method.
     }
 
     /**
@@ -88,12 +81,7 @@ class File extends Session
      */
     public function getFlash($key)
     {
-        if (isset($_SESSION[$key])) {
-            unset($_SESSION[$key]);
-            return true;
-        } else {
-            return false;
-        }
+        // TODO: Implement getFlash() method.
     }
 
     /**
@@ -104,8 +92,7 @@ class File extends Session
      */
     public function setFlash($key, $value)
     {
-        $key = 'flash_' . $key;
-        $_SESSION[$key] = $value;
+        // TODO: Implement setFlash() method.
     }
 
     /**

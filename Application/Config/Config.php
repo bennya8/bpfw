@@ -1,31 +1,139 @@
 <?php
 
 return array(
-    'system' => array(
-        'baseUrl' => 'www'
+    'namespace' => array(
+        'App\\Common' => APP_PATH . '/Common',
+        'App\\Event' => APP_PATH . '/Event',
+        'App\\Model' => APP_PATH . '/Model',
     ),
 
     'module' => array(
-
-    ),
-
-    'component' => array(
-        'log' => array(),
-        'debug' => array(),
-        'route' => array(),
-        'cache' => array(),
-        'session' => array(),
-        'translate' => array(
-            'default_language' => 'zh-cn'
-
+        'site' => array(
+            'path' => 'App\\Module\\Site',
+            'namespace' => array(
+                'App\\Module\\Site' => APP_PATH . 'Module/Site',
+                'App\\Module\\Site\\Controller' => APP_PATH . 'Module/Site/Controller',
+            )
         )
     ),
 
-    'route' => array(
-
+    'event' => array(
+        'app_start' => array(),
+        'app_end' => array(),
+        'view_start' => array(),
+        'view_end' => array()
     ),
 
-    'database' => array(
+    'component' => array(
+        'logger' => array(
+            'level' => '',
+            'size' => 204800,
+            'format' => 'Y-m-d H:i:s',
+            'extension' => '.log'
+        ),
 
+        'profiler' => array(
+            'level' => ''
+        ),
+
+        'cache' => array(
+            'adapter' => 'file',
+
+            'file' => array(
+                'path' => 'Runtime/Cache',
+                'node' => 10
+            ),
+
+            'redis' => array(),
+            'memcache' => array(
+                'servers' => array(
+                    array(
+                        'host' => 'localhost',
+                        'port' => 11211,
+                        'weight' => 10
+                    ),
+                    array(
+                        'host' => 'localhost',
+                        'port' => 11212,
+                        'weight' => 10
+                    ),
+                    array(
+                        'host' => 'localhost',
+                        'port' => 11213,
+                        'weight' => 10
+                    ),
+                    array(
+                        'host' => 'localhost',
+                        'port' => 11214,
+                        'weight' => 10
+                    ),
+                    array(
+                        'host' => 'localhost',
+                        'port' => 11215,
+                        'weight' => 10
+                    ),
+                ),
+            ),
+        ),
+
+        'cookie' => array(
+            'prefix' => 'fw_',
+            'expire' => 3600,
+            'path' => '/',
+            'domain' => ''
+        ),
+
+        'session' => array(
+            'adapter' => 'file',
+        ),
+
+        'translate' => array(
+            'default' => 'zh-cn'
+        ),
+
+        'security' => array(
+            'encryptKey' => '123ckd'
+        ),
+
+        'route' => array(
+            // pathinfo / queryinfo / rewrite
+            'mode' => 'rewrite',
+            'defaultModule' => 'site',
+            'defaultController' => 'site',
+            'defaultAction' => 'index',
+            'rules' => array(
+                '/' => array('site/site/index'),
+                '/news-(:id).html' => array('site/site/test','id=(:id)')
+            )
+        ),
+
+        'view' => array(
+            // 'smarty' , 'template lite'
+            'engine' => 'native',
+            'forceCompile' => true,
+            'templateDir' => '',
+            'enableCache' => '',
+            'cacheTime' => 3600,
+            'cacheDir' => '',
+        ),
+
+        'database' => array(
+            'adapter' => 'mysql',
+            'cache' => true, // field cache
+            'prefix' => '',
+            'servers' => array(
+                'master' => array(
+                    // only use pdo driver require this param
+                    // 'dsn' => 'pdo:mysql',
+
+                    'host' => 'localhost',
+                    'port' => 3306,
+                    'username' => 'root',
+                    'password' => 'root',
+                    'charset' => 'utf8',
+                    'database' => '_test_'
+                )
+            )
+        )
     )
 );

@@ -1,6 +1,10 @@
 <?php
 
-namespace Wiicode\Helper;
+namespace System\Helper;
 
 class Tree
-{}
+{
+    public function show($data)
+    {
+    }
+}
