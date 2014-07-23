@@ -11,7 +11,7 @@
 define('ENVIRONMENT', 'development');
 
 define('ROOT_PATH', str_replace('\\', '/', dirname(__DIR__)) . '/');
-define('SYSTEM_PATH', ROOT_PATH . '/Framework/');
+define('SYSTEM_PATH', ROOT_PATH . 'Framework/');
 
 define('APP_NAME', 'Application');
 define('APP_PATH', ROOT_PATH . APP_NAME . '/');
