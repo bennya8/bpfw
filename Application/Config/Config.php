@@ -25,76 +25,6 @@ return array(
     ),
 
     'component' => array(
-        'logger' => array(
-            'level' => '',
-            'size' => 204800,
-            'format' => 'Y-m-d H:i:s',
-            'extension' => '.log'
-        ),
-
-        'profiler' => array(
-            'level' => ''
-        ),
-
-        'cache' => array(
-            'adapter' => 'file',
-
-            'file' => array(
-                'path' => 'Runtime/Cache',
-                'node' => 10
-            ),
-
-            'redis' => array(),
-            'memcache' => array(
-                'servers' => array(
-                    array(
-                        'host' => 'localhost',
-                        'port' => 11211,
-                        'weight' => 10
-                    ),
-                    array(
-                        'host' => 'localhost',
-                        'port' => 11212,
-                        'weight' => 10
-                    ),
-                    array(
-                        'host' => 'localhost',
-                        'port' => 11213,
-                        'weight' => 10
-                    ),
-                    array(
-                        'host' => 'localhost',
-                        'port' => 11214,
-                        'weight' => 10
-                    ),
-                    array(
-                        'host' => 'localhost',
-                        'port' => 11215,
-                        'weight' => 10
-                    ),
-                ),
-            ),
-        ),
-
-        'cookie' => array(
-            'prefix' => 'fw_',
-            'expire' => 3600,
-            'path' => '/',
-            'domain' => ''
-        ),
-
-        'session' => array(
-            'adapter' => 'file',
-        ),
-
-        'translate' => array(
-            'default' => 'zh-cn'
-        ),
-
-        'security' => array(
-            'encryptKey' => '123ckd'
-        ),
-
         'route' => array(
             // pathinfo / queryinfo / rewrite
             'mode' => 'rewrite',
@@ -103,7 +33,7 @@ return array(
             'defaultAction' => 'index',
             'rules' => array(
                 '/' => array('site/site/index'),
-                '/news-(:id).html' => array('site/site/test','id=(:id)')
+                '/news-(:id).html' => array('site/site/test', 'id=(:id)')
             )
         ),
 
@@ -118,14 +48,21 @@ return array(
         ),
 
         'database' => array(
-            'adapter' => 'mysql',
+            'adapter' => 'pdo',
             'cache' => true, // field cache
             'prefix' => '',
             'servers' => array(
                 'master' => array(
-                    // only use pdo driver require this param
-                    // 'dsn' => 'pdo:mysql',
-
+                    'dsn' => 'pdo:mysql',
+                    'host' => 'localhost',
+                    'port' => 3306,
+                    'username' => 'root',
+                    'password' => 'root',
+                    'charset' => 'utf8',
+                    'database' => '_test_'
+                ),
+                'slave' => array(
+                    'dsn' => 'pdo:mysql',
                     'host' => 'localhost',
                     'port' => 3306,
                     'username' => 'root',
@@ -134,6 +71,61 @@ return array(
                     'database' => '_test_'
                 )
             )
-        )
+        ),
+
+        'cache' => array(
+            'adapter' => 'file',
+
+            // file adapter setting
+            'filePath' => 'Runtime/Cache',
+            'fileNode' => 10,
+
+            // redis adapter setting
+            'redisServers' => array(),
+
+            // memcached adapter setting
+            'memcachedServers' => array(
+                // host , port , weight
+                array('localhost', 11211, 30),
+                array('localhost', 11212, 30),
+                array('localhost', 11213, 10),
+            ),
+        ),
+
+        'cookie' => array(
+            'prefix' => 'fw_',
+            'expire' => 3600,
+            'path' => '/',
+            'domain' => ''
+        ),
+
+        'session' => array(
+            'adapter' => 'memcached',
+            'name' => 'connect-session',
+            'expire' => 3600,
+            'encrypt' => false,
+
+
+            'databaseTable' => 'pre_session'
+        ),
+
+        'logger' => array(
+            'level' => '',
+            'size' => 204800,
+            'format' => 'Y-m-d H:i:s',
+            'extension' => '.log'
+        ),
+
+        'profiler' => array(
+            'level' => ''
+        ),
+
+        'translate' => array(
+            'default' => 'zh-cn'
+        ),
+
+        'security' => array(
+            'encryptKey' => '123ckd'
+        ),
     )
 );
