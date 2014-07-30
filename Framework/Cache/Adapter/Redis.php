@@ -79,6 +79,33 @@ class Redis extends Cache
     }
 
     /**
+     * Increment numeric item's value
+     * @param $key
+     * @param int $offset
+     * @param int $initialValue
+     * @param int $expiry
+     * @return mixed
+     */
+    public function increment($key, $offset = 1, $initialValue = 0, $expiry = 0)
+    {
+        // TODO: Implement increment() method.
+    }
+
+    /**
+     * Decrement numeric item's value
+     * @param $key
+     * @param int $offset
+     * @param int $initialValue
+     * @param int $expiry
+     * @return mixed
+     */
+    public function decrement($key, $offset = 1, $initialValue = 0, $expiry = 0)
+    {
+        // TODO: Implement decrement() method.
+    }
+
+
+    /**
      * Open a cache server connection
      * @access public
      * @throws \Exception
@@ -90,11 +117,14 @@ class Redis extends Cache
             throw new \Exception('redis module not install');
         }
         $this->_db = new \Redis();
+
+
+
         $this->_db->connect('localhost');
     }
 
     /**
-     * Close a cache server connect
+     * Close a cache server connection
      * @access public
      * @return mixed
      */

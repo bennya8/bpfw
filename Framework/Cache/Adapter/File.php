@@ -15,9 +15,18 @@ use System\Cache\Cache;
 
 class File extends Cache
 {
-    protected $path = 'Runtime/Cache';
 
-    protected $node = 10;
+    /**
+     * File cache path
+     * @var string
+     */
+    protected $filePath = 'Runtime/Cache';
+
+    /**
+     * File cache node numbers
+     * @var int
+     */
+    protected $fileNode = 10;
 
     /**
      * Fetch cache data with given key
@@ -53,6 +62,7 @@ class File extends Cache
 
     /**
      * Checks if the given key in the cache data
+     * @access public
      * @param $key
      * @return mixed
      */
@@ -62,13 +72,43 @@ class File extends Cache
     }
 
     /**
-     * Free all data from cache data
+     * Increment numeric item's value
+     * @access public
+     * @param $key
+     * @param int $offset
+     * @param int $initialValue
+     * @param int $expiry
      * @return mixed
+     */
+    public function increment($key, $offset = 1, $initialValue = 0, $expiry = 0)
+    {
+        // TODO: Implement increment() method.
+    }
+
+    /**
+     * Decrement numeric item's value
+     * @access public
+     * @param $key
+     * @param int $offset
+     * @param int $initialValue
+     * @param int $expiry
+     * @return mixed
+     */
+    public function decrement($key, $offset = 1, $initialValue = 0, $expiry = 0)
+    {
+        // TODO: Implement decrement() method.
+    }
+
+
+    /**
+     * Free all data from cache data
+     * @access public
+     * @return bool
      */
     public function flush()
     {
-        for ($i = 0, $len = $this->node; $i < $len; $i++) {
-            $path = ROOT_PATH . $this->path . '/' . $i . '/';
+        for ($i = 0, $len = $this->fileNode; $i < $len; $i++) {
+            $path = ROOT_PATH . $this->filePath . '/' . $i . '/';
             if (is_dir($path)) {
                 $files = scandir($path);
                 foreach ($files as $file) {
@@ -78,36 +118,53 @@ class File extends Cache
                 }
             }
         }
+        return true;
     }
 
     /**
      * Open a cache server connection
-     * @return mixed
+     * @access public
+     * @return bool
      */
     public function open()
     {
-        for ($i = 0, $len = $this->node; $i < $len; $i++) {
-            $nodePath = ROOT_PATH . $this->path . '/' . $i;
+        for ($i = 0, $len = $this->fileNode; $i < $len; $i++) {
+            $nodePath = APP_PATH . $this->filePath . '/' . $i;
             if (!is_dir($nodePath)) mkdir($nodePath, 0777, true);
         }
+        return true;
     }
 
     /**
-     * Close a cache server connect
-     * @return mixed
+     * Close a cache server connection
+     * @access public
+     * @return bool
      */
     public function close()
     {
         return true;
     }
 
+    /**
+     * Get cache key node
+     * @access protected
+     * @param string $key
+     * @return int
+     */
     protected function getNodeKey($key)
     {
-        return abs(crc32($key)) % $this->node;
+        return abs(crc32($key)) % $this->fileNode;
     }
 
+    /**
+     * Get cache key path
+     * @access protected
+     * @param string $key
+     * @return string
+     */
     protected function getKeyPath($key)
     {
-        return ROOT_PATH . $this->path . '/' . $this->getNodeKey($key) . '/' . md5($key);
+        return ROOT_PATH . $this->filePath . '/' . $this->getNodeKey($key) . '/' . md5($key);
     }
+
 }

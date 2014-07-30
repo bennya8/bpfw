@@ -16,6 +16,12 @@ use System\Core\DI;
 
 class Memcached extends Cache
 {
+    private $_db;
+
+    protected $memcachedServers = array();
+
+    protected $memcachedExpire = 0;
+
     /**
      * Fetch cache data with given key
      * @access public
@@ -24,8 +30,9 @@ class Memcached extends Cache
      */
     public function get($key)
     {
-        // TODO: Implement get() method.
+        return $this->_db->get($key);
     }
+
 
     /**
      * Write cache data with given key and value
@@ -34,9 +41,9 @@ class Memcached extends Cache
      * @param $value
      * @return mixed
      */
-    public function set($key, $value)
+    public function set($key, $value, $expire = 0)
     {
-        // TODO: Implement set() method.
+        return $this->_db->set($key, $value, $this->memcachedExpire);
     }
 
     /**
@@ -47,7 +54,7 @@ class Memcached extends Cache
      */
     public function remove($key)
     {
-        // TODO: Implement remove() method.
+        return $this->_db->delete($key);
     }
 
     /**
@@ -58,8 +65,22 @@ class Memcached extends Cache
      */
     public function has($key)
     {
-        // TODO: Implement has() method.
+        return (boolean)$this->_db->get($key);
     }
+
+    /**
+     * Increase
+     */
+    public function increment($key, $offset = 1, $initial_value = 0, $expiry = 0)
+    {
+
+    }
+
+    public function decrement($key, $offset = 1, $initial_value = 0, $expiry = 0)
+    {
+        // TODO: Implement decrement() method.
+    }
+
 
     /**
      * Free all data from cache data
@@ -68,7 +89,7 @@ class Memcached extends Cache
      */
     public function flush()
     {
-        // TODO: Implement flush() method.
+        return $this->_db->flush();
     }
 
     /**
@@ -82,27 +103,35 @@ class Memcached extends Cache
             throw new \Exception('memcached module not install');
         }
         $this->_db = new \Memcached();
-
-        $this->_db->set('abc', 123);
-
-//        var_dump($this->_db->getResultCode());
-//        var_dump($this->_db->getResultMessage());
-//
-//        var_dump($this->_db);
-
-
-//        var_dump($this->_db->get('abc'));
+        $this->_db->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
+        $this->_db->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, TRUE);
+        $this->_db->addServers($this->memcachedServers);
     }
 
     /**
-     * Close a cache server connect
+     * Close a cache server connection
      * @access public
      * @return mixed
      */
     public function close()
     {
-        return true;
+        $this->_db->resetServerList();
     }
 
-
+    /**
+     * Invoke method
+     * @param $method
+     * @param $args
+     * @return mixed
+     * @throws \Exception
+     */
+    public function __call($method, $args)
+    {
+        if (method_exists($this->_db, $method)) {
+            $reflectMethod = new \ReflectionMethod($this->_db, $method);
+            return $reflectMethod->invokeArgs($this->_db, $args);
+        } else {
+            throw new \Exception('invoke no exists method');
+        }
+    }
 }
