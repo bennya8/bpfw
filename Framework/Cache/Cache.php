@@ -16,7 +16,7 @@ use System\Core\Di,
 
 abstract class Cache extends Component
 {
-    
+
     /**
      * Cache instance
      * @access private
@@ -43,16 +43,7 @@ abstract class Cache extends Component
      */
     public function __construct()
     {
-        $this->config = $this->getDI('config')->get('component');
-        $this->config = $this->config['cache'];
-        $adapter = $this->config['adapter'];
-        if (!empty($this->config[$adapter]) && is_array($this->config[$adapter])) {
-            foreach ($this->config[$adapter] as $propKey => $propValue) {
-                if (property_exists($this, $propKey)) {
-                    $this->$propKey = $propValue;
-                }
-            }
-        }
+        parent::__construct('cache');
         $this->open();
     }
 
@@ -67,17 +58,20 @@ abstract class Cache extends Component
     /**
      * Cache factory
      * @access public
+     * @param string $adapter
      * @throws \Exception
      * @return object
      */
-    public static function factory()
+    public static function factory($adapter = '')
     {
-        $config = Di::factory()->get('config')->get('component');
-        $config = $config['cache'];
-        if (!isset(self::$_drivers[$config['adapter']])) {
+        if (empty($adapter)) {
+            $config = DI::factory()->get('config')->get('component');
+            $adapter = $config['cache']['adapter'];
+        }
+        if (!isset(self::$_drivers[$adapter])) {
             throw new \Exception('unknown cache adapter');
         }
-        $class = self::$_drivers[$config['adapter']];
+        $class = self::$_drivers[$adapter];
         if (!self::$_instance instanceof $class) {
             self::$_instance = new $class();
         }
@@ -118,23 +112,44 @@ abstract class Cache extends Component
     abstract public function has($key);
 
     /**
+     * Increment numeric item's value
+     * @param $key
+     * @param int $offset
+     * @param int $initialValue
+     * @param int $expiry
+     * @return mixed
+     */
+    abstract public function increment($key, $offset = 1, $initialValue = 0, $expiry = 0);
+
+    /**
+     * Decrement numeric item's value
+     * @param $key
+     * @param int $offset
+     * @param int $initialValue
+     * @param int $expiry
+     * @return mixed
+     */
+    abstract public function decrement($key, $offset = 1, $initialValue = 0, $expiry = 0);
+
+    /**
      * Free all data from cache data
      * @access public
-     * @return mixed
+     * @return bool
      */
     abstract public function flush();
 
     /**
      * Open a cache server connection
      * @access public
-     * @return mixed
+     * @return bool
      */
     abstract public function open();
 
     /**
-     * Close a cache server connect
+     * Close a cache server connection
      * @access public
-     * @return mixed
+     * @return bool
      */
     abstract public function close();
+
 }
