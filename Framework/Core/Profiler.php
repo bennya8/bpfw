@@ -13,9 +13,11 @@ namespace System\Core;
 
 class Profiler
 {
-    private static $_trace = array();
+
     private static $_timeStart = '';
     private static $_timeEnd = '';
+
+    private static $_trace = array();
 
     public static function start()
     {
@@ -25,14 +27,14 @@ class Profiler
     public static function end()
     {
         self::$_timeEnd = microtime(true);
-        return round((self::$_timeEnd - self::$_timeStart), 4);
+        self::printTrace();
     }
 
 
     public static function trace($message)
     {
         if (is_string($message)) {
-            self::$_trace[] = date('H:i:s', time()) . ' ' . microtime() . ' Memory Used:' . memory_get_peak_usage(true) . ' ' . $message;
+            self::$_trace[] = round((microtime(true) - self::$_timeStart), 5) . ' Memory Used:' . memory_get_peak_usage(true) . ' ' . $message;
         }
     }
 
@@ -40,7 +42,8 @@ class Profiler
     {
 
         $html = '<table width="99%" style="position:absolute;bottom:0;">';
-
+        $html .= '<tr><td>Script time: ' . round((self::$_timeEnd - self::$_timeStart), 4) .
+            '&nbsp;&nbsp;Memory peak: ' . round(memory_get_peak_usage(true) / 1024 / 1024, 2) . ' MB</td></tr>';
         for ($i = count(self::$_trace) - 1; $i >= 0; $i--) {
             $html .= '<tr><td style="background:#eee;">' . self::$_trace[$i] . '</td></tr>';
         }
