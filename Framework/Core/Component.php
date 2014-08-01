@@ -20,6 +20,8 @@ abstract class Component
      */
     private $_di = array();
 
+    protected $config = array();
+
     /**
      * Constructor
      */
@@ -30,9 +32,9 @@ abstract class Component
             $className = strtolower(array_pop($className));
         }
         $config = $this->getDI('config')->get('component');
-        $config = $config[$className];
-        if (!empty($config) && is_array($config)) {
-            foreach ($config as $propKey => $propValue) {
+        $this->config = $config[$className];
+        if (!empty($this->config) && is_array($this->config)) {
+            foreach ($this->config as $propKey => $propValue) {
                 if (property_exists($this, $propKey)) {
                     $this->$propKey = $propValue;
                 }
@@ -60,7 +62,7 @@ abstract class Component
      * @param $mixed
      * @param bool $shared
      */
-    protected function setDI($name, $mixed, $shared = true)
+    protected function setDI($name, $mixed, $shared = false)
     {
         if ($shared) {
             DI::factory()->set($name, $mixed);
@@ -76,7 +78,11 @@ abstract class Component
      */
     public function __get($key)
     {
-        return property_exists($this, $key) ? $this->$key : null;
+        if (property_exists($this, $key)) {
+            return $this->$key;
+        } else {
+            return $this->getDI($key);
+        }
     }
 
     /**
@@ -86,7 +92,12 @@ abstract class Component
      */
     public function __set($key, $value)
     {
-        $this->$key = $value;
+        if (property_exists($this, $key)) {
+            $this->$key = $value;
+            echo 1;
+        } else {
+            $this->setDI($key, $value);
+        }
     }
 
     /**
