@@ -33,7 +33,7 @@ class View extends Component
     {
         $tpl = APP_PATH . 'Module/' . ucfirst(MODULE) . '/View/' . ucfirst(CONTROLLER) . '/' . $template . $this->tplExt;
         if (!is_file($tpl)) {
-            trigger_error('template not exist', E_USER_NOTICE);
+            throw new \Exception('template not exist', E_ERROR);
         }
         ob_start();
         extract($this->_data);
