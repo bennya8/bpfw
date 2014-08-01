@@ -15,89 +15,11 @@ use System\Session\Session;
 
 class Redis extends Session
 {
-    /**
-     * Fetch session data with given key
-     * @param $key
-     * @return mixed
-     */
-    public function get($key)
-    {
-        // TODO: Implement get() method.
-    }
-
-    /**
-     * Write session data with given key and value
-     * @param $key
-     * @param $value
-     * @return mixed
-     */
-    public function set($key, $value)
-    {
-        // TODO: Implement set() method.
-    }
-
-    /**
-     * Delete session data with given key
-     * @param $key
-     * @return mixed
-     */
-    public function delete($key)
-    {
-        // TODO: Implement delete() method.
-    }
-
-    /**
-     * Checks if the given key in the session data
-     * @param $key
-     * @return mixed
-     */
-    public function has($key)
-    {
-        // TODO: Implement has() method.
-    }
-
-    /**
-     * Free all data from session data
-     * @return mixed
-     */
-    public function flush()
-    {
-        // TODO: Implement flush() method.
-    }
-
-    /**
-     * Destroy session
-     * @return mixed
-     */
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
-
-    /**
-     * Get flash data with given key
-     * @param $key
-     * @return mixed
-     */
-    public function getFlash($key)
-    {
-        // TODO: Implement getFlash() method.
-    }
-
-    /**
-     * Set flash data with key and value
-     * @param $key
-     * @param $value
-     * @return mixed
-     */
-    public function setFlash($key, $value)
-    {
-        // TODO: Implement setFlash() method.
-    }
 
     /**
      * Session open / connect method handler
-     * @return mixed
+     * @access protected
+     * @return boolean
      */
     protected function _open()
     {
@@ -106,7 +28,8 @@ class Redis extends Session
 
     /**
      * Session close / disconnect method handler
-     * @return mixed
+     * @access protected
+     * @return boolean
      */
     protected function _close()
     {
@@ -115,36 +38,44 @@ class Redis extends Session
 
     /**
      * Session fetch data method handler
-     * @return mixed
+     * @access protected
+     * @param array $data
+     * @return array
      */
-    protected function _read()
+    protected function _read($data)
     {
         // TODO: Implement _read() method.
     }
 
     /**
      * Session write data method handler
-     * @return mixed
+     * @access protected
+     * @param array $data
+     * @return void
      */
-    protected function _write()
+    protected function _write($data)
     {
         // TODO: Implement _write() method.
     }
 
     /**
      * Session destroy method handler
-     * @return mixed
+     * @access protected
+     * @param string $data
+     * @return void
      */
-    protected function _destroy()
+    protected function _destroy($data)
     {
         // TODO: Implement _destroy() method.
     }
 
     /**
      * Session garbage collection method handler
-     * @return mixed
+     * @access protected
+     * @param int $expire
+     * @return void
      */
-    protected function _gc()
+    protected function _gc($expire)
     {
         // TODO: Implement _gc() method.
     }
