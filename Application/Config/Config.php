@@ -32,8 +32,7 @@ return array(
             'defaultController' => 'site',
             'defaultAction' => 'index',
             'rules' => array(
-                '/' => array('site/site/index'),
-                '/news-(:id).html' => array('site/site/test', 'id=(:id)')
+                '/' => array('site/site/index')
             )
         ),
 
@@ -53,7 +52,6 @@ return array(
             'prefix' => '',
             'servers' => array(
                 'master' => array(
-                    'dsn' => 'pdo:mysql',
                     'host' => 'localhost',
                     'port' => 3306,
                     'username' => 'root',
@@ -62,7 +60,6 @@ return array(
                     'database' => '_test_'
                 ),
                 'slave' => array(
-                    'dsn' => 'pdo:mysql',
                     'host' => 'localhost',
                     'port' => 3306,
                     'username' => 'root',
@@ -110,9 +107,10 @@ return array(
         ),
 
         'logger' => array(
-            'level' => '',
+            'level' => 'error,warning,notice,sql',
+            'path' => 'Runtime/Logs',
             'size' => 204800,
-            'format' => 'Y-m-d H:i:s',
+            'format' => 'Ymd',
             'extension' => '.log'
         ),
 
