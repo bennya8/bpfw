@@ -21,14 +21,12 @@ class Application
     public function main()
     {
         $this->registerMainService();
-        Profiler::trace('app_start');
+        Profiler::start();
         $this->getDI('event')->notify('app_start');
         $this->registerService();
-        $this->getDI('event')->notify('dispatcher_start');
         $this->getDI('route')->dispatcher();
-        $this->getDI('event')->notify('dispatcher_end');
         $this->getDI('event')->notify('app_end');
-        Profiler::trace('app_end');
+        Profiler::end();
     }
 
     /**
@@ -77,11 +75,12 @@ class Application
      */
     protected function registerService()
     {
+        $config = $this->getDI('config');
         $loader = $this->getDI('loader');
-        $loader->import('Common.Constants','.php');
-        $loader->import('Common.Functions','.php');
-        $loader->registerNamespace($this->getDI('config')->get('namespace'));
-        $components = array_map('ucfirst', array_keys($this->getDI('config')->get('component')));
+        $loader->import('Common.Constants', '.php');
+        $loader->import('Common.Functions', '.php');
+        $loader->registerNamespace($config->get('namespace'));
+        $components = array_map('ucfirst', array_keys($config->get('component')));
         $services = array('Logger', 'Profiler', 'Cookie', 'Translate', 'Security');
         $factoryServices = array('Cache', 'Database', 'Session');
         foreach ($components as $component) {
@@ -93,7 +92,7 @@ class Application
                 $this->setDI(strtolower($component), $class::factory());
             }
         }
-        $modules = $this->getDI('config')->get('module');
+        $modules = $config->get('module');
         foreach ($modules as $module) {
             $loader->registerNamespace($module['namespace']);
         }
@@ -108,18 +107,14 @@ class Application
     public static function exceptionHandler($exception)
     {
         switch ($exception->getCode()) {
-            case E_ERROR:
-            case E_STRICT:
-            case E_DEPRECATED:
-            case E_WARNING:
-            case E_PARSE:
-            case E_NOTICE:
-                echo 'server error: '.$exception->getMessage();
-
-            break;
             case 404:
                 echo 'page not found';
                 break;
+            case 500:
+                echo 'server internal error';
+                break;
+            default:
+                echo 'runtime error: ' . $exception->getMessage();
         }
     }
 

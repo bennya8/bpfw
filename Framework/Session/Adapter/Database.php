@@ -11,143 +11,99 @@
 
 namespace System\Session\Adapter;
 
+use System\Core\DI;
+use System\Core\Request;
 use System\Session\Session;
 
 class Database extends Session
 {
-    public function __construct()
-    {
+    private $_db;
 
-    }
-
-    /**
-     * Fetch session data with given key
-     * @param $key
-     * @return mixed
-     */
-    public function get($key)
-    {
-        // TODO: Implement get() method.
-    }
-
-    /**
-     * Write session data with given key and value
-     * @param $key
-     * @param $value
-     * @return mixed
-     */
-    public function set($key, $value)
-    {
-        // TODO: Implement set() method.
-    }
-
-    /**
-     * Delete session data with given key
-     * @param $key
-     * @return mixed
-     */
-    public function delete($key)
-    {
-        // TODO: Implement delete() method.
-    }
-
-    /**
-     * Checks if the given key in the session data
-     * @param $key
-     * @return mixed
-     */
-    public function has($key)
-    {
-        // TODO: Implement has() method.
-    }
-
-    /**
-     * Free all data from session data
-     * @return mixed
-     */
-    public function flush()
-    {
-        // TODO: Implement flush() method.
-    }
-
-    public function destroy()
-    {
-
-    }
-
-    /**
-     * Get flash data with given key
-     * @param $key
-     * @return mixed
-     */
-    public function getFlash($key)
-    {
-        // TODO: Implement getFlash() method.
-    }
-
-    /**
-     * Set flash data with key and value
-     * @param $key
-     * @param $value
-     * @return mixed
-     */
-    public function setFlash($key, $value)
-    {
-        // TODO: Implement setFlash() method.
-    }
-
+    protected $databaseTable = 'pre_session';
 
     /**
      * Session open / connect method handler
-     * @return mixed
+     * @return bool
      */
     protected function _open()
     {
-        // TODO: Implement _open() method.
+        $this->_db = DI::factory()->get('database');
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . $this->databaseTable . '` (
+                  `session_id` varchar(40) NOT NULL,
+                  `expire` int(10) unsigned NOT NULL,
+                  `ip_address` varchar(60) NOT NULL,
+                  `user_agent` varchar(120) NOT NULL,
+                  `user_data` text NOT NULL,
+                  PRIMARY KEY (`session_id`),
+                  KEY `last_activity_idx` (`expire`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8';
+        $this->_db->execute($sql);
+        return (boolean)$this->_db;
     }
 
     /**
      * Session close / disconnect method handler
-     * @return mixed
+     * @return bool
      */
     protected function _close()
     {
-        // TODO: Implement _close() method.
+        return true;
     }
 
     /**
      * Session fetch data method handler
-     * @return mixed
+     * @param array $data session data
+     * @return array
      */
-    protected function _read()
+    protected function _read($data)
     {
-        // TODO: Implement _read() method.
+        $sql = "SELECT user_data FROM {$this->databaseTable} WHERE `session_id` = '{$data[0]}'";
+        $row = $this->_db->query($sql);
+        return isset($row[0]) ? unserialize($row[0]['user_data']) : array();
     }
 
     /**
      * Session write data method handler
-     * @return mixed
+     * @param array $data session data
+     * @return void
      */
-    protected function _write()
+    protected function _write($data)
     {
-        // TODO: Implement _write() method.
+        $expire = time() + $this->expire;
+        $user_data = serialize($data[1]);
+        $sql = "SELECT session_id FROM {$this->databaseTable} WHERE `session_id` = '{$data[0]}'";
+        $exist = $this->_db->query($sql);
+        if ($exist) {
+            $sql = "UPDATE {$this->databaseTable} SET `user_data` = '{$user_data}' , `expire` = '{$expire}'
+                    WHERE `session_id` = '{$data[0]}'";
+            $this->_db->execute($sql);
+        } else {
+            $request = new Request();
+            $sql = "INSERT INTO {$this->databaseTable} (session_id,expire,ip_address,user_agent,user_data)
+                    VALUES ('{$data[0]}','{$expire}','{$request->getUserIp()}','{$request->getUserAgent()}','{$user_data}')";
+            $this->_db->execute($sql);
+        }
     }
 
     /**
      * Session destroy method handler
-     * @return mixed
+     * @param array $data session data
+     * @return void
      */
-    protected function _destroy()
+    protected function _destroy($data)
     {
-        // TODO: Implement _destroy() method.
+        $sql = "DELETE FROM {$this->databaseTable} WHERE `session_id` = '{$data[0]}'";
+        $this->_db->execute($sql);
     }
 
     /**
      * Session garbage collection method handler
-     * @return mixed
+     * @param int $expire
+     * @return void
      */
-    protected function _gc()
+    protected function _gc($expire)
     {
-        // TODO: Implement _gc() method.
+        $sql = "DELETE FROM {$this->databaseTable} WHERE `expire` <= {$expire}";
+        $this->_db->execute($sql);
     }
 }

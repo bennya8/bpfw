@@ -3,6 +3,5 @@
 .project
 .settings
 .svn
-.idea
-Runtime/*
+.idea/*
 demo/*

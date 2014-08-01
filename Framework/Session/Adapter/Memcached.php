@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Memcache Session
+ * Memcached Session
  * @namespace System\Session\Adapter
- * @package system.session.adapter.memcache
+ * @package system.session.adapter.memcached
  * @author Benny <benny_a8@live.com>
  * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
@@ -13,8 +13,15 @@ namespace System\Session\Adapter;
 
 use System\Session\Session;
 
-class Redis extends Session
+class Memcached extends Session
 {
+
+    /**
+     * Memcached database instance
+     * @access private
+     * @var object
+     */
+    private $_db;
 
     /**
      * Session open / connect method handler
@@ -23,7 +30,8 @@ class Redis extends Session
      */
     protected function _open()
     {
-        // TODO: Implement _open() method.
+        $this->_db = new \System\Cache\Adapter\Memcached();
+        return (boolean)$this->_db;
     }
 
     /**
@@ -33,7 +41,7 @@ class Redis extends Session
      */
     protected function _close()
     {
-        // TODO: Implement _close() method.
+        return true;
     }
 
     /**
@@ -44,7 +52,8 @@ class Redis extends Session
      */
     protected function _read($data)
     {
-        // TODO: Implement _read() method.
+        $record = $this->_db->get($this->prefix . $data[0]);
+        return !empty($record) ? unserialize($record) : array();
     }
 
     /**
@@ -55,7 +64,7 @@ class Redis extends Session
      */
     protected function _write($data)
     {
-        // TODO: Implement _write() method.
+        $this->_db->set($this->prefix . $data[0], serialize($data[1]), $this->expire);
     }
 
     /**
@@ -66,7 +75,7 @@ class Redis extends Session
      */
     protected function _destroy($data)
     {
-        // TODO: Implement _destroy() method.
+        $this->_db->delete($this->prefix . $data);
     }
 
     /**
@@ -77,7 +86,7 @@ class Redis extends Session
      */
     protected function _gc($expire)
     {
-        // TODO: Implement _gc() method.
+        return true;
     }
 
 }

@@ -11,32 +11,44 @@
 
 namespace System\Database\Adapter;
 
-use System\Core\DI;
 use System\Database\Database;
 
 class MySQLi extends Database
 {
+
     /**
-     * Database instances container
+     * Database servers instance
      * @var array
      */
     private $_servers = array();
 
     /**
-     * Database resource
-     * @var object
+     * Instance id selector
+     * @var string
      */
     private $_id = '';
 
     /**
-     * Switch database connection with given identify. etc. master,slave1,slave2
+     * Get currently database connection identify
      * @access public
-     * @param $id
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    /**
+     * Set database connection with given identify. etc. master,slave1,slave2
+     * @access public
+     * @param string $id
      * @return void
      */
-    public function pick($id)
+    public function setId($id)
     {
-        $this->_id = $id;
+        if (is_string($id) && array_key_exists($id, $this->_servers)) {
+            $this->_id = $id;
+        }
     }
 
     /**
@@ -47,18 +59,16 @@ class MySQLi extends Database
      */
     public function connect()
     {
-        $config = DI::factory()->get('config')->get('component');
-        $servers = $config['database']['servers'];
         if (!function_exists('mysqli_connect')) {
             throw new \Exception('mysqli module not install', E_ERROR);
         }
-        $ids = array_keys($servers);
+        $ids = array_keys($this->_config['servers']);
         if (empty($ids)) {
             throw new \Exception('fail to load server config', E_ERROR);
         } else {
             $this->_id = $ids[0];
         }
-        foreach ($servers as $id => $cfg) {
+        foreach ($this->_config['servers'] as $id => $cfg) {
             if (!isset($this->_servers[$id])) {
                 $resource = new \mysqli($cfg['host'], $cfg['username'], $cfg['password'], $cfg['database'], $cfg['port']);
                 $resource->select_db($cfg['database']);
@@ -74,7 +84,10 @@ class MySQLi extends Database
      */
     public function close()
     {
-        // TODO: Implement close() method.
+        foreach ($this->_servers as $id => $resource) {
+            $resource->close();
+            unset($this->_servers[$id]);
+        }
     }
 
     /**
@@ -82,11 +95,25 @@ class MySQLi extends Database
      * @access public
      * @param string $sql
      * @param array $params [optional] bind query, only available for pdo driver
+     * @throws \Exception
      * @return mixed
      */
     public function query($sql, $params = null)
     {
-        // TODO: Implement query() method.
+        $stmt = $this->_servers[$this->_id]->prepare($sql);
+        $result = $stmt->execute();
+        if (!$result) {
+            throw new \Exception('query sql: ' . $sql, E_ERROR);
+        }
+        $list = array();
+        if ($stmt->num_rows > 0) {
+            while ($row = $stmt->fetch_assoc()) {
+                $list[] = $row;
+            }
+        }
+        $result->free();
+        $result->close();
+        return $list;
     }
 
     /**
@@ -94,11 +121,19 @@ class MySQLi extends Database
      * @access public
      * @param string $sql
      * @param array $params [optional] bind query, only available for pdo driver
+     * @throws \Exception
      * @return mixed
      */
     public function execute($sql, $params = null)
     {
-        // TODO: Implement execute() method.
+        $stmt = $this->_servers[$this->_id]->prepare($sql);
+        $result = $stmt->execute();
+        if (!$result) {
+            throw new \Exception('execute sql: ' . $sql, E_ERROR);
+        }
+        $result->free();
+        $result->close();
+        return $this->_servers[$this->_id]->affected_rows;
     }
 
     /**
@@ -108,7 +143,7 @@ class MySQLi extends Database
      */
     public function begin()
     {
-        // TODO: Implement begin() method.
+        return $this->_servers[$this->_id]->autocommit(false);
     }
 
     /**
@@ -118,7 +153,7 @@ class MySQLi extends Database
      */
     public function commit()
     {
-        // TODO: Implement commit() method.
+        return $this->_servers[$this->_id]->commit();
     }
 
     /**
@@ -128,7 +163,7 @@ class MySQLi extends Database
      */
     public function rollback()
     {
-        // TODO: Implement rollback() method.
+        return $this->_servers[$this->_id]->rollback();
     }
 
     /**
@@ -138,7 +173,7 @@ class MySQLi extends Database
      */
     public function lastInsertId()
     {
-        // TODO: Implement lastInsertId() method.
+        return $this->_servers[$this->_id]->insert_id;
     }
 
     /**
@@ -148,7 +183,7 @@ class MySQLi extends Database
      */
     public function affectedRows()
     {
-        // TODO: Implement affectedRows() method.
+        return $this->_servers[$this->_id]->affected_rows;
     }
 
     /**
@@ -317,8 +352,8 @@ class MySQLi extends Database
      */
     public function version()
     {
-        // TODO: Implement version() method.
+        $version = $this->query('select VERSION() as version');
+        return isset($version[0]['version']) ? $version[0]['version'] : 'unknown';
     }
-
 
 }

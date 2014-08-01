@@ -31,10 +31,10 @@ class Translate extends Component
      */
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct('translate');
         $path = SYSTEM_PATH . '/i18n/' . $this->default . '/system.php';
         if (!is_file($path)) {
-            throw new \Exception('lang pack not found', E_USER_NOTICE);
+            throw new \Exception('lang pack not found', E_WARNING);
         }
         $this->_dictionary = require $path;
     }

@@ -18,7 +18,14 @@ class EventManager
      * Binding events container
      * @var array
      */
-    protected $_events = array();
+    protected $_events = array(
+        'app_start' => array(
+            'System\\Event\\FrameworkStart'
+        ),
+        'app_end' => array(
+            'System\\Event\\FrameworkClose'
+        )
+    );
 
     /**
      * Constructor
@@ -79,6 +86,7 @@ class EventManager
                 }
             }
         }
+        Profiler::trace($name);
     }
 
 }
