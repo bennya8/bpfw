@@ -80,6 +80,8 @@ class Route extends Component
      */
     public function dispatcher()
     {
+        $this->getDI('event')->notify('dispatcher_start');
+
         $this->parseUrl();
 
         define('MODULE', $this->dispatch['module']);
@@ -107,6 +109,8 @@ class Route extends Component
         }
 
         $reflectMethod->invoke(new $controller());
+
+        $this->getDI('event')->notify('dispatcher_end');
     }
 
     /**
