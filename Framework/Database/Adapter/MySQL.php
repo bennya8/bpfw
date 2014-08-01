@@ -11,11 +11,11 @@
 
 namespace System\Database\Adapter;
 
-use System\Core\DI;
 use System\Database\Database;
 
 class MySQL extends Database
 {
+
     /**
      * Database servers instance
      * @var array
@@ -29,12 +29,26 @@ class MySQL extends Database
     private $_id = '';
 
     /**
-     * Switch database instance by using id selector
-     * @param string $id
+     * Get currently database connection identify
+     * @access public
+     * @return string
      */
-    public function pick($id = '')
+    public function getId()
     {
-        $this->_id = $id;
+        return $this->_id;
+    }
+
+    /**
+     * Set database connection with given identify. etc. master,slave1,slave2
+     * @access public
+     * @param string $id
+     * @return void
+     */
+    public function setId($id)
+    {
+        if (is_string($id) && array_key_exists($id, $this->_servers)) {
+            $this->_id = $id;
+        }
     }
 
     /**
@@ -45,18 +59,16 @@ class MySQL extends Database
      */
     public function connect()
     {
-        $config = DI::factory()->get('config')->get('component');
-        $servers = $config['database']['servers'];
         if (!function_exists('mysql_connect')) {
             throw new \Exception('mysql module not install', E_ERROR);
         }
-        $ids = array_keys($servers);
+        $ids = array_keys($this->_config['servers']);
         if (empty($ids)) {
             throw new \Exception('fail to load server config', E_ERROR);
         } else {
             $this->_id = $ids[0];
         }
-        foreach ($servers as $id => $cfg) {
+        foreach ($this->_config['servers'] as $id => $cfg) {
             if (!isset($this->_servers[$id])) {
                 $resource = mysql_connect($cfg['host'] . ':' . $cfg['port'], $cfg['username'], $cfg['password']);
                 mysql_select_db($cfg['database'], $resource);
@@ -92,7 +104,7 @@ class MySQL extends Database
         $rows = array();
         $result = mysql_query($sql, $this->_servers[$this->_id]);
         if (!$result) {
-            throw new \Exception(mysql_error($this->_servers[$this->_id]));
+            throw new \Exception(mysql_error($this->_servers[$this->_id]), E_ERROR);
         }
         while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
             $rows[] = $row;
@@ -319,18 +331,24 @@ class MySQL extends Database
         // TODO: Implement addIndex() method.
     }
 
-
+    /**
+     * Drop an index
+     * @access public
+     * @return mixed
+     */
     public function dropIndex()
     {
-//        ALTER TABLE `dingmore_www`.`www_user`
-//DROP INDEX `222` ;
+        // TODO: Implement dropIndex() method.
     }
 
+    /**
+     * Get database version
+     * @return mixed
+     */
     public function version()
     {
         $version = $this->query('select VERSION() as version');
         return isset($version[0]['version']) ? $version[0]['version'] : 'unknown';
     }
-
 
 }

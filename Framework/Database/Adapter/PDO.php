@@ -6,32 +6,84 @@ use System\Database\Database;
 
 class PDO extends Database
 {
+
     /**
-     * Switch database connection with given identify. etc. master,slave1,slave2
-     * @access public
-     * @param $id
+     * Database servers instance
+     * @var array
      */
-    public function pick($id)
+    private $_servers = array();
+
+    /**
+     * Instance id selector
+     * @var string
+     */
+    private $_id = '';
+
+    /**
+     * Get last query affected rows
+     * @var int
+     */
+    private $_affectedRows = -1;
+
+    /**
+     * Get currently database connection identify
+     * @access public
+     * @return string
+     */
+    public function getId()
     {
-        // TODO: Implement pick() method.
+        return $this->_id;
+    }
+
+    /**
+     * Set database connection with given identify. etc. master,slave1,slave2
+     * @access public
+     * @param string $id
+     * @return void
+     */
+    public function setId($id)
+    {
+        if (is_string($id) && array_key_exists($id, $this->_servers)) {
+            $this->_id = $id;
+        }
     }
 
     /**
      * Open several database connection
-     * @return mixed
+     * @access public
+     * @throws \Exception
+     * @return bool
      */
     public function connect()
     {
-        // TODO: Implement connect() method.
+        if (!in_array('mysql', pdo_drivers())) {
+            throw new \Exception('pdo mysql module not install', E_ERROR);
+        }
+        $ids = array_keys($this->_config['servers']);
+        if (empty($ids)) {
+            throw new \Exception('fail to load server config', E_ERROR);
+        } else {
+            $this->_id = $ids[0];
+        }
+        foreach ($this->_config['servers'] as $id => $cfg) {
+            if (!isset($this->_servers[$id])) {
+                $options[\PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES ' . $cfg['charset'];
+                $this->_servers[$id] = new \PDO("mysql:host={$cfg['host']};port={$cfg['port']};dbname={$cfg['database']}",
+                    $cfg['username'], $cfg['password'], $options);
+            }
+        }
     }
 
     /**
      * Close several database connection
-     * @return mixed
+     * @access public
+     * @return bool
      */
     public function close()
     {
-        // TODO: Implement close() method.
+        foreach ($this->_servers as $id => $resource) {
+            unset($this->_servers[$id]);
+        }
     }
 
     /**
@@ -39,11 +91,22 @@ class PDO extends Database
      * @access public
      * @param string $sql
      * @param array $params [optional] bind query, only available for pdo driver
+     * @throws \Exception
      * @return mixed
      */
     public function query($sql, $params = null)
     {
-        // TODO: Implement query() method.
+        $stmt = $this->_servers[$this->_id]->prepare($sql);
+        if (!empty($params) && is_array($params)) {
+            $result = $stmt->execute($params);
+        } else {
+            $result = $stmt->execute();
+        }
+        if (!$result) {
+            throw new \Exception('query sql: ' . $sql, E_ERROR);
+        }
+        $this->_affectedRows = $stmt->rowCount();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -51,11 +114,21 @@ class PDO extends Database
      * @access public
      * @param string $sql
      * @param array $params [optional] bind query, only available for pdo driver
+     * @throws \Exception
      * @return mixed
      */
     public function execute($sql, $params = null)
     {
-        // TODO: Implement execute() method.
+        $stmt = $this->_servers[$this->_id]->prepare($sql);
+        if (!empty($params) && is_array($params)) {
+            $result = $stmt->execute($params);
+        } else {
+            $result = $stmt->execute();
+        }
+        if (!$result) {
+            throw new \Exception('execute sql: ' . $sql, E_ERROR);
+        }
+        return $this->_affectedRows = $stmt->rowCount();
     }
 
     /**
@@ -65,7 +138,7 @@ class PDO extends Database
      */
     public function begin()
     {
-        // TODO: Implement begin() method.
+        return $this->_servers[$this->_id]->beginTransaction();
     }
 
     /**
@@ -75,7 +148,7 @@ class PDO extends Database
      */
     public function commit()
     {
-        // TODO: Implement commit() method.
+        return $this->_servers[$this->_id]->commit();
     }
 
     /**
@@ -85,7 +158,7 @@ class PDO extends Database
      */
     public function rollback()
     {
-        // TODO: Implement rollback() method.
+        return $this->_servers[$this->_id]->rollBack();
     }
 
     /**
@@ -95,7 +168,7 @@ class PDO extends Database
      */
     public function lastInsertId()
     {
-        // TODO: Implement lastInsertId() method.
+        return $this->_servers[$this->_id]->lastInsertId();
     }
 
     /**
@@ -105,7 +178,7 @@ class PDO extends Database
      */
     public function affectedRows()
     {
-        // TODO: Implement affectedRows() method.
+        return $this->_affectedRows;
     }
 
     /**
@@ -274,13 +347,8 @@ class PDO extends Database
      */
     public function version()
     {
-        // TODO: Implement version() method.
+        $version = $this->query('select VERSION() as version');
+        return isset($version[0]['version']) ? $version[0]['version'] : 'unknown';
     }
 
-
 }
-
-
-
-
-

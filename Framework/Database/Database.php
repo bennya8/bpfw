@@ -15,6 +15,7 @@ use System\Core\DI;
 
 abstract class Database
 {
+
     /**
      * Database instance
      * @var array
@@ -31,7 +32,11 @@ abstract class Database
         'pdo' => 'System\\Database\\Adapter\\PDO',
     );
 
-    protected $config = array();
+    /**
+     * Database setting
+     * @var array
+     */
+    protected $_config = array();
 
     /**
      * Constructor
@@ -55,17 +60,21 @@ abstract class Database
 
     /**
      * Database factory
+     * @access public
+     * @param string $adapter
      * @throws \Exception
      * @return object
      */
-    public static function factory()
+    public static function factory($adapter = '')
     {
-        $config = DI::factory()->get('config')->get('component');
-        $config = $config['database'];
-        if (!isset(self::$_drivers[$config['adapter']])) {
+        if (empty($adapter)) {
+            $config = DI::factory()->get('config')->get('component');
+            $adapter = $config['database']['adapter'];
+        }
+        if (!isset(self::$_drivers[$adapter])) {
             throw new \Exception('unknown database adapter', E_ERROR);
         }
-        $class = self::$_drivers[$config['adapter']];
+        $class = self::$_drivers[$adapter];
         if (!self::$_instance instanceof $class) {
             self::$_instance = new $class();
         }
@@ -73,12 +82,19 @@ abstract class Database
     }
 
     /**
+     * Get currently database connection identify
+     * @access public
+     * @return string
+     */
+    abstract public function getId();
+
+    /**
      * Switch database connection with given identify. etc. master,slave1,slave2
      * @access public
      * @param string $id
      * @return void
      */
-    abstract public function pick($id);
+    abstract public function setId($id);
 
     /**
      * Open several database connection
@@ -264,4 +280,5 @@ abstract class Database
      * @return mixed
      */
     abstract public function version();
+
 }

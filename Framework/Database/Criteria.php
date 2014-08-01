@@ -15,6 +15,7 @@ use System\Core\DI;
 
 class Criteria
 {
+
     /**
      * SQL safe mode
      * @var boolean
@@ -175,7 +176,7 @@ class Criteria
     /**
      * Build a delete sql and send a db query
      * @access public
-     * @param array $condition
+     * @param array $where
      * @throws \Exception
      * @return array execute result
      */
@@ -452,4 +453,5 @@ class Criteria
             return $this;
         }
     }
+
 }
