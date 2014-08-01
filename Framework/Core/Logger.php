@@ -13,37 +13,71 @@ namespace System\Core;
 
 class Logger extends Component
 {
-    const NOTICE = 'Notice Error';
-    const INFO = 'Info Error';
-    const WARNING = 'Warning Error';
-    const ERROR = 'Fatal Error';
 
-    protected $filePath = '/Runtime/Logs/';
-    protected $fileName = '';
-    protected $fileSize = 204800;
-    protected $fileFormat = 'Ymd';
-    protected $fileExtension = '.log';
+    /**
+     * Log trace level
+     * @var string
+     */
+    protected $level = 'notice,info,warning,error,sql';
 
-    public function __construct($fileName = '')
+    /**
+     * File path
+     * @var string
+     */
+    protected $path = 'Runtime/Logs';
+
+    /**
+     * File name with format
+     * @var string
+     */
+    protected $format = 'Ymd';
+
+    /**
+     * File volumes size
+     * @var int
+     */
+    protected $size = 204800;
+
+    /**
+     * File extension
+     * @var string
+     */
+    protected $extension = '.log';
+
+    private $_logs = array();
+
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
-        parent::__construct();
+        parent::__construct('logger');
+        if (!is_dir(APP_PATH . $this->path)) mkdir(APP_PATH . $this->path, 0664, true);
+    }
 
-        $filePath = ROOT_PATH . $this->filePath;
-        if (!empty($filename)) {
-            if (!file_exists($filePath)) mkdir($filePath, 0755, true);
-            $this->fileName = $filePath . date($this->fileFormat) . $this->fileExtension;
-        } else {
-            $this->fileName = $filePath . $fileName . $this->fileExtension;
+    /**
+     * Destructor
+     */
+    public function __destruct()
+    {
+        $content = '';
+        foreach ($this->_logs as $log) {
+            $content .= $log . "\r\n";
+        }
+        $filename = APP_PATH . $this->path . '/' . date($this->format) . $this->extension;
+        file_put_contents($filename, $content, FILE_APPEND | LOCK_EX);
+    }
+
+    /**
+     * Log a message
+     * @param mixed $message
+     * @param string $type
+     */
+    public function log($message, $type = 'notice')
+    {
+        if (strpos($this->level, $type) !== false) {
+            $this->_logs[] = date('y-m-d H:i:s') . ' [' . $type . '] ' . "\r\n" . var_export($message, true);
         }
     }
 
-    public function log($message, $type = self::INFO)
-    {
-        $breakLine = str_repeat("\r\n", 2);
-        $content = date('Y-m-d H:i:s') . ' ' . $type . $breakLine;
-        if (is_array($message) || is_object($message)) {
-            $content .= var_export($message, true) . $breakLine;
-        }
-        file_put_contents($this->fileName, $content, FILE_APPEND);
-    }
 }
