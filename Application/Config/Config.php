@@ -26,7 +26,7 @@ return array(
 
     'component' => array(
         'route' => array(
-            // pathinfo / queryinfo / rewrite
+            // support mode: pathinfo / queryinfo / rewrite
             'mode' => 'rewrite',
             'defaultModule' => 'site',
             'defaultController' => 'site',
@@ -37,7 +37,7 @@ return array(
         ),
 
         'view' => array(
-            // 'smarty' , 'template lite'
+            // support engine: native / smarty / tplite'
             'engine' => 'native',
             'forceCompile' => true,
             'templateDir' => '',
@@ -71,21 +71,24 @@ return array(
         ),
 
         'cache' => array(
-            'adapter' => 'file',
+            // support adapter: file, memcached, redis
+            'adapter' => 'redis',
 
             // file adapter setting
             'filePath' => 'Runtime/Cache',
             'fileNode' => 10,
 
             // redis adapter setting
-            'redisServers' => array(),
+            'redisServers' => array(
+                array('localhost', 6379),
+                array('localhost', 6380),
+            ),
 
             // memcached adapter setting
             'memcachedServers' => array(
                 // host , port , weight
-                array('localhost', 11211, 30),
-                array('localhost', 11212, 30),
-                array('localhost', 11213, 10),
+                array('localhost', 11211, 1),
+                array('localhost', 11212, 1),
             ),
         ),
 
@@ -97,12 +100,13 @@ return array(
         ),
 
         'session' => array(
-            'adapter' => 'memcached',
+            // support adapter: file, memcached, redis, database
+            'adapter' => 'redis',
             'name' => 'connect-session',
             'expire' => 3600,
             'encrypt' => false,
 
-
+            // database adapter setting
             'databaseTable' => 'pre_session'
         ),
 
