@@ -16,6 +16,6 @@ define('SYSTEM_PATH', ROOT_PATH . 'Framework/');
 define('APP_NAME', 'Application');
 define('APP_PATH', ROOT_PATH . APP_NAME . '/');
 
-require SYSTEM_PATH . '/core/Application.php';
+require SYSTEM_PATH . '/Bootstrap.php';
 $application = new \System\Core\Application();
 $application->main();
