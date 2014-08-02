@@ -13,6 +13,7 @@ namespace System\Core;
 
 class Translate extends Component
 {
+
     /**
      * Language dictionary
      * @var array
@@ -32,11 +33,19 @@ class Translate extends Component
     public function __construct()
     {
         parent::__construct('translate');
-        $path = SYSTEM_PATH . '/i18n/' . $this->default . '/system.php';
-        if (!is_file($path)) {
-            throw new \Exception('lang pack not found', E_WARNING);
+        $sysDict = SYSTEM_PATH . '/i18n/' . $this->default . '/system.php';
+        if (is_file($sysDict)) {
+            $this->_dictionary = array_merge(require $sysDict, $this->_dictionary);
         }
-        $this->_dictionary = require $path;
+        $appPath = scandir(APP_PATH . 'i18n/' . $this->default);
+        foreach ($appPath as $file) {
+            if ($file != '.' && $file != '..') {
+                $appDict = APP_PATH . 'i18n/' . $this->default . '/' . $file;
+                if (is_file($appDict)) {
+                    $this->_dictionary = array_merge(require $appDict, $this->_dictionary);
+                }
+            }
+        }
     }
 
     /**
@@ -58,4 +67,5 @@ class Translate extends Component
     {
         $this->_dictionary[$key] = $value;
     }
+
 }

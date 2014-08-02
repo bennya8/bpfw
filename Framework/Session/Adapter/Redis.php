@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Memcache Session
+ * Redis Session
  * @namespace System\Session\Adapter
- * @package system.session.adapter.memcache
+ * @package system.session.adapter.redis
  * @author Benny <benny_a8@live.com>
  * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
@@ -17,13 +17,21 @@ class Redis extends Session
 {
 
     /**
+     * Redis database instance
+     * @access private
+     * @var object
+     */
+    private $_db;
+
+    /**
      * Session open / connect method handler
      * @access protected
      * @return boolean
      */
     protected function _open()
     {
-        // TODO: Implement _open() method.
+        $this->_db = new \System\Cache\Adapter\Redis();
+        return (boolean)$this->_db;
     }
 
     /**
@@ -33,7 +41,7 @@ class Redis extends Session
      */
     protected function _close()
     {
-        // TODO: Implement _close() method.
+        return true;
     }
 
     /**
@@ -44,7 +52,8 @@ class Redis extends Session
      */
     protected function _read($data)
     {
-        // TODO: Implement _read() method.
+        $record = $this->_db->get($this->prefix . $data[0]);
+        return !empty($record) ? unserialize($record) : array();
     }
 
     /**
@@ -55,7 +64,7 @@ class Redis extends Session
      */
     protected function _write($data)
     {
-        // TODO: Implement _write() method.
+        $this->_db->set($this->prefix . $data[0], serialize($data[1]), $this->expire);
     }
 
     /**
@@ -66,18 +75,18 @@ class Redis extends Session
      */
     protected function _destroy($data)
     {
-        // TODO: Implement _destroy() method.
+        $this->_db->delete($this->prefix . $data);
     }
 
     /**
      * Session garbage collection method handler
      * @access protected
      * @param int $expire
-     * @return void
+     * @return boolean
      */
     protected function _gc($expire)
     {
-        // TODO: Implement _gc() method.
+        return true;
     }
 
 }

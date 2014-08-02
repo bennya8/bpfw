@@ -44,8 +44,8 @@ abstract class Database
      */
     public function __construct()
     {
-        $this->config = DI::factory()->get('config')->get('component');
-        $this->config = $this->config['database'];
+        $config = DI::factory()->get('config')->get('component');
+        $this->_config = $config['database'];
         $this->connect();
     }
 

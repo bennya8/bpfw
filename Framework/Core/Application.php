@@ -20,8 +20,8 @@ class Application
      */
     public function main()
     {
-        $this->registerMainService();
         Profiler::start();
+        $this->registerMainService();
         $this->getDI('event')->notify('app_start');
         $this->registerService();
         $this->getDI('route')->dispatcher();
@@ -43,27 +43,8 @@ class Application
             default:
                 error_reporting(0);
         }
-        set_exception_handler(array('System\\Core\\Application', 'exceptionHandler'));
+//        set_exception_handler(array('System\\Core\\Application', 'exceptionHandler'));
         set_error_handler(array('System\\Core\\Application', 'errorHandler'));
-        require SYSTEM_PATH . 'Core/Loader.php';
-        $loader = new Loader();
-        $loader->register();
-        $loader->registerNamespace(array(
-            'System\\Cache' => SYSTEM_PATH . 'Cache',
-            'System\\Cache\\Adapter' => SYSTEM_PATH . 'Cache/Adapter',
-            'System\\Core' => SYSTEM_PATH . 'Core',
-            'System\\Event' => SYSTEM_PATH . 'Event',
-            'System\\Extend' => SYSTEM_PATH . 'Extend',
-            'System\\Database' => SYSTEM_PATH . 'Database',
-            'System\\Database\\Adapter' => SYSTEM_PATH . 'Database/Adapter',
-            'System\\Database\\Adapter\\MySQL' => SYSTEM_PATH . 'Database/Adapter/MySQL',
-            'System\\Database\\Adapter\\MySQLi' => SYSTEM_PATH . 'Database/Adapter/MySQLi',
-            'System\\Database\\Adapter\\PDO' => SYSTEM_PATH . 'Database/Adapter/PDO',
-            'System\\Helper' => SYSTEM_PATH . 'Helper',
-            'System\\Session' => SYSTEM_PATH . 'Session',
-            'System\\Session\\Adapter' => SYSTEM_PATH . 'Session/Adapter',
-        ));
-        $this->setDI('loader', $loader);
         $this->setDI('config', new Config());
         $this->setDI('event', new EventManager());
         $this->setDI('route', new Route());

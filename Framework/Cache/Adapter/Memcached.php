@@ -39,6 +39,7 @@ class Memcached extends Cache
      * @access public
      * @param $key
      * @param $value
+     * @param int $expire
      * @return mixed
      */
     public function set($key, $value, $expire = 0)
@@ -95,6 +96,7 @@ class Memcached extends Cache
     /**
      * Open a cache server connection
      * @access public
+     * @throws \Exception
      * @return mixed
      */
     public function open()

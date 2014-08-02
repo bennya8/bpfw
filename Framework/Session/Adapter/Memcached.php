@@ -82,7 +82,7 @@ class Memcached extends Session
      * Session garbage collection method handler
      * @access protected
      * @param int $expire
-     * @return void
+     * @return boolean
      */
     protected function _gc($expire)
     {
