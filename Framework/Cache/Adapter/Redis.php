@@ -17,11 +17,17 @@ class Redis extends Cache
 {
 
     /**
-     * Cache database instance
+     * Redis instance
      * @access private
      * @var object
      */
     private $_db;
+
+    /**
+     * Redis servers config
+     * @var array
+     */
+    protected $redisServers = array();
 
     /**
      * Fetch cache data with given key
@@ -31,7 +37,7 @@ class Redis extends Cache
      */
     public function get($key)
     {
-        // TODO: Implement get() method.
+        return $this->_db->get($key);
     }
 
     /**
@@ -43,7 +49,7 @@ class Redis extends Cache
      */
     public function set($key, $value)
     {
-        // TODO: Implement set() method.
+        return $this->_db->set($key, $value);
     }
 
     /**
@@ -54,7 +60,7 @@ class Redis extends Cache
      */
     public function remove($key)
     {
-        // TODO: Implement remove() method.
+        return $this->_db->del($key);
     }
 
     /**
@@ -65,17 +71,18 @@ class Redis extends Cache
      */
     public function has($key)
     {
-        // TODO: Implement has() method.
+        return $this->_db->exists($key);
     }
 
     /**
      * Free all data from cache data
      * @access public
+     * @param string $host
      * @return mixed
      */
-    public function flush()
+    public function flush($host = '')
     {
-        // TODO: Implement flush() method.
+        return in_array($host, $this->_db->_hosts()) ? $this->_db->_instance($host)->flush() : false;
     }
 
     /**
@@ -88,7 +95,7 @@ class Redis extends Cache
      */
     public function increment($key, $offset = 1, $initialValue = 0, $expiry = 0)
     {
-        // TODO: Implement increment() method.
+        return $this->_db->exists($key) ? $this->_db->incrBy($key, $offset) : $this->_db->incrBy($key, $initialValue);
     }
 
     /**
@@ -101,35 +108,42 @@ class Redis extends Cache
      */
     public function decrement($key, $offset = 1, $initialValue = 0, $expiry = 0)
     {
-        // TODO: Implement decrement() method.
+        return $this->_db->exists($key) ? $this->_db->decrBy($key, $offset) : $this->_db->decrBy($key, $initialValue);
     }
-
 
     /**
      * Open a cache server connection
      * @access public
      * @throws \Exception
-     * @return mixed
+     * @return bool
      */
     public function open()
     {
         if (!class_exists('\\Redis')) {
-            throw new \Exception('redis module not install');
+            throw new \Exception('redis module not install', E_ERROR);
         }
-        $this->_db = new \Redis();
-
-
-
-        $this->_db->connect('localhost');
+        if (empty($this->redisServers)) {
+            throw new \Exception('redis servers not set', E_ERROR);
+        }
+        $servers = array();
+        foreach ($this->redisServers as $server) {
+            $servers[] = implode(':', $server);
+        }
+        $this->_db = new \RedisArray($servers);
+        return true;
     }
 
     /**
      * Close a cache server connection
      * @access public
-     * @return mixed
+     * @return bool
      */
     public function close()
     {
+        $servers = $this->_db->_hosts();
+        foreach ($servers as $server) {
+            $this->_db->_instance($server)->close();
+        }
         return true;
     }
 
@@ -142,11 +156,10 @@ class Redis extends Cache
      */
     public function __call($method, $args)
     {
-        if (method_exists($this->_db, $method)) {
-            $reflectMethod = new \ReflectionMethod($this->_db, $method);
-            return $reflectMethod->invokeArgs($this->_db, $args);
+        if (method_exists('\\Redis', $method)) {
+            return $this->_db->__call($method, $args);
         } else {
-            throw new \Exception('invoke no exists method');
+            throw new \Exception('invoke no exists method', E_ERROR);
         }
     }
 }
