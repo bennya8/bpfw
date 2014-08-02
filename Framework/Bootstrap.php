@@ -2,8 +2,8 @@
 
 /**
  * Framework bootstrap
- * @namespace System\Core
- * @package system.cache.translate
+ * @namespace System
+ * @package system.bootstrap
  * @author Benny <benny_a8@live.com>
  * @copyright ©2012-2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
