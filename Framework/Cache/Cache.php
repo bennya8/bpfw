@@ -11,8 +11,8 @@
 
 namespace System\Cache;
 
-use System\Core\Di,
-    System\Core\Component;
+use System\Core\Di;
+use System\Core\Component;
 
 abstract class Cache extends Component
 {

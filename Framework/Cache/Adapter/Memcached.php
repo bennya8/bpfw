@@ -16,11 +16,19 @@ use System\Core\DI;
 
 class Memcached extends Cache
 {
+
+    /**
+     * Memcached instance
+     * @access private
+     * @var object
+     */
     private $_db;
 
+    /**
+     * Memcached servers config
+     * @var array
+     */
     protected $memcachedServers = array();
-
-    protected $memcachedExpire = 0;
 
     /**
      * Fetch cache data with given key
@@ -44,7 +52,7 @@ class Memcached extends Cache
      */
     public function set($key, $value, $expire = 0)
     {
-        return $this->_db->set($key, $value, $this->memcachedExpire);
+        return $this->_db->set($key, $value, $expire);
     }
 
     /**
@@ -75,6 +83,7 @@ class Memcached extends Cache
     public function increment($key, $offset = 1, $initial_value = 0, $expiry = 0)
     {
 
+
     }
 
     public function decrement($key, $offset = 1, $initial_value = 0, $expiry = 0)
@@ -97,7 +106,7 @@ class Memcached extends Cache
      * Open a cache server connection
      * @access public
      * @throws \Exception
-     * @return mixed
+     * @return bool
      */
     public function open()
     {
@@ -108,16 +117,18 @@ class Memcached extends Cache
         $this->_db->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
         $this->_db->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, TRUE);
         $this->_db->addServers($this->memcachedServers);
+        return true;
     }
 
     /**
      * Close a cache server connection
      * @access public
-     * @return mixed
+     * @return bool
      */
     public function close()
     {
         $this->_db->resetServerList();
+        return true;
     }
 
     /**
@@ -133,7 +144,7 @@ class Memcached extends Cache
             $reflectMethod = new \ReflectionMethod($this->_db, $method);
             return $reflectMethod->invokeArgs($this->_db, $args);
         } else {
-            throw new \Exception('invoke no exists method');
+            throw new \Exception('invoke no exists method', E_ERROR);
         }
     }
 }
