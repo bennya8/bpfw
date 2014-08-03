@@ -3,9 +3,9 @@
 /**
  * Event Manager
  * @namespace System\Core
- * @package system.core
+ * @package system.core.eventmanager
  * @author Benny <benny_a8@live.com>
- * @copyright ©2012-2014 http://github.com/bennya8
+ * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -20,10 +20,10 @@ class EventManager
      */
     protected $_events = array(
         'app_start' => array(
-            'System\\Event\\FrameworkStart'
+            'System\\Event\\AppStart'
         ),
         'app_end' => array(
-            'System\\Event\\FrameworkClose'
+            'System\\Event\\AppClose'
         )
     );
 

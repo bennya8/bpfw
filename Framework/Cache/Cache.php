@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Cache component abstract class
+ * Cache
  * @namespace System\Cache
  * @package system.cache.cache
  * @author Benny <benny_a8@live.com>
- * @copyright ©2012-2014 http://github.com/bennya8
+ * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 

@@ -2,10 +2,10 @@
 
 /**
  * Dependency injection
- * @namespace System\Core;
+ * @namespace System\Core
  * @package system.core.di
  * @author Benny <benny_a8@live.com>
- * @copyright ©2012-2014 http://github.com/bennya8
+ * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 

@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Event
+ * App close event
  * @namespace System\Event
- * @package system.event.event
+ * @package system.event.appclose
  * @author Benny <benny_a8@live.com>
- * @copyright ©2012-2014 http://github.com/bennya8
+ * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
 namespace System\Event;
 
-abstract class Event
+class AppClose extends Event
 {
 
     /**
@@ -19,6 +19,9 @@ abstract class Event
      * @param mixed $args
      * @return void
      */
-    abstract public function run($args);
+    public function run($args)
+    {
+        session_write_close();
+    }
 
 }

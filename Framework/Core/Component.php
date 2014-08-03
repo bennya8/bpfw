@@ -2,10 +2,10 @@
 
 /**
  * Component
- * @namespace System\Core;
+ * @namespace System\Core
  * @package system.core.component
  * @author Benny <benny_a8@live.com>
- * @copyright ©2012-2014 http://github.com/bennya8
+ * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -16,10 +16,16 @@ abstract class Component
 
     /**
      * Dependency inject container
+     * @access private
      * @var array
      */
     private $_di = array();
 
+    /**
+     * Component settings
+     * @access protected
+     * @var array
+     */
     protected $config = array();
 
     /**
@@ -44,8 +50,9 @@ abstract class Component
 
     /**
      * Get object from di container
-     * @param $name
-     * @return bool
+     * @access public
+     * @param string $name
+     * @return mixed
      */
     protected function getDI($name)
     {
@@ -58,9 +65,11 @@ abstract class Component
 
     /**
      * Set object to di container
-     * @param $name
-     * @param $mixed
-     * @param bool $shared
+     * @access protected
+     * @param string $name
+     * @param mixed $mixed
+     * @param boolean $shared
+     * @param void
      */
     protected function setDI($name, $mixed, $shared = false)
     {
@@ -73,8 +82,9 @@ abstract class Component
 
     /**
      * Get exists property with given key
-     * @param $key
-     * @return null
+     * @access public
+     * @param string $key
+     * @return mixed
      */
     public function __get($key)
     {
@@ -87,8 +97,10 @@ abstract class Component
 
     /**
      * Set property with given key and value
-     * @param $key
-     * @param $value
+     * @access public
+     * @param string $key
+     * @param mixed $value
+     * @return void
      */
     public function __set($key, $value)
     {
@@ -102,7 +114,9 @@ abstract class Component
 
     /**
      * Unset property with given key
-     * @param $key
+     * @access public
+     * @param string $key
+     * @return void
      */
     public function __unset($key)
     {
@@ -111,10 +125,11 @@ abstract class Component
 
     /**
      * Invoke method
-     * @param $method
-     * @param $args
-     * @return mixed
+     * @access public
+     * @param string $method
+     * @param array $args
      * @throws \Exception
+     * @return mixed
      */
     public function __call($method, $args)
     {
@@ -127,10 +142,11 @@ abstract class Component
 
     /**
      * Invoke static method
-     * @param $method
-     * @param $args
-     * @return mixed
+     * @access public
+     * @param string $method
+     * @param array $args
      * @throws \Exception
+     * @return mixed
      */
     public static function __callstatic($method, $args)
     {
@@ -141,4 +157,5 @@ abstract class Component
             throw new \Exception('invoke no exists static method', E_WARNING);
         }
     }
+
 }

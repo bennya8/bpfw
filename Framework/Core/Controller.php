@@ -5,7 +5,7 @@
  * @namespace System\Core
  * @package system.core.controller
  * @author Benny <benny_a8@live.com>
- * @copyright ©2012-2014 http://github.com/bennya8
+ * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -47,10 +47,12 @@ abstract class Controller extends Component
      * Display template
      * @param $template
      */
-    public function display($template)
+    public function render($template)
     {
-        $this->view->display($template);
+        $this->view->render($template);
     }
+
+
 
     /**
      * Register template variables
@@ -59,7 +61,7 @@ abstract class Controller extends Component
      */
     public function assign($name, $value = '')
     {
-        $this->view->assign($name, $value);
+        $this->view->setData($name, $value);
     }
 
 
