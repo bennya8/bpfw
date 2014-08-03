@@ -2,10 +2,10 @@
 
 /**
  * Loader
- * @namespace System\Core;
+ * @namespace System\Core
  * @package system.core.loader
  * @author Benny <benny_a8@live.com>
- * @copyright ©2012-2014 http://github.com/bennya8
+ * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -57,8 +57,6 @@ class Loader
             require $path;
         } else if (strpos($class, '\\') !== false && $this->registerClass($class)) {
             require $this->getClass($class);
-        } else {
-            throw new \Exception(sprintf('class %s not found', $class), E_WARNING);
         }
     }
 
@@ -130,9 +128,8 @@ class Loader
      * @param string $suffix
      * @return void
      */
-    public function import($classAlias, $suffix = '.class.php')
+    public function import($classAlias, $suffix = '.php')
     {
-        $classAlias = str_replace('.', '/', $classAlias);
         if (substr($classAlias, 0, 1) === '@') {
             $classAlias = SYSTEM_PATH . substr($classAlias, 1) . $suffix;
         } else {

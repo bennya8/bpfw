@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Session component abstract class
+ * Session
  * @namespace System\Session\Adapter
  * @package system.session.adapter.session
  * @author Benny <benny_a8@live.com>

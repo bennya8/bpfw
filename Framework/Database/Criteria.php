@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Criteria SQL Query Standard Class
+ * Criteria SQL Query Builder
  * @namespace System\Database
  * @package system.database.criteria
  * @author Benny <benny_a8@live.com>

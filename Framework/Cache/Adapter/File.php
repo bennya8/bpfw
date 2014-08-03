@@ -5,7 +5,7 @@
  * @namespace System\Cache\Adapter
  * @package system.cache.adapter.file
  * @author Benny <benny_a8@live.com>
- * @copyright ©2013-2014 http://github.com/bennya8
+ * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 

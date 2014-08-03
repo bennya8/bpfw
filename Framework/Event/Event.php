@@ -15,9 +15,9 @@ abstract class Event
 {
 
     /**
-     * Event fire method
-     * @param $args
-     * @return mixed
+     * Event entrance
+     * @param mixed $args
+     * @return void
      */
     abstract public function run($args);
 
