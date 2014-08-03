@@ -9,10 +9,10 @@ return array(
 
     'module' => array(
         'site' => array(
-            'path' => 'App\\Module\\Site',
+            'path' => 'App\\Site',
             'namespace' => array(
-                'App\\Module\\Site' => APP_PATH . 'Module/Site',
-                'App\\Module\\Site\\Controller' => APP_PATH . 'Module/Site/Controller',
+                'App\\Site' => APP_PATH . 'Site',
+                'App\\Site\\Controller' => APP_PATH . 'Site/Controller',
             )
         )
     ),
@@ -39,11 +39,10 @@ return array(
         'view' => array(
             // support engine: native / smarty / tplite'
             'engine' => 'native',
-            'forceCompile' => true,
-            'templateDir' => '',
-            'enableCache' => '',
-            'cacheTime' => 3600,
-            'cacheDir' => '',
+            'theme' => 'Default',
+            'layout' => 'layout',
+
+            // smarty and tplite engine setting
         ),
 
         'database' => array(
