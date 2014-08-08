@@ -125,7 +125,11 @@ class View extends Component
     {
         $this->getDI('event')->notify('view_start');
         $layout = $this->getTemplatePath('Layouts/layout', $this->theme);
-        echo str_replace($layout, '__CONTENT__', $this->fetch($template, $this->theme, $cache_id));
+        $this->setData('__CONTENT__', $this->fetch($template, $this->theme, $cache_id));
+        ob_start();
+        @extract($this->_data);
+        require $layout;
+        echo ob_get_clean();
         $this->getDI('event')->notify('view_end');
     }
 
@@ -153,21 +157,23 @@ class View extends Component
     protected function getTemplatePath($template, $theme)
     {
         $template = explode('/', $template);
+        $namespace = $this->getDI('config')->get('module');
+
         switch (count($template)) {
             case 1:
-                $tpl = APP_PATH . '/' . ucfirst(MODULE) . '/View/' . $theme . '/' . ucfirst(CONTROLLER) . '/' .
+                $tpl = $namespace[MODULE]['realpath'] . '/View/' . $theme . '/' . ucfirst(CONTROLLER) . '/' .
                     $template[0] . $this->templateExt;
                 break;
             case 2:
-                $tpl = APP_PATH . '/' . ucfirst(MODULE) . '/View/' . $theme . '/' . ucfirst($template[0]) . '/' .
+                $tpl = $namespace[MODULE]['realpath'] . '/View/' . $theme . '/' . ucfirst($template[0]) . '/' .
                     $template[1] . $this->templateExt;
                 break;
             case 3:
-                $tpl = APP_PATH . '/' . ucfirst($template[0]) . '/View/' . $theme . '/' . ucfirst($template[1]) . '/' .
+                $tpl = $namespace[$template[0]]['realpath'] . '/View/' . $theme . '/' . ucfirst($template[1]) . '/' .
                     $template[2] . $this->templateExt;
                 break;
             default:
-                $tpl = APP_PATH . '/' . ucfirst(MODULE) . '/View/' . $theme . '/' . ucfirst(CONTROLLER) . '/' .
+                $tpl = $namespace[MODULE]['realpath'] . '/View/' . $theme . '/' . ucfirst(CONTROLLER) . '/' .
                     $template[0] . $this->templateExt;
         }
         if (!is_file($tpl)) {

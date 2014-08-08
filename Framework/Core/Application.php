@@ -43,7 +43,7 @@ class Application
             default:
                 error_reporting(0);
         }
-//        set_exception_handler(array('System\\Core\\Application', 'exceptionHandler'));
+        set_exception_handler(array('System\\Core\\Application', 'exceptionHandler'));
         set_error_handler(array('System\\Core\\Application', 'errorHandler'));
         $this->setDI('config', new Config());
         $this->setDI('event', new EventManager());
@@ -58,13 +58,14 @@ class Application
     {
         $config = $this->getDI('config');
         $loader = $this->getDI('loader');
+        $loader->import('@Common.Constants', '.php');
         $loader->import('Common.Constants', '.php');
         $loader->import('Common.Functions', '.php');
         $loader->registerNamespace($config->get('namespace'));
         $components = array_map('ucfirst', array_keys($config->get('component')));
         $services = array('Logger', 'Profiler', 'Cookie', 'Translate', 'Security');
         $factoryServices = array('Cache', 'Database', 'Session');
-        foreach ($components as $component) {
+        array_walk($components, function ($component) use ($services, $factoryServices) {
             if (in_array($component, $services)) {
                 $class = 'System\\Core\\' . $component;
                 $this->setDI(strtolower($component), new $class);
@@ -72,11 +73,16 @@ class Application
                 $class = 'System\\' . $component . '\\' . $component;
                 $this->setDI(strtolower($component), $class::factory());
             }
-        }
+        });
+        $helpers = array('Assets', 'Http');
+        array_walk($helpers, function ($helper) {
+            $class = 'System\\Helper\\' . $helper;
+            $this->setDI(strtolower($helper), new $class);
+        });
         $modules = $config->get('module');
-        foreach ($modules as $module) {
+        array_walk($modules, function ($module) use ($loader) {
             $loader->registerNamespace($module['namespace']);
-        }
+        });
     }
 
     /**
@@ -89,10 +95,10 @@ class Application
     {
         switch ($exception->getCode()) {
             case 404:
-                echo 'page not found';
+                echo $exception->getMessage();
                 break;
             case 500:
-                echo 'server internal error';
+                echo $exception->getMessage();
                 break;
             default:
                 echo 'runtime error: ' . $exception->getMessage();
@@ -106,9 +112,15 @@ class Application
      * @throws \Exception
      * @return void
      */
-    public static function errorHandler($code = '', $message = '')
+    public static function errorHandler($code = E_NOTICE, $message = '')
     {
-        throw new \Exception($message, $code);
+        switch ($code) {
+            case E_ERROR:
+                throw new \Exception($message, $code);
+                break;
+            default:
+                echo $message;
+        }
     }
 
     /**

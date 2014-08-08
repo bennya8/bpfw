@@ -106,7 +106,6 @@ abstract class Component
     {
         if (property_exists($this, $key)) {
             $this->$key = $value;
-            echo 1;
         } else {
             $this->setDI($key, $value);
         }

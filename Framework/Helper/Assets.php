@@ -19,14 +19,14 @@ class Assets
      * @access public
      * @var string
      */
-    public $baseUrl = '/';
+    public $baseUrl = '';
 
     /**
      * Asset path
      * @access public
      * @var string
      */
-    public $basePath = 'Public/Assets/';
+    public $basePath = 'assets';
 
     /**
      * Script tags
@@ -45,14 +45,14 @@ class Assets
      * @param string $name
      * @param string $type
      * @param string $version
-     * @return void
+     * @return string
      */
     public function js($name, $type = '', $version = '')
     {
         if (!empty($version)) $version = '?v=' . $version;
         $type = in_array($type, $this->_scriptType) ? $this->_scriptType[$type] : 'text/javascript';
-        $src = $this->baseUrl . $this->basePath . $name . $version;
-        echo '<script type="' . $type . '" src="' . $src . '"></script>';
+        $src = $this->baseUrl() . $this->basePath . '/' . $name . $version;
+        return '<script type="' . $type . '" src="' . $src . '"></script>';
     }
 
     /**
@@ -60,13 +60,13 @@ class Assets
      * @access public
      * @param string $name
      * @param string $version
-     * @return void
+     * @return string
      */
     public function css($name, $version = '')
     {
         if (!empty($version)) $version = '?v=' . $version;
-        $src = $this->basePath . $this->basePath . $name . $version;
-        echo '<link type="text/css" rel="stylesheet" src="' . $src . '" />';
+        $src = $this->baseUrl() . $this->basePath . '/' . $name . $version;
+        return '<link type="text/css" rel="stylesheet" href="' . $src . '" />';
     }
 
     /**
@@ -74,7 +74,7 @@ class Assets
      * @access public
      * @param string $name
      * @param array $attributes
-     * @return void
+     * @return string
      */
     public function img($name, $attributes = array())
     {
@@ -85,19 +85,44 @@ class Assets
                 $attr .= $k . '="' . $v . '" ';
             }
         }
-        $src = $this->baseUrl . $this->basePath . $name;
-        echo '<img src="' . $src . '" ' . $attr . ' />';
+        $src = $this->baseUrl() . $this->basePath . '/' . $name;
+        return '<img src="' . $src . '" ' . $attr . ' />';
     }
 
     /**
      * Print img url
      * @access public
      * @param string $name
-     * @return void
+     * @return string
      */
     public function imgUrl($name)
     {
-        echo $this->baseUrl . $this->basePath . $name;
+        return $this->baseUrl() . $this->basePath . '/' . $name;
+    }
+
+    /**
+     * Generate base url
+     * @return string
+     */
+    public function baseUrl()
+    {
+        if (!empty($this->baseUrl)) {
+            return $this->baseUrl;
+        } else {
+            $protocol = strtolower(substr($_SERVER['SERVER_PROTOCOL'], 0, 5)) == 'https://' ? 'https://' : 'http://';
+            return $this->baseUrl = $protocol . $_SERVER['HTTP_HOST'] . str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+        }
+    }
+
+    /**
+     * Generate site url
+     * @param string $url
+     * @param string $params
+     * @return array|string
+     */
+    public function siteUrl($url = '', $params = '')
+    {
+        return \System\Core\Uri::siteUrl($url, $params);
     }
 
 }

@@ -47,10 +47,10 @@ class Uri
                     $url = $baseUrl . MODULE . '/' . CONTROLLER . '/' . $url[0] . $params;
                     break;
                 case 2:
-                    $url = $baseUrl . MODULE . '/' . $url[1] . '/' . $url[0] . $params;
+                    $url = $baseUrl . MODULE . '/' . $url[0] . '/' . $url[1] . $params;
                     break;
                 case 3:
-                    $url = $baseUrl . $url[2] . '/' . $url[1] . '/' . $url[0] . $params;
+                    $url = $baseUrl . $url[0] . '/' . $url[1] . '/' . $url[2] . $params;
                     break;
             }
         } elseif ($mode['mode'] == 'queryinfo') {

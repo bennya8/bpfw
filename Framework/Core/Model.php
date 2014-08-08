@@ -17,6 +17,41 @@ abstract class Model
 {
 
     /**
+     * Validate when field not empty
+     */
+    const FIELD_NOT_EMPTY = 0;
+
+    /**
+     * Validate when field is set
+     */
+    const FIELD_ISSET = 1;
+
+    /**
+     * Validate when field not empty and is set
+     */
+    const FIELD_BOTH = 2;
+
+    /**
+     * Validate field value from GET query
+     */
+    const INPUT_GET = 'get';
+
+    /**
+     * Validate field value from POST params
+     */
+    const INPUT_POST = 'post';
+
+    /**
+     * Validate field value from PUT params
+     */
+    const INPUT_PUT = 'put';
+
+    /**
+     * Validate field value from DELETE params
+     */
+    const INPUT_DELETE = 'delete';
+
+    /**
      * Database config
      * @access private
      * @var array
@@ -43,6 +78,26 @@ abstract class Model
      * @var array
      */
     private $_criteriaChains = array('table', 'field', 'select', 'update', 'insert', 'where', 'join', 'group', 'order', 'limit');
+
+    /**
+     * Validation instance
+     * @access private
+     * @var object
+     */
+    private $_validation;
+
+    /**
+     * Valid data
+     * @var array
+     */
+    private $_data = array();
+
+    /**
+     * Error message
+     * @access private
+     * @var string
+     */
+    private $_error = array();
 
     /**
      * Table primary key
@@ -73,6 +128,13 @@ abstract class Model
     public $columns = array();
 
     /**
+     * Validate rules
+     * @public
+     * @var array
+     */
+    public $rules = array();
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -80,47 +142,176 @@ abstract class Model
         $this->_config = DI::factory()->get('config')->get('component')['database'];
         $this->_db = DI::factory()->get('database');
         $this->_criteria = new Criteria();
+        $this->_validation = new Validation();
 
+        $this->tablePrefix = $this->_config['prefix'];
         if (empty($this->table)) {
             $table = explode('\\', get_class($this));
             $table = preg_replace("/[A-Z]/", "_\\0", array_pop($table));
             $this->table = strtolower(trim($table, "_"));
-            $this->tablePrefix = $this->_config['prefix'];
         }
 
         if (empty($this->columns)) {
             $cache = DI::factory()->get('cache');
-            $cacheId = md5('tabel_' . $this->table);
-            if ($this->_config['cache']) {
-                $columns = $cache->get($cacheId);
-                if ($columns && is_array($columns)) {
-                    $this->columns = $columns;
+            if (is_object($cache) && $this->_config['cache']) {
+                $cache_id = md5('tabel_' . $this->table);
+                if ($this->_config['cache']) {
+                    $columns = $cache->get($cache_id);
+                    if ($columns && is_array($columns)) {
+                        $this->columns = $columns;
+                    }
                 }
             }
             if (empty($this->columns)) {
-                $columns = $this->_db->query('SHOW COLUMNS FROM ' . $this->table);
+                $columns = $this->_db->query('SHOW COLUMNS FROM ' . $this->tableName());
                 foreach ($columns as $column) {
                     $this->columns[] = $column['Field'];
                 }
-                $cache->set($cacheId, $this->columns);
+                if (is_object($cache) && $this->_config['cache']) {
+                    $cache->set($cache_id, $this->columns);
+                }
             }
         }
     }
 
     /**
-     * Find a record by primary key
+     * Get rule by given event key and rules
+     * @param $on
+     * @return null
+     */
+    public function getRules($on)
+    {
+        return isset($this->rules[$on]) ? $this->rules[$on] : false;
+    }
+
+    /**
+     * Set rule by given event key and rules
+     * @param $on
+     * @param $rules
+     */
+    public function setRules($on, $rules)
+    {
+        if (is_array($rules)) {
+            $this->rules[$on] = $rules;
+        }
+    }
+
+    public function create($on)
+    {
+        return $this->validateRules($on, true);
+    }
+
+    /**
+     * Run specified rule
+     * @param $on
+     * @param bool $isField
+     * @return array|bool
+     */
+    public function validateRules($on, $isField = false)
+    {
+        if (!$rules = $this->getRules($on)) {
+            return true;
+        }
+        $isValid = true;
+        foreach ($this->rules[$on] as $validate) {
+            $validate = array_pad($validate, 6, '');
+            // formmat [field,input,detect,function,message,express]
+            if (!$isField || in_array($validate[0], $this->columns)) {
+                $value = false;
+                $param = $this->_params($validate[1], $validate[0]);
+                switch ($validate[2]) {
+                    case self::FIELD_NOT_EMPTY:
+                        if (!empty($param)) {
+                            $value = $this->_validate($validate[3], $param, $validate[5]);
+                        }
+                        break;
+                    case self::FIELD_ISSET:
+                        if (isset($param)) {
+                            $value = $this->_validate($validate[3], $param, $validate[5]);
+                        }
+                        break;
+                    case self::FIELD_BOTH:
+                        if (isset($param) && !empty($param)) {
+                            $value = $this->_validate($validate[3], $param, $validate[5]);
+                        }
+                        break;
+                }
+                if ($value !== false) {
+                    $this->_data[$validate[0]] = $value;
+                } else {
+                    $isValid = false;
+                    $this->_error[] = $validate[4];
+                }
+            }
+        }
+        return $isValid ? $this->_data : false;
+    }
+
+    public function _validate($function, $value, $expression)
+    {
+        return $this->_validation->$function($value, $expression) ? $value : false;
+    }
+
+    /**
+     * Get error
      * @access public
-     * @param null $id
+     * @return mixed
+     */
+    public function getError()
+    {
+        return isset($this->_error[0]) ? $this->_error[0] : '';
+    }
+
+    /**
+     * Get error list
+     * @access public
+     * @return array
+     */
+    public function getErrorList()
+    {
+        return $this->_error;
+    }
+
+
+    /**
+     * Run validate
+     * @param $input
+     * @param $key
      * @return bool
      */
-    public function find($id = null)
+    public function _params($input, $key)
     {
-        if (empty($id)) return false;
-        return $this->_criteria
-            ->table($this->table)
-            ->where("`{$this->pk}` = '{$id}'")
+        $params = array();
+        if (strtolower($input) == 'put' || strtolower($input) == 'delete') {
+            parse_str(file_get_contents('php://input'), $params);
+            $_REQUEST = $params + $_REQUEST;
+        } elseif (strtolower($input) == 'post') {
+            $params =& $_POST;
+        } elseif (strtolower($input) == 'get') {
+            $params =& $_GET;
+        } elseif (strtolower($input) == 'cookie') {
+            $params =& $_COOKIE;
+        } elseif (strtolower($input) == 'request') {
+            $params =& $_REQUEST;
+        }
+        return isset($params[$key]) ? $params[$key] : '';
+
+    }
+
+
+    /**
+     * Find a record by condition
+     * @access public
+     * @param array $condition
+     * @return mixed
+     */
+    public function find($condition = array())
+    {
+        $row = $this->_criteria
+            ->table($this->tableName())
             ->limit('1')
-            ->select();
+            ->select($condition);
+        return isset($row[0]) ? $row[0] : false;
     }
 
     /**
@@ -133,7 +324,7 @@ abstract class Model
     public function findBy($name, $value)
     {
         return $this->_criteria
-            ->table($this->table)
+            ->table($this->tableName())
             ->where("`{$name}` = '{$value}'")
             ->select();
     }
@@ -147,7 +338,7 @@ abstract class Model
     public function findAll($condition = array())
     {
         return $this->_criteria
-            ->table($this->table)
+            ->table($this->tableName())
             ->select($condition);
     }
 
@@ -160,7 +351,7 @@ abstract class Model
     public function add($data = null)
     {
         return $this->_criteria
-            ->table($this->table)
+            ->table($this->tableName())
             ->insert($data);
     }
 
@@ -174,7 +365,7 @@ abstract class Model
     public function save($data = null, $where = null)
     {
         return $this->_criteria
-            ->table($this->table)
+            ->table($this->tableName())
             ->update($data, $where);
     }
 
@@ -187,7 +378,7 @@ abstract class Model
     public function remove($where = null)
     {
         return $this->_criteria
-            ->table($this->table)
+            ->table($this->tableName())
             ->delete($where);
     }
 
@@ -197,7 +388,7 @@ abstract class Model
      * @param null / string $name
      * @return string
      */
-    public function table($name = null)
+    public function tableName($name = null)
     {
         return empty($name) ? $this->tablePrefix . $this->table : $this->tablePrefix . $name;
     }

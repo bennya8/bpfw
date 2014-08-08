@@ -35,11 +35,11 @@ class Request
     }
 
     /**
-     * Get a param from $_GET array
+     * Get params from $_GET
      * @access public
      * @param string $key
-     * @param string string $default
-     * @param string $filter
+     * @param string $default
+     * @param bool $filter
      * @return mixed
      */
     public function get($key, $default = '', $filter = null)
@@ -48,7 +48,7 @@ class Request
     }
 
     /**
-     * Get a param from $_POST array
+     * Get a param from $_POST
      * @access public
      * @param string $key
      * @param string $default
@@ -61,7 +61,7 @@ class Request
     }
 
     /**
-     * Get input params
+     * Get all input params
      * @access public
      * @param string $input get,post,put,delete,cookie,request
      * @param string $key

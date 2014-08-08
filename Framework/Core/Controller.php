@@ -15,142 +15,263 @@ abstract class Controller extends Component
 {
 
     /**
-     * View component instance
-     * @var View
+     * View instance
+     * @access protected
+     * @var object
      */
     protected $view;
 
     /**
-     * Request component instance
+     * Request instance
+     * @access protected
      * @var Request
      */
     protected $request;
 
     /**
-     * Response component instance
+     * Response instance
+     * @access protected
      * @var Response
      */
     protected $response;
 
     /**
      * Constructor
-     * Initialize components
      */
     public function __construct()
     {
         $this->request = new Request();
         $this->response = new Response();
         $this->view = new View();
+        if (method_exists($this, 'initialize')) {
+            $this->initialize();
+        }
     }
 
     /**
-     * Display template
+     * Display a view with layout
+     * @access public
      * @param $template
+     * @param $cache_id
+     * @return void
      */
-    public function render($template)
+    public function render($template, $cache_id = '')
     {
-        $this->view->render($template);
+        $this->view->render($template, $cache_id);
     }
 
-
+    /**
+     * Display a view without layout
+     * @access public
+     * @param $template
+     * @param string $cache_id
+     * @return void
+     */
+    public function partial($template, $cache_id = '')
+    {
+        $this->view->partial($template, $cache_id);
+    }
 
     /**
      * Register template variables
+     * @access public
      * @param $name
      * @param string $value
+     * @return void
      */
     public function assign($name, $value = '')
     {
         $this->view->setData($name, $value);
     }
 
+    /**
+     * Get base url
+     * @return string
+     */
+    public function baseUrl()
+    {
+        return Uri::baseUrl();
+    }
 
-    public function get($key, $default = '', $filter = false)
+    /**
+     * Get a formatted site url
+     * @param string $url
+     * @param string $params
+     * @return array | string
+     */
+    public function siteUrl($url = '', $params = '')
+    {
+        return Uri::siteUrl($url, $params);
+    }
+
+    /**
+     * Get params from $_GET
+     * @access public
+     * @param string $key
+     * @param string $default
+     * @param string $filter
+     * @return mixed
+     */
+    public function get($key, $default = '', $filter = null)
     {
         return $this->request->get($key, $default, $filter);
     }
 
-    public function getPost($key, $default = false, $filter = false)
+    /**
+     * Get a param from $_POST
+     * @access public
+     * @param string $key
+     * @param string $default
+     * @param string $filter
+     * @return mixed
+     */
+    public function getPost($key, $default = '', $filter = null)
     {
         return $this->request->getPost($key, $default, $filter);
     }
 
-    public function getParam($key, $default = '', $filter = false)
+    /**
+     * Get all input params
+     * @access public
+     * @param string $input get,post,put,delete,cookie,request
+     * @param string $key
+     * @param string $default
+     * @param string $filter
+     * @return mixed
+     */
+    public function getParam($input, $key, $default = '', $filter = null)
     {
-        return $this->request->getParam($key, $default, $filter);
+        return $this->request->getParam($input, $key, $default, $filter);
     }
 
+    /**
+     * Detect a http get method request
+     * @access public
+     * @return bool
+     */
     public function isGet()
     {
         return $this->request->isGet();
     }
 
+    /**
+     * Detect a http post method request
+     * @access public
+     * @return bool
+     */
     public function isPost()
     {
         return $this->request->isPost();
     }
 
+    /**
+     * Detect a http put method request
+     * @access public
+     * @return bool
+     */
     public function isPut()
     {
         return $this->request->isPut();
     }
 
+    /**
+     * Detect a http delete method request
+     * @access public
+     * @return bool
+     */
     public function isDelete()
     {
         return $this->request->isDelete();
     }
 
+    /**
+     * Detect an ajax request
+     * @access public
+     * @return bool
+     */
     public function isAjax()
     {
         return $this->request->isAjax();
     }
 
+    /**
+     * Get user agent
+     * @access public
+     * @return string
+     */
     public function getUserAgent()
     {
         return $this->request->getUserAgent();
     }
 
+    /**
+     * Get user ip address
+     * @access public
+     * @return string
+     */
     public function getUserIp()
     {
         return $this->request->getUserIp();
     }
 
-    public function getBaseUrl()
-    {
-        return $this->request->getBaseUrl();
-    }
-
+    /**
+     * @param string $url
+     */
     public function redirect($url = '')
     {
         $this->response->redirect($url);
     }
 
+    /**
+     * @param string $name
+     * @return array|string
+     */
     public function getHeader($name = '')
     {
         return $this->response->getHeader($name);
     }
 
 
+    /**
+     * @param $name
+     * @param string $value
+     */
     public function setHeader($name, $value = '')
     {
         $this->response->setHeader($name, $value);
     }
 
+    /**
+     * @param int $statusCode
+     * @param string $contentType
+     */
     public function sendHeader($statusCode = 200, $contentType = 'html')
     {
         $this->response->sendHeader($statusCode, $contentType);
     }
 
+    /**
+     * @param int $status
+     * @param string $message
+     * @param array $data
+     * @param string $return
+     */
     public function toApi($status = 0, $message = '', $data = array(), $return = 'json')
     {
         $this->response->toApi($status, $message, $data, $return);
     }
 
+    /**
+     * @param $data
+     */
     public function toJson($data)
     {
         $this->response->toJson($data);
     }
 
+    /**
+     * @param $data
+     */
     public function toXml($data)
     {
         $this->response->toXml($data);
