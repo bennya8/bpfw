@@ -122,9 +122,9 @@ class Route extends Component
     {
         if ($this->mode == 'pathinfo') {
             $url = explode('/', trim(str_replace('\\', '/', $_SERVER['PATH_INFO']), '/'));
-            $this->dispatch['module'] = !empty($url) ? array_shift($url) : $this->defaultModule;
-            $this->dispatch['controller'] = !empty($url) ? array_shift($url) : $this->defaultController;
-            $this->dispatch['action'] = !empty($url) ? array_shift($url) : $this->defaultAction;
+            $this->dispatch['module'] = !empty($url[0]) ? array_shift($url) : $this->defaultModule;
+            $this->dispatch['controller'] = !empty($url[0]) ? array_shift($url) : $this->defaultController;
+            $this->dispatch['action'] = !empty($url[0]) ? array_shift($url) : $this->defaultAction;
             if (!empty($url)) {
                 $key = $value = array();
                 foreach ($url as $k => $v) {
