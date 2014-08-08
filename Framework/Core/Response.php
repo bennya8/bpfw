@@ -95,12 +95,14 @@ class Response
 
     public function toJson($data)
     {
+        $this->sendHeader(200, 'json');
         exit(json_encode($data));
     }
 
     public function toJsonp($data)
     {
         $callback = isset($_GET['jsonp']) ? $_GET['jsonp'] : 'jsonp';
+        $this->sendHeader(200, 'json');
         exit($callback . '(' . json_encode($data) . ')');
     }
 
