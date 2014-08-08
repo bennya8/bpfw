@@ -108,7 +108,7 @@ class File extends Cache
     public function flush()
     {
         for ($i = 0, $len = $this->fileNode; $i < $len; $i++) {
-            $path = ROOT_PATH . $this->filePath . '/' . $i . '/';
+            $path = APP_PATH . $this->filePath . '/' . $i . '/';
             if (is_dir($path)) {
                 $files = scandir($path);
                 foreach ($files as $file) {
@@ -164,7 +164,7 @@ class File extends Cache
      */
     protected function getKeyPath($key)
     {
-        return ROOT_PATH . $this->filePath . '/' . $this->getNodeKey($key) . '/' . md5($key);
+        return APP_PATH . $this->filePath . '/' . $this->getNodeKey($key) . '/' . md5($key);
     }
 
 }
