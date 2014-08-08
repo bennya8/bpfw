@@ -1,33 +1,58 @@
 <?php
 
 return array(
+    /* auto load common namespace */
     'namespace' => array(
         'App\\Common' => APP_PATH . '/Common',
         'App\\Event' => APP_PATH . '/Event',
         'App\\Model' => APP_PATH . '/Model',
     ),
 
+    /* auto load module namespace */
     'module' => array(
         'site' => array(
             'path' => 'App\\Site',
+            'realpath' => APP_PATH . 'Module/Site',
             'namespace' => array(
-                'App\\Site' => APP_PATH . 'Site',
-                'App\\Site\\Controller' => APP_PATH . 'Site/Controller',
+                'App\\Site' => APP_PATH . 'Module/Site',
+                'App\\Site\\Controller' => APP_PATH . 'Module/Site/Controller',
+                'App\\Site\\Event' => APP_PATH . 'Module/Site/Event',
+                'App\\Site\\Model' => APP_PATH . 'Module/Site/Model',
             )
-        )
+        ),
+
+        'admin' => array(
+            'path' => 'App\\Admin',
+            'realpath' => APP_PATH . 'Module/Admin',
+            'namespace' => array(
+                'App\\Admin' => APP_PATH . 'Module/Admin',
+                'App\\Admin\\Controller' => APP_PATH . 'Module/Admin/Controller',
+                'App\\Admin\\Event' => APP_PATH . 'Module/Admin/Event',
+                'App\\Admin\\Model' => APP_PATH . 'Module/Admin/Model',
+            )
+        ),
+
     ),
 
+    /* event trigger */
     'event' => array(
         'app_start' => array(),
-        'app_end' => array(),
+        'dispatcher_start' => array(),
         'view_start' => array(),
-        'view_end' => array()
+        'view_end' => array(),
+        'dispatcher_end' => array(),
+        'app_end' => array(),
     ),
 
+    /* framework components */
+    /* notice: you can comment out following components which you don't want to use */
     'component' => array(
+        // ###################################################
+        // core component, don't comment these out
+        // ###################################################
         'route' => array(
             // support mode: pathinfo / queryinfo / rewrite
-            'mode' => 'rewrite',
+            'mode' => 'pathinfo',
             'defaultModule' => 'site',
             'defaultController' => 'site',
             'defaultAction' => 'index',
@@ -35,20 +60,21 @@ return array(
                 '/' => array('site/site/index')
             )
         ),
-
         'view' => array(
             // support engine: native / smarty / tplite'
             'engine' => 'native',
             'theme' => 'Default',
             'layout' => 'layout',
-
             // smarty and tplite engine setting
         ),
 
+        // ###################################################
+        // optional components
+        // ###################################################
         'database' => array(
             'adapter' => 'pdo',
-            'cache' => true, // field cache
-            'prefix' => '',
+            'cache' => false, // field cache
+            'prefix' => 'shop_',
             'servers' => array(
                 'master' => array(
                     'host' => 'localhost',
@@ -58,20 +84,20 @@ return array(
                     'charset' => 'utf8',
                     'database' => '_test_'
                 ),
-                'slave' => array(
-                    'host' => 'localhost',
-                    'port' => 3306,
-                    'username' => 'root',
-                    'password' => 'root',
-                    'charset' => 'utf8',
-                    'database' => '_test_'
-                )
+               'slave' => array(
+                   'host' => 'localhost',
+                   'port' => 3306,
+                   'username' => 'root',
+                   'password' => 'root',
+                   'charset' => 'utf8',
+                   'database' => '_test_'
+               )
             )
         ),
 
         'cache' => array(
             // support adapter: file, memcached, redis
-            'adapter' => 'redis',
+            'adapter' => 'file',
 
             // file adapter setting
             'filePath' => 'Runtime/Cache',
@@ -90,7 +116,7 @@ return array(
                 array('localhost', 11212, 1),
             ),
         ),
-
+        /*
         'cookie' => array(
             'prefix' => 'fw_',
             'expire' => 3600,
@@ -117,10 +143,6 @@ return array(
             'extension' => '.log'
         ),
 
-        'profiler' => array(
-            'level' => ''
-        ),
-
         'translate' => array(
             'default' => 'zh-cn'
         ),
@@ -128,5 +150,6 @@ return array(
         'security' => array(
             'encryptKey' => '123ckd'
         ),
+        */
     )
 );

@@ -11,4 +11,10 @@ class Site extends Controller
         $this->assign('hello', '^_^');
         $this->render('index');
     }
+
+    public function test()
+    {
+
+
+    }
 }
