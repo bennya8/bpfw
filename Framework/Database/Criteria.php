@@ -26,7 +26,7 @@ class Criteria
      * SELECT statement template
      * @var string
      */
-    private $_select = 'SELECT @FIELD FROM @TABLE @JOIN@WHERE@GROUP@ORDER@LIMIT';
+    private $_select = 'SELECT @FIELD FROM @TABLE @JOIN @WHERE @GROUP @ORDER @LIMIT';
 
     /**
      * INSERT statement template
