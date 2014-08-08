@@ -53,9 +53,6 @@ class Profiler
     public static function end()
     {
         self::$_timeEnd = microtime(true);
-        if (ENVIRONMENT === 'development') {
-            self::printTrace();
-        }
     }
 
     /**
@@ -79,11 +76,14 @@ class Profiler
      */
     public static function printTrace()
     {
+        self::end();
+        $backtrace = debug_backtrace();
         $html = '<table style="position:fixed;bottom:0;left: 0;width: 100%;z-index: 9999;border-spacing: 1px;">';
         $html .= '<tr><td style="background:#ddd;">Script time: ' . round((self::$_timeEnd - self::$_timeStart), 4) .
             '&nbsp;&nbsp;Memory peak: ' . round(memory_get_usage(true) / 1024 / 1024, 2) . ' MB</td></tr>';
-        for ($i = count(self::$_trace) - 1; $i >= 0; $i--) {
-            $html .= '<tr><td style="background:#eee;">' . self::$_trace[$i] . '</td></tr>';
+
+        foreach($backtrace as $trace){
+
         }
         $html .= '</table>';
         echo $html;

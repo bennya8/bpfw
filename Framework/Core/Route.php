@@ -138,7 +138,7 @@ class Route extends Component
                 $_GET = array_merge($_GET, array_combine($key, $value));
             }
         } elseif ($this->mode == 'rewrite') {
-            $url = str_replace('\\', '/', $_SERVER['PATH_INFO']);
+            $url = str_replace($_SERVER['SCRIPT_NAME'],'',$_SERVER['DOCUMENT_URI']);
             foreach ($this->rules as $regex => $route) {
                 $regex = str_replace('/', '\/', preg_replace('(\(:\w*\))', '(\w*)', $regex));
                 if (preg_match("/^" . $regex . "$/", $url, $match)) {

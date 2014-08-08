@@ -103,6 +103,9 @@ class Application
             default:
                 echo 'runtime error: ' . $exception->getMessage();
         }
+        if (ENVIRONMENT === 'development') {
+            Profiler::printTrace();
+        }
     }
 
     /**
@@ -120,6 +123,9 @@ class Application
                 break;
             default:
                 echo $message;
+        }
+        if (ENVIRONMENT === 'development') {
+            Profiler::printTrace();
         }
     }
 
