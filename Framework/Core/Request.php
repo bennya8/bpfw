@@ -35,32 +35,6 @@ class Request
     }
 
     /**
-     * Get params from $_GET
-     * @access public
-     * @param string $key
-     * @param string $default
-     * @param bool $filter
-     * @return mixed
-     */
-    public function get($key, $default = '', $filter = null)
-    {
-        return $this->getParam('get', $key, $default, $filter);
-    }
-
-    /**
-     * Get a param from $_POST
-     * @access public
-     * @param string $key
-     * @param string $default
-     * @param string $filter
-     * @return mixed
-     */
-    public function getPost($key, $default = '', $filter = null)
-    {
-        return $this->getParam('post', $key, $default, $filter);
-    }
-
-    /**
      * Get all input params
      * @access public
      * @param string $input get,post,put,delete,cookie,request
@@ -83,8 +57,10 @@ class Request
         } elseif (strtolower($input) == 'request') {
             $this->_params =& $_REQUEST;
         }
-        if (empty($this->_params[$key]) && !isset($this->_params[$key])) {
+        if (!isset($this->_params[$key])) {
             return $this->_params[$key] = $default;
+        } else if (!$filter) {
+            return $this->_params[$key];
         } else {
             return $this->_params[$key] = $this->filter($this->_params[$key], $filter);
         }

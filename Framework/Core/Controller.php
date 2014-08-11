@@ -114,7 +114,7 @@ abstract class Controller extends Component
      */
     public function get($key, $default = '', $filter = null)
     {
-        return $this->request->get($key, $default, $filter);
+        return $this->request->getParam('get', $key, $default, $filter);
     }
 
     /**
@@ -127,7 +127,7 @@ abstract class Controller extends Component
      */
     public function getPost($key, $default = '', $filter = null)
     {
-        return $this->request->getPost($key, $default, $filter);
+        return $this->request->getParam('post', $key, $default, $filter);
     }
 
     /**
@@ -256,9 +256,9 @@ abstract class Controller extends Component
      * @param array $data
      * @param string $return
      */
-    public function toApi($status = 0, $message = '', $data = array(), $return = 'json')
+    public function toApi($code = 0, $message = '', $data = array(), $return = 'json')
     {
-        $this->response->toApi($status, $message, $data, $return);
+        $this->response->toApi($code, $message, $data, $return);
     }
 
     /**

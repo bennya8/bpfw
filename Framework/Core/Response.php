@@ -73,10 +73,10 @@ class Response
         }
     }
 
-    public function toApi($status = 0, $message = '', $data = array(), $return = 'json')
+    public function toApi($code = 0, $message = '', $data = array(), $return = 'json')
     {
         $data = array(
-            'status' => $status,
+            'code' => $code,
             'message' => $message,
             'data' => $data
         );
