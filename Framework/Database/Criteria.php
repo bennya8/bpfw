@@ -324,8 +324,6 @@ class Criteria
                         }
                         $logic = isset($v[2]) ? ' ' . $v[2] : '';
                         $parsedWhere .= $k . $where . $v[1] . $logic . ' ';
-
-                        var_dump($k);
                     }
                 }
             }
