@@ -58,14 +58,13 @@ class Application
     {
         $config = $this->getDI('config');
         $loader = $this->getDI('loader');
-        $loader->import('@Common.Constants', '.php');
         $loader->import('Common.Constants', '.php');
         $loader->import('Common.Functions', '.php');
         $loader->registerNamespace($config->get('namespace'));
         $components = array_map('ucfirst', array_keys($config->get('component')));
         $services = array('Logger', 'Profiler', 'Cookie', 'Translate', 'Security');
         $factoryServices = array('Cache', 'Database', 'Session');
-        array_walk($components, function ($component) use ($services, $factoryServices) {
+        foreach ($components as $component) {
             if (in_array($component, $services)) {
                 $class = 'System\\Core\\' . $component;
                 $this->setDI(strtolower($component), new $class);
@@ -73,16 +72,16 @@ class Application
                 $class = 'System\\' . $component . '\\' . $component;
                 $this->setDI(strtolower($component), $class::factory());
             }
-        });
+        }
         $helpers = array('Assets', 'Http');
-        array_walk($helpers, function ($helper) {
+        foreach ($helpers as $helper) {
             $class = 'System\\Helper\\' . $helper;
             $this->setDI(strtolower($helper), new $class);
-        });
+        }
         $modules = $config->get('module');
-        array_walk($modules, function ($module) use ($loader) {
+        foreach ($modules as $module) {
             $loader->registerNamespace($module['namespace']);
-        });
+        }
     }
 
     /**

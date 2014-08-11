@@ -139,7 +139,8 @@ abstract class Model
      */
     public function __construct()
     {
-        $this->_config = DI::factory()->get('config')->get('component')['database'];
+        $config = DI::factory()->get('config')->get('component');
+        $this->_config = $config['database'];
         $this->_db = DI::factory()->get('database');
         $this->_criteria = new Criteria();
         $this->_validation = new Validation();
@@ -311,7 +312,7 @@ abstract class Model
             ->table($this->tableName())
             ->limit('1')
             ->select($condition);
-        return isset($row[0]) ? $row[0] : false;
+        return isset($row[0]) ? $row[0] : array();
     }
 
     /**
