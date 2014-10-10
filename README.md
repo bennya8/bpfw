@@ -13,9 +13,7 @@ E-mail : benny_a8@live.com
 * 引入AOP切面编程思想，支持Event调度
 * 模块化开发，充分体现HMVC思想，方便维护
 * 支持3种路由模式，queryinfo，pathinfo，rewrite
-* （添加今年超流行的Restful控制器，方便写API接口）
 * 缓存组件，支持File，Memcached，Redis适配器
-* （尝鲜引入CacheModel，利用Redis HSET构建NOSQL ORM）
 * 数据库组件，支持MySQL，MySQLi，PDO适配器
 * （增加数据库集群支持，终于可以连接多个数据库示例，随意切换CRUD）
 * 几个实用小助手类
@@ -49,6 +47,10 @@ E-mail : benny_a8@live.com
 
 ## BUG汇报地址
 (https://github.com/bennya8/bpfw/issues)
+
+## 待更新
+* （Restful控制器，方便写API接口）
+* （CacheModel，利用Redis HSET构建数据模型）
 
 ## 代码格式化
 严格按照Zend2标准进行格式化，提高代码可阅读性
