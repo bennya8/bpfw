@@ -78,14 +78,19 @@ class Http
     public function setHeader($name, $value = '')
     {
         if (is_string($name)) {
-            $this->_header[$name] = $value;
+            $this->_header[$this->getHeaderFormatKey($name)] = $value;
         } else if (is_array($name)) {
             foreach ($name as $key => $value) {
-                $key = ucwords(str_replace('_', ' ', strtolower($key)));
-                $key = str_replace(' ', '-', $key);
-                $this->_header[$key] = $value;
+                $this->_header[$this->getHeaderFormatKey($key)] = $value;
             }
         }
+    }
+
+    public function getHeaderFormatKey($key)
+    {
+        $key = ucwords(str_replace('_', ' ', strtolower($key)));
+        $key = str_replace(' ', '-', $key);
+        return $key;
     }
 
     /**
@@ -167,14 +172,18 @@ class Http
      */
     private function _request($method, $url)
     {
-        if (!empty($url)) {
+        if (empty($url)) {
             return false;
         }
         $method = in_array($method, array('get', 'post', 'put', 'delete')) ? $method : 'get';
         $ch = curl_init();
 
         if (!empty($this->_header)) {
-            curl_setopt($ch, CURLOPT_HEADER, $this->_header);
+            $header = array();
+            foreach ($this->_header as $k => $v) {
+                $header[] = trim(trim($k, ' '), ':') . ': ' . $v;
+            }
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         }
 
         if (!empty($this->_userAgent)) {
@@ -185,16 +194,13 @@ class Http
             curl_setopt($ch, CURLOPT_REFERER, $this->_refrence);
         }
 
-        if ($method == 'get') {
-            if (!empty($this->_params)) {
-                $url = $url . '?' . http_build_query($this->_params);
-            }
-            curl_setopt($ch, CURLOPT_URL, $url);
+        if ($method == 'get' && !empty($this->_params)) {
+            $url = $url . '?' . http_build_query($this->_params);
         } elseif ($method == 'post') {
             if (!empty($this->_params)) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_params);
             }
-            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
         } elseif ($method == 'put') {
             if (!empty($this->_params)) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_params);
@@ -206,7 +212,7 @@ class Http
             }
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
         }
-
+        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($ch);
         curl_close($ch);
