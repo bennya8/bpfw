@@ -13,8 +13,17 @@ namespace System\Core;
 
 class Response
 {
+
+    /**
+     * Header maps
+     * @var array
+     */
     protected $header = array();
 
+    /**
+     * Http response status code
+     * @var array
+     */
     protected $statusCode = array(
         200 => 'HTTP/1.1 200 OK',
         301 => 'HTTP/1.1 301 Moved Permanently',
@@ -27,6 +36,10 @@ class Response
         600 => 'HTTP/1.1 600 Unparseable Response Headers'
     );
 
+    /**
+     * Http response content type
+     * @var array
+     */
     protected $contentType = array(
         'binary' => 'Content-Type: application/octet-stream',
         'xml' => 'Content-Type: text/xml',
@@ -35,6 +48,11 @@ class Response
         'html' => 'Content-Type: text/html'
     );
 
+    /**
+     * Get request header list or single value with given key
+     * @param string $name
+     * @return array|string
+     */
     public function getHeader($name = '')
     {
         $header = array();
@@ -55,6 +73,11 @@ class Response
         }
     }
 
+    /**
+     * Set a response header message
+     * @param $name
+     * @param string $value
+     */
     public function setHeader($name, $value = '')
     {
         $name = ucwords(str_replace('_', ' ', strtolower($name)));
@@ -62,6 +85,11 @@ class Response
         $this->header[$name] = $value;
     }
 
+    /**
+     * Send a bunch of headers
+     * @param int $statusCode
+     * @param string $contentType
+     */
     public function sendHeader($statusCode = 200, $contentType = 'html')
     {
         header($this->statusCode[$statusCode]);
@@ -73,6 +101,12 @@ class Response
         }
     }
 
+    /**
+     * @param int $code
+     * @param string $message
+     * @param array $data
+     * @param string $return
+     */
     public function toApi($code = 0, $message = '', $data = array(), $return = 'json')
     {
         $data = array(
@@ -82,34 +116,93 @@ class Response
         );
         switch ($return) {
             case 'json':
+                $this->sendHeader(200, 'json');
                 $this->toJson($data);
                 break;
             case 'jsonp':
+                $this->sendHeader(200, 'jsonp');
                 $this->toJsonp($data);
                 break;
             case 'xml':
-                $this->toXml($data);
+                $this->sendHeader(200, 'xml');
+                $dom = new \DomDocument('1.0', 'utf-8');
+                $response = $dom->createElement('response');
+                $dom->appendChild($response);
+                $elemCode = $dom->createElement('code', $data['code']);
+                $response->appendchild($elemCode);
+                $elemCode = $dom->createElement('message', $data['message']);
+                $response->appendchild($elemCode);
+                $results = $dom->createElement('data');
+                $this->xml_encode($data['data'], $results, $dom);
+                $response->appendchild($results);
+                exit($dom->saveXML());
                 break;
         }
     }
 
+    /**
+     * Encode data with application/json document format
+     * @param $data
+     * @return string
+     */
     public function toJson($data)
     {
-        $this->sendHeader(200, 'json');
-        exit(json_encode($data));
+        return json_encode($data);
     }
 
+    /**
+     * Encode data with application/jsonp document format
+     * @param $data mixed
+     * @return string
+     */
     public function toJsonp($data)
     {
         $callback = isset($_GET['jsonp']) ? $_GET['jsonp'] : 'jsonp';
-        $this->sendHeader(200, 'json');
-        exit($callback . '(' . json_encode($data) . ')');
+        return $callback . '(' . json_encode($data) . ')';
     }
 
-    public function toXml($data)
+    /**
+     * Encode data with html/xml document format
+     * @param $data mixed
+     * @param $rootElement string
+     * @return string
+     */
+    public function toXml($data, $rootElement = 'response')
     {
-        //@todo
-        exit();
+        $dom = new \DomDocument('1.0', 'utf-8');
+        $root = $dom->createElement($rootElement);
+        $this->xml_encode($data, $root, $dom);
+        $dom->appendChild($root);
+        return $dom->saveXML();
+    }
+
+    /**
+     * Recursive encode xml
+     * @param $data mixed
+     * @param $results \Object
+     * @param $dom \DomDocument
+     */
+    protected function xml_encode($data, $results, $dom)
+    {
+        foreach ($data as $key => $obj) {
+            $key = is_numeric($key) ? 'item' : $key;
+            if (is_object($obj) || is_array($obj)) {
+                $item = $dom->createElement($key);
+                foreach ($obj as $attrKey => $attrVal) {
+                    $attrKey = is_numeric($attrKey) ? 'item' : $attrKey;
+                    if (is_array($attrVal) || is_object($attrVal)) {
+                        $this->xml_encode($attrVal, $item, $dom);
+                    } else {
+                        $node = $dom->createElement($attrKey, htmlspecialchars(strval($attrVal)));
+                        $item->appendChild($node);
+                    }
+                }
+                $results->appendChild($item);
+            } else {
+                $item = $dom->createElement($key, htmlspecialchars(strval($obj)));
+                $results->appendChild($item);
+            }
+        }
     }
 
     /**
