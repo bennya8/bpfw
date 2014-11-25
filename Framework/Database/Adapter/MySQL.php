@@ -214,29 +214,22 @@ class MySQL extends Database
     /**
      * Drop a table
      * @access public
+     * @param string $tableName
+     * @param string $newTableName
      * @return mixed
      */
-    public function dropTable()
+    public function dropTable($tableName, $newTableName)
     {
         // TODO: Implement dropTable() method.
     }
 
     /**
-     * Rename a table
-     * @access public
-     * @return mixed
-     */
-    public function renameTable()
-    {
-        // TODO: Implement renameTable() method.
-    }
-
-    /**
      * Perform table optimize
      * @access public
+     * @param string $tableName
      * @return mixed
      */
-    public function optimizeTable()
+    public function optimizeTable($tableName)
     {
         // TODO: Implement optimizeTable() method.
     }
@@ -244,9 +237,10 @@ class MySQL extends Database
     /**
      * Perform table repair
      * @access public
+     * @param string $tableName
      * @return mixed
      */
-    public function repairTable()
+    public function repairTable($tableName)
     {
         // TODO: Implement repairTable() method.
     }
@@ -254,9 +248,10 @@ class MySQL extends Database
     /**
      * Get table engine
      * @access public
+     * @param string $tableName
      * @return mixed
      */
-    public function getTableEngine()
+    public function getTableEngine($tableName)
     {
         // TODO: Implement getTableEngine() method.
     }
@@ -264,82 +259,15 @@ class MySQL extends Database
     /**
      * Set table engine
      * @access public
+     * @param string $tableName
+     * @param string $engineName
      * @return mixed
      */
-    public function setTableEngine()
+    public function setTableEngine($tableName, $engineName)
     {
         // TODO: Implement setTableEngine() method.
     }
 
-    /**
-     * Show view list
-     * @access public
-     * @return mixed
-     */
-    public function showView()
-    {
-        // TODO: Implement showView() method.
-    }
-
-    /**
-     * Create a view
-     * @access public
-     * @return mixed
-     */
-    public function createView()
-    {
-        // TODO: Implement createView() method.
-    }
-
-    /**
-     * Modify a view
-     * @access public
-     * @return mixed
-     */
-    public function alterView()
-    {
-        // TODO: Implement alterView() method.
-    }
-
-    /**
-     * Drop a view
-     * @access public
-     * @return mixed
-     */
-    public function dropView()
-    {
-        // TODO: Implement dropView() method.
-    }
-
-    /**
-     * Show index list
-     * @access public
-     * @return mixed
-     */
-    public function getIndex()
-    {
-        // TODO: Implement getIndex() method.
-    }
-
-    /**
-     * Add an index
-     * @access public
-     * @return mixed
-     */
-    public function addIndex()
-    {
-        // TODO: Implement addIndex() method.
-    }
-
-    /**
-     * Drop an index
-     * @access public
-     * @return mixed
-     */
-    public function dropIndex()
-    {
-        // TODO: Implement dropIndex() method.
-    }
 
     /**
      * Get database version

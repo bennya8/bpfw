@@ -164,116 +164,37 @@ abstract class Database
     abstract public function affectedRows();
 
     /**
-     * Show table list
-     * @access public
-     * @return mixed
-     */
-    abstract public function showTable();
-
-    /**
-     * Create a table
-     * @access public
-     * @return mixed
-     */
-    abstract public function createTable();
-
-    /**
-     * Modify a table
-     * @access public
-     * @return mixed
-     */
-    abstract public function alterTable();
-
-    /**
-     * Drop a table
-     * @access public
-     * @return mixed
-     */
-    abstract public function dropTable();
-
-    /**
-     * Rename a table
-     * @access public
-     * @return mixed
-     */
-    abstract public function renameTable();
-
-    /**
      * Perform table optimize
      * @access public
+     * @param string $tableName
      * @return mixed
      */
-    abstract public function optimizeTable();
+    abstract public function optimizeTable($tableName);
 
     /**
      * Perform table repair
      * @access public
+     * @param string $tableName
      * @return mixed
      */
-    abstract public function repairTable();
+    abstract public function repairTable($tableName);
 
     /**
      * Get table engine
      * @access public
+     * @param string $tableName
      * @return mixed
      */
-    abstract public function getTableEngine();
+    abstract public function getTableEngine($tableName);
 
     /**
      * Set table engine
      * @access public
-     * @return mixed
+     * @param string $tableName
+     * @param string $engineName
+     * @return void
      */
-    abstract public function setTableEngine();
-
-    /**
-     * Show view list
-     * @access public
-     * @return mixed
-     */
-    abstract public function showView();
-
-    /**
-     * Create a view
-     * @access public
-     * @return mixed
-     */
-    abstract public function createView();
-
-    /**
-     * Modify a view
-     * @access public
-     * @return mixed
-     */
-    abstract public function alterView();
-
-    /**
-     * Drop a view
-     * @access public
-     * @return mixed
-     */
-    abstract public function dropView();
-
-    /**
-     * Show index list
-     * @access public
-     * @return mixed
-     */
-    abstract public function getIndex();
-
-    /**
-     * Add an index
-     * @access public
-     * @return mixed
-     */
-    abstract public function addIndex();
-
-    /**
-     * Drop an index
-     * @access public
-     * @return mixed
-     */
-    abstract public function dropIndex();
+    abstract public function setTableEngine($tableName, $engineName);
 
     /**
      * Get database version

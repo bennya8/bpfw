@@ -26,7 +26,7 @@ class Criteria
      * SELECT statement template
      * @var string
      */
-    private $_select = 'SELECT @FIELD FROM @TABLE @JOIN @WHERE @GROUP @ORDER @LIMIT';
+    private $_select = 'SELECT @FIELD FROM @TABLE @JOIN @WHERE @GROUP @HAVING @ORDER @LIMIT';
 
     /**
      * INSERT statement template
@@ -404,6 +404,22 @@ class Criteria
     }
 
     /**
+     * Convert having data to sql segment
+     * @access protected
+     * @return string
+     */
+    protected function parseHaving()
+    {
+        $parsedOrder = '';
+        if ($this->checkCondition('having')) {
+            if (is_string($this->_condition['having'])) {
+                $parsedOrder = 'HAVING ' . $this->_condition['having'];
+            }
+        }
+        return $parsedOrder;
+    }
+
+    /**
      * Convert limit data to sql segment
      * @access protected
      * @return string
@@ -428,7 +444,9 @@ class Criteria
      */
     public function checkCondition($key)
     {
-        return isset($this->_condition[$key]) && !empty($this->_condition[$key]) ? true : false;
+        return isset($this->_condition[strtolower($key)]) && !empty($this->_condition[strtolower($key)]) ?
+            true :
+            false;
     }
 
     /**
