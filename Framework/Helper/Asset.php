@@ -2,8 +2,8 @@
 
 /**
  * Assets helper
- * @namespace System\Core;
- * @package system.helper.assets
+ * @namespace System\Helper;
+ * @package system.helper.asset
  * @author Benny <benny_a8@live.com>
  * @copyright ©2014 http://github.com/bennya8
  * @license http://www.apache.org/licenses/LICENSE-2.0
@@ -11,7 +11,7 @@
 
 namespace System\Helper;
 
-class Assets
+class Asset
 {
 
     /**

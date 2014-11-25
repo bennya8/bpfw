@@ -2,7 +2,7 @@
 
 /**
  * Http helper
- * @namespace System\Core
+ * @namespace System\Helper
  * @package system.helper.http
  * @author Benny <benny_a8@live.com>
  * @copyright ©2014 http://github.com/bennya8
@@ -206,7 +206,7 @@ class Http
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_params);
             }
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-        } elseif ($method == 'put') {
+        } elseif ($method == 'delete') {
             if (!empty($this->_params)) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_params);
             }

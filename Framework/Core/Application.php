@@ -73,7 +73,7 @@ class Application
                 $this->setDI(strtolower($component), $class::factory());
             }
         }
-        $helpers = array('Assets', 'Http');
+        $helpers = array('Asset', 'Http');
         foreach ($helpers as $helper) {
             $class = 'System\\Helper\\' . $helper;
             $this->setDI(strtolower($helper), new $class);
