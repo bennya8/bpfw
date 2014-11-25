@@ -248,9 +248,24 @@ abstract class Model
         return $isValid ? $this->_data : false;
     }
 
+    /**
+     * Validate method
+     * @param $function
+     * @param $value
+     * @param $expression
+     * @return bool
+     */
     public function _validate($function, $value, $expression)
     {
-        return $this->_validation->$function($value, $expression) ? $value : false;
+        if (method_exists($this, $function)) {
+            return $this->$function($value, $expression) ? $value : false;
+        } else if (function_exists($function)) {
+            return $function($value, $expression) ? $value : false;
+        } else if (method_exists($this->_validation, $function)) {
+            return $this->_validation->$function($value, $expression) ? $value : false;
+        } else {
+            return $value;
+        }
     }
 
     /**
@@ -351,9 +366,10 @@ abstract class Model
      */
     public function add($data = null)
     {
-        return $this->_criteria
-            ->table($this->tableName())
-            ->insert($data);
+        if (method_exists($this, 'beforeAdd')) $this->beforeAdd();
+        $result = $this->_criteria->table($this->tableName())->insert($data);
+        if (method_exists($this, 'afterAdd')) $this->afterAdd();
+        return $result;
     }
 
     /**
@@ -365,9 +381,10 @@ abstract class Model
      */
     public function save($data = null, $where = null)
     {
-        return $this->_criteria
-            ->table($this->tableName())
-            ->update($data, $where);
+        if (method_exists($this, 'beforeSave')) $this->beforeSave();
+        $result = $this->_criteria->table($this->tableName())->update($data, $where);
+        if (method_exists($this, 'afterSave')) $this->afterSave();
+        return $result;
     }
 
     /**
@@ -378,9 +395,10 @@ abstract class Model
      */
     public function remove($where = null)
     {
-        return $this->_criteria
-            ->table($this->tableName())
-            ->delete($where);
+        if (method_exists($this, 'beforeRemove')) $this->beforeRemove();
+        $result = $this->_criteria->table($this->tableName())->delete($where);
+        if (method_exists($this, 'afterRemove')) $this->afterRemove();
+        return $result;
     }
 
     /**
@@ -479,165 +497,57 @@ abstract class Model
     }
 
     /**
-     * Show table list
-     * @access public
-     * @return mixed
-     */
-    public function showTable()
-    {
-        return $this->_db->showTable();
-    }
-
-    /**
-     * Create a table
-     * @access public
-     * @return mixed
-     */
-    public function createTable()
-    {
-        return $this->_db->createTable();
-    }
-
-    /**
-     * Modify a table
-     * @access public
-     * @return mixed
-     */
-    public function alterTable()
-    {
-        return $this->_db->alterTable();
-
-    }
-
-    /**
-     * Drop a table
-     * @access public
-     * @return mixed
-     */
-    public function dropTable()
-    {
-        return $this->_db->dropTable();
-    }
-
-    /**
-     * Rename a table
-     * @access public
-     * @return mixed
-     */
-    public function renameTable()
-    {
-        return $this->_db->renameTable();
-    }
-
-    /**
      * Perform table optimize
      * @access public
+     * @param string $tableName
      * @return mixed
      */
-    public function optimizeTable()
+    public function optimizeTable($tableName)
     {
-        return $this->_db->optimizeTable();
+        return $this->_db->optimizeTable($tableName);
     }
 
     /**
      * Perform table repair
      * @access public
+     * @param string $tableName
      * @return mixed
      */
-    public function repairTable()
+    public function repairTable($tableName)
     {
-        return $this->_db->repairTable();
+        return $this->_db->repairTable($tableName);
     }
 
     /**
      * Get table engine
      * @access public
+     * @param string $tableName
      * @return mixed
      */
-    public function getTableEngine()
+    public function getTableEngine($tableName)
     {
-        return $this->_db->getTableEngine();
+        $this->_db->getTableEngine($tableName);
     }
 
     /**
      * Set table engine
      * @access public
-     * @return mixed
+     * @param string $tableName
+     * @param string $engineName
+     * @return void
      */
-    public function setTableEngine()
+    public function setTableEngine($tableName, $engineName)
     {
-        return $this->_db->setTableEngine();
+        $this->_db->setTableEngine($tableName, $engineName);
     }
 
     /**
-     * Show view list
-     * @access public
+     * Get database version
      * @return mixed
      */
-    public function showView()
+    public function version()
     {
-        return $this->_db->showView();
-    }
-
-    /**
-     * Create a view
-     * @access public
-     * @return mixed
-     */
-    public function createView()
-    {
-        return $this->_db->createView();
-    }
-
-    /**
-     * Modify a view
-     * @access public
-     * @return mixed
-     */
-    public function alterView()
-    {
-        return $this->_db->alterView();
-    }
-
-    /**
-     * Drop a view
-     * @access public
-     * @return mixed
-     */
-    public function dropView()
-    {
-        return $this->_db->dropView();
-
-    }
-
-    /**
-     * Show index list
-     * @access public
-     * @return mixed
-     */
-    public function showIndex()
-    {
-        return $this->_db->getIndex();
-    }
-
-    /**
-     * Add an index
-     * @access public
-     * @return mixed
-     */
-    public function addIndex()
-    {
-        return $this->_db->addIndex();
-    }
-
-    /**
-     * Drop an index
-     * @access public
-     * @return mixed
-     */
-    public function dropIndex()
-    {
-        return $this->_db->dropIndex();
+        return $this->_db->version();
     }
 
     /**
