@@ -444,7 +444,7 @@ class Criteria
      */
     public function checkCondition($key)
     {
-        return isset($this->_condition[str]) && !empty($this->_condition[$key]) ? true : false;
+        return isset($this->_condition[$key]) && !empty($this->_condition[$key]) ? true : false;
     }
 
     /**
@@ -459,6 +459,9 @@ class Criteria
 
     /**
      * Chains invoke mechanism
+     * @param $method string
+     * @param $args array
+     * @return self / void
      */
     public function __call($method, $args = array())
     {
