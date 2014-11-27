@@ -35,7 +35,7 @@ class Database extends Session
                   `user_agent` varchar(120) NOT NULL,
                   `user_data` text NOT NULL,
                   PRIMARY KEY (`session_id`),
-                  KEY `last_activity_idx` (`expire`)
+                  KEY `idx_expire` (`expire`)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8';
         $this->_db->execute($sql);
         return (boolean)$this->_db;

@@ -444,9 +444,7 @@ class Criteria
      */
     public function checkCondition($key)
     {
-        return isset($this->_condition[strtolower($key)]) && !empty($this->_condition[strtolower($key)]) ?
-            true :
-            false;
+        return isset($this->_condition[str]) && !empty($this->_condition[$key]) ? true : false;
     }
 
     /**

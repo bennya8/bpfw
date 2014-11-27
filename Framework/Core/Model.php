@@ -154,8 +154,8 @@ abstract class Model
 
         if (empty($this->columns)) {
             $cache = DI::factory()->get('cache');
+            $cache_id = md5('tabel_' . $this->table);
             if (is_object($cache) && $this->_config['cache']) {
-                $cache_id = md5('tabel_' . $this->table);
                 if ($this->_config['cache']) {
                     $columns = $cache->get($cache_id);
                     if ($columns && is_array($columns)) {
