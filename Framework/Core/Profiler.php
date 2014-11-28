@@ -77,13 +77,17 @@ class Profiler
     public static function printTrace()
     {
         self::end();
-        $backtrace = debug_backtrace();
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $html = '<table style="position:fixed;bottom:0;left: 0;width: 100%;z-index: 9999;border-spacing: 1px;">';
         $html .= '<tr><td style="background:#ddd;">Script time: ' . round((self::$_timeEnd - self::$_timeStart), 4) .
             '&nbsp;&nbsp;Memory peak: ' . round(memory_get_usage(true) / 1024 / 1024, 2) . ' MB</td></tr>';
 
-        foreach($backtrace as $trace){
-
+        foreach ($backtrace as $trace) {
+            $securePath = '';
+            if (isset($trace['file']) && isset($trace['line'])) {
+                $securePath .= 'File: ' . str_replace(dirname(APP_PATH), '', $trace['file']) . ' Line: ' . $trace['line'];
+            }
+            $html .= "<tr><td style='background:#ddd;'>Class: {$trace['class']}{$trace['type']}{$trace['function']} ##### {$securePath}</td></tr>";
         }
         $html .= '</table>';
         echo $html;

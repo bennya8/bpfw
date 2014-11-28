@@ -38,11 +38,13 @@ abstract class Component
             $className = strtolower(array_pop($className));
         }
         $config = $this->getDI('config')->get('component');
-        $this->config = $config[$className];
-        if (!empty($this->config) && is_array($this->config)) {
-            foreach ($this->config as $propKey => $propValue) {
-                if (property_exists($this, $propKey)) {
-                    $this->$propKey = $propValue;
+        if (isset($config[$className])) {
+            $this->config = $config[$className];
+            if (!empty($this->config) && is_array($this->config)) {
+                foreach ($this->config as $propKey => $propValue) {
+                    if (property_exists($this, $propKey)) {
+                        $this->$propKey = $propValue;
+                    }
                 }
             }
         }

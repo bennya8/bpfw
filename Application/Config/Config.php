@@ -34,6 +34,23 @@ return array(
 
     ),
 
+    /* helper */
+    'helper' => array(
+        // example:
+        // 'asset' => array( // di instance name
+        //      'class'=>'App\Helper\YourSDK', // Your Helper Class
+        //      'args' => array( // Initialize args
+        //          'server_url'=>'127.0.0.1')
+        //       ),
+        //'asset' => array('class' => 'System\Helper\Asset'),
+        //'captcha' => array('class' => 'System\Helper\Captcha'),
+        //'cart' => array('class' => 'System\Helper\Cart'),
+        //'http' => array('class' => 'System\Helper\Http'),
+        //'queue' => array('class' => 'System\Helper\Queue'),
+        //'tree' => array('class' => 'System\Helper\Tree'),
+        //'upload' => array('class' => 'System\Helper\Upload'),
+    ),
+
     /* event trigger */
     'event' => array(
         'app_start' => array(),
@@ -47,9 +64,8 @@ return array(
     /* framework components */
     /* notice: you can comment out following components which you don't want to use */
     'component' => array(
-        // ###################################################
-        // core component, don't comment these out
-        // ###################################################
+        /*
+
         'route' => array(
             // support mode: pathinfo / queryinfo / rewrite
             'mode' => 'pathinfo',
@@ -68,9 +84,6 @@ return array(
             // smarty and tplite engine setting
         ),
 
-        // ###################################################
-        // optional components
-        // ###################################################
         'database' => array(
             'adapter' => 'pdo',
             'cache' => false, // field cache
@@ -84,14 +97,14 @@ return array(
                     'charset' => 'utf8',
                     'database' => '_test_'
                 ),
-               'slave' => array(
-                   'host' => 'localhost',
-                   'port' => 3306,
-                   'username' => 'root',
-                   'password' => 'root',
-                   'charset' => 'utf8',
-                   'database' => '_test_'
-               )
+                'slave' => array(
+                    'host' => 'localhost',
+                    'port' => 3306,
+                    'username' => 'root',
+                    'password' => 'root',
+                    'charset' => 'utf8',
+                    'database' => '_test_'
+                )
             )
         ),
 
@@ -116,7 +129,7 @@ return array(
                 array('localhost', 11212, 1),
             ),
         ),
-        /*
+
         'cookie' => array(
             'prefix' => 'fw_',
             'expire' => 3600,

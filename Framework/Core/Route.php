@@ -54,7 +54,7 @@ class Route extends Component
      * Default controller
      * @var string
      */
-    protected $defaultController = 'index';
+    protected $defaultController = 'site';
 
     /**
      * Default action

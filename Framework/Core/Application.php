@@ -73,10 +73,11 @@ class Application
                 $this->setDI(strtolower($component), $class::factory());
             }
         }
-        $helpers = array('Asset', 'Http');
-        foreach ($helpers as $helper) {
-            $class = 'System\\Helper\\' . $helper;
-            $this->setDI(strtolower($helper), new $class);
+        $helpers = $config->get('helper');
+        foreach ($helpers as $name => $helper) {
+            if (isset($helper['class'])) {
+                $this->setDI(strtolower($name), new $helper['class']);
+            }
         }
         $modules = $config->get('module');
         foreach ($modules as $module) {
@@ -126,6 +127,7 @@ class Application
         if (ENVIRONMENT === 'development') {
             Profiler::printTrace();
         }
+
     }
 
     /**
