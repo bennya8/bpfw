@@ -15,20 +15,6 @@ abstract class Component
 {
 
     /**
-     * Dependency inject container
-     * @access private
-     * @var array
-     */
-    private $_di = array();
-
-    /**
-     * Component settings
-     * @access protected
-     * @var array
-     */
-    protected $config = array();
-
-    /**
      * Constructor
      */
     public function __construct($className = '')
@@ -39,9 +25,8 @@ abstract class Component
         }
         $config = $this->getDI('config')->get('component');
         if (isset($config[$className])) {
-            $this->config = $config[$className];
-            if (!empty($this->config) && is_array($this->config)) {
-                foreach ($this->config as $propKey => $propValue) {
+            if (!empty($config[$className]) && is_array($config[$className])) {
+                foreach ($config[$className] as $propKey => $propValue) {
                     if (property_exists($this, $propKey)) {
                         $this->$propKey = $propValue;
                     }
@@ -58,11 +43,7 @@ abstract class Component
      */
     protected function getDI($name)
     {
-        if (isset($this->_di[$name])) {
-            return $this->_di[$name];
-        } else {
-            return DI::factory()->get($name);
-        }
+        return DI::factory()->get($name);
     }
 
     /**
@@ -70,16 +51,11 @@ abstract class Component
      * @access protected
      * @param string $name
      * @param mixed $mixed
-     * @param boolean $shared
      * @param void
      */
-    protected function setDI($name, $mixed, $shared = false)
+    protected function setDI($name, $mixed)
     {
-        if ($shared) {
-            DI::factory()->set($name, $mixed);
-        } else {
-            $this->_di[$name] = $mixed;
-        }
+        DI::factory()->set($name, $mixed);
     }
 
     /**

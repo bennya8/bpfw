@@ -40,9 +40,9 @@ abstract class Controller extends Component
      */
     public function __construct()
     {
-        $this->request = new Request();
-        $this->response = new Response();
-        $this->view = new View();
+        $this->request = $this->getDI('request');
+        $this->response = $this->getDI('response');
+        $this->view = $this->getDI('view');
         if (method_exists($this, 'initialize')) {
             $this->initialize();
         }

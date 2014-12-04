@@ -11,14 +11,13 @@
 
 namespace System\Core;
 
-class Application
+class Application extends Component
 {
 
     /**
-     * Application main entrance
-     * @return void
+     * Application Constructor
      */
-    public function main()
+    public function __construct()
     {
         Profiler::start();
         $this->registerMainService();
@@ -48,6 +47,10 @@ class Application
         $this->setDI('config', new Config());
         $this->setDI('event', new EventManager());
         $this->setDI('route', new Route());
+        $this->setDI('request', new Request());
+        $this->setDI('response', new Response());
+        $this->setDI('view', new View());
+        $this->setDI('app', $this);
     }
 
     /**
@@ -73,15 +76,15 @@ class Application
                 $this->setDI(strtolower($component), $class::factory());
             }
         }
-        $helpers = $config->get('helper');
+        $modules = $config->get('module');
+        foreach ($modules as $module) {
+            $loader->registerNamespace($module['namespace']);
+        }
+        $helpers = $this->getDI('config')->get('helper');
         foreach ($helpers as $name => $helper) {
             if (isset($helper['class'])) {
                 $this->setDI(strtolower($name), new $helper['class']);
             }
-        }
-        $modules = $config->get('module');
-        foreach ($modules as $module) {
-            $loader->registerNamespace($module['namespace']);
         }
     }
 
@@ -95,8 +98,6 @@ class Application
     {
         switch ($exception->getCode()) {
             case 404:
-                echo $exception->getMessage();
-                break;
             case 500:
                 echo $exception->getMessage();
                 break;
@@ -119,6 +120,7 @@ class Application
     {
         switch ($code) {
             case E_ERROR:
+            case E_WARNING:
                 throw new \Exception($message, $code);
                 break;
             default:
@@ -127,51 +129,6 @@ class Application
         if (ENVIRONMENT === 'development') {
             Profiler::printTrace();
         }
-
-    }
-
-    /**
-     * Get instance from di container
-     * @param $name
-     * @return mixed
-     */
-    protected function getDI($name)
-    {
-        return DI::factory()->get($name);
-    }
-
-    /**
-     * Set instance to di container
-     * @param $name
-     * @param $mixed
-     * @return mixed
-     */
-    protected function setDI($name, $mixed)
-    {
-        return DI::factory()->set($name, $mixed);
-    }
-
-    /**
-     * Magic get method
-     * Get instance from di container
-     * @param $name
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        return $this->getDI($name);
-    }
-
-    /**
-     * Magic set method
-     * Set instance to di container
-     * @param $name
-     * @param $mixed
-     * @return mixed
-     */
-    public function __set($name, $mixed)
-    {
-        return $this->setDI($name, $mixed);
     }
 
 }
