@@ -62,7 +62,7 @@ class Criteria
      * Available chains method
      * @var array
      */
-    private $_chains = array('table', 'field', 'select', 'update', 'insert', 'where', 'join', 'group', 'order', 'limit');
+    private $_chains = array('table', 'field', 'select', 'update', 'insert', 'where', 'join', 'group', 'having', 'order', 'limit');
 
     /**
      * Database instance
@@ -94,6 +94,7 @@ class Criteria
             '@JOIN',
             '@WHERE',
             '@GROUP',
+            '@HAVING',
             '@ORDER',
             '@LIMIT'
         ), array(
@@ -102,6 +103,7 @@ class Criteria
             $this->parseJoin(),
             $this->parseWhere(),
             $this->parseGroup(),
+            $this->parseHaving(),
             $this->parseOrder(),
             $this->parseLimit()
         ), $this->_select);
