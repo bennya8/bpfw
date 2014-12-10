@@ -33,7 +33,7 @@ class EventManager
     public function __construct()
     {
         $events = DI::factory()->get('config')->get('event');
-        $this->_events = array_merge($events, $this->_events);
+        $this->_events = array_merge_recursive($events, $this->_events);
     }
 
     /**
