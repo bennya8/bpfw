@@ -15,6 +15,20 @@ class Application extends Component
 {
 
     /**
+     * Application main method
+     * @return Application
+     */
+    public static function main()
+    {
+        $application = DI::factory()->get('application');
+        if (!$application instanceof self) {
+            $application = new self();
+            DI::factory()->set('application', $application);
+        }
+        return $application;
+    }
+
+    /**
      * Application Constructor
      */
     public function __construct()
@@ -50,7 +64,6 @@ class Application extends Component
         $this->setDI('request', new Request());
         $this->setDI('response', new Response());
         $this->setDI('view', new View());
-        $this->setDI('app', $this);
     }
 
     /**
@@ -80,11 +93,9 @@ class Application extends Component
         foreach ($modules as $module) {
             $loader->registerNamespace($module['namespace']);
         }
-        $helpers = $this->getDI('config')->get('helper');
+        $helpers = $config->get('helper');
         foreach ($helpers as $name => $helper) {
-            if (isset($helper['class'])) {
-                $this->setDI(strtolower($name), new $helper['class']);
-            }
+            $this->setDI(strtolower($name), new $helper['class']);
         }
     }
 
