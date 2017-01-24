@@ -13,7 +13,7 @@ class DiService implements DiServiceInterface
 	 * Defined use which way to resolve service 
 	 * Etc class name or function closure
 	 */
-	private _difinition;
+	private _definition;
 
 	/**
 	 * Singleton shared
@@ -30,7 +30,7 @@ class DiService implements DiServiceInterface
 	public function __construct(string name, definition, boolean resolved)
 	{
 		let this->_name = name;
-		let this->_difinition = definition;
+		let this->_definition = definition;
 		let this->_resolved = resolved;
 	}
 
@@ -41,19 +41,19 @@ class DiService implements DiServiceInterface
 
 	public function getDefinition()
 	{
-		return this->_difinition;
+		return this->_definition;
 	}
 
 	public function setDefinition(definition) -> void
 	{
-		let this->_difinition = definition;
+		let this->_definition = definition;
 	}
 
 	public function resolve(parameters = null)
 	{
 		var definition, instance;
 
-		let definition = this->_difinition;
+		let definition = this->_definition;
 
 		if (typeof definition == "string") {
 			
