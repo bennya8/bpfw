@@ -1,0 +1,10 @@
+{
+  "name": "diggme-opensdk",
+  "version": "1.0.0",
+  "description": "develop@diggme.cn",
+  "author": "develop",
+  "license": "MIT",
+  "devDependencies": {
+    "axios": "^0.16.2"
+  }
+}
