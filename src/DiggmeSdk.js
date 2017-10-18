@@ -19,24 +19,35 @@
      * constructor
      * @param appKey
      * @param serverUrl
+     * @param headerAuth
      * @constructor
      */
     var DiggmeSdk = function (appKey, serverUrl) {
         this.appKey = appKey;
         this.serverUrl = serverUrl;
-
-        if (!appKey || !serverUrl) {
-            throw new Error('[DiggmeSdk] app_key or server_url cannot empty');
-        }
+        this.headerAuth = true;
 
         axios.defaults.headers.common = {
-            'X-Requested-With': 'XMLHttpRequest',
             'Accept': 'application/json'
         };
-        axios.interceptors.request.use(function (config) {
-            config.headers['Authorization'] = localStorage.getItem('accessToken') || '';
-            return config;
-        });
+
+        if (this.headerAuth) {
+            axios.interceptors.request.use(function (config) {
+                config.headers['Authorization'] = localStorage.getItem('accessToken') || '';
+                config.headers['Authorization-User'] = localStorage.getItem('userToken') || '';
+                return config;
+            });
+        } else {
+            axios.defaults.headers.common = {};
+            axios.interceptors.request.use(function (config) {
+                if (!config.params) {
+                    config.params = {};
+                }
+                config.params.access_token = localStorage.getItem('accessToken') || '';
+                config.params.user_token = localStorage.getItem('userToken') || '';
+                return config;
+            });
+        }
     };
 
     /*********************************************************
@@ -57,7 +68,7 @@
                     'code': code
                 }
             }).then(function (response) {
-                if (response.data.http_status === 200) {
+                if (response.data.http_status == 200) {
                     localStorage.setItem('accessToken', response.data.data.access_token);
                     localStorage.setItem('accessTokenExpire', response.data.data.expire_in);
                 }
@@ -109,7 +120,7 @@
     };
 
     /*********************************************************
-     * Test 测试
+     * Channel 渠道
      *********************************************************/
 
     /**
@@ -178,7 +189,6 @@
      * 渠道测试报告
      * @param testId
      * @param inCode
-     * @returns {Promise}
      */
     DiggmeSdk.prototype.getChannelTestReport = function (testId, inCode) {
         var _this = this;
@@ -198,8 +208,6 @@
 
     /**
      * 查询订单状态
-     * @param testId
-     * @param inCode
      * @returns {Promise}
      */
     DiggmeSdk.prototype.getChannelTestCodeStatus = function (testId, inCode) {
@@ -245,7 +253,7 @@
     };
 
     /**
-     * 提交测试结果
+     * 提交问卷结果
      * @param testId
      * @param inCode
      * @param choices
@@ -267,7 +275,10 @@
     };
 
     /**
-     * 获取测试信息列表
+     * 获取问卷人口信息列表
+     * @param testId
+     * @param inCode
+     * @returns {Promise}
      */
     DiggmeSdk.prototype.getChannelTestInfoList = function (testId, inCode) {
         var _this = this;
@@ -286,7 +297,7 @@
     };
 
     /**
-     * 提交测试信息
+     * 提交问卷人口信息
      * @param testId
      * @param inCode
      * @param setting
@@ -342,8 +353,16 @@
     }
 
     /**
-     * 同步Ajax函数
-     * @param {*} opts
+     * 是否HTTPS请求
+     * @returns boolean
+     */
+    function isHttps() {
+        return document.location.protocol === 'https:';
+    }
+
+    /**
+     * 同步Ajax请求
+     * @param opts
      */
     function syncAjax(opts) {
         var defaults = {
