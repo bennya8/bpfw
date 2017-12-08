@@ -3,3 +3,7 @@
 .DS_Store
 .temp/*
 /ext/*
+/vendor/
+compile.log
+compile-errors.log
+composer.lock
