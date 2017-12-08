@@ -1,9 +1,9 @@
-namespace Bzfw\Core;
+namespace Bzfw\Di;
 
 class Di
 {
 
-	/**
+		/**
 		 * Class instances container
 		 * @var array
 		 */

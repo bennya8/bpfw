@@ -1,4 +1,4 @@
-namespace Bzfw\Core;
+namespace Bzfw\Di;
 
 interface DiServiceInterface
 {

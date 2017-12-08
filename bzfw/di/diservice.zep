@@ -1,5 +1,4 @@
-namespace Bzfw\Core;
-
+namespace Bzfw\Di;
 
 class DiService implements DiServiceInterface
 {
