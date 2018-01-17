@@ -1,6 +1,6 @@
 #api_js_sdk
 
-## 项目依赖
+## SDK依赖
 
 ```
 npm install axios -S
@@ -37,4 +37,3 @@ require(['DiggmeSdk'],function(sdk){
     var client = new DiggmeSdk(appKey,appServerUrl);
 </script>
 ```
->>>>>>> init project
